@@ -11,4 +11,6 @@ int main() {
 
 	//JetonFaune j(Faune::saumon);
 	//cout << j;
+
+	// Test des cartes
 }
