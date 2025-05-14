@@ -89,12 +89,12 @@ Direction coteTangent(const Position& a, const Position& b)
 
 std::vector<Position> Position::getVecteurPositionsAdjacentes() const {
 	return {
-		Position(q + 1, r, s - 1),    // Nord-Est, côté 0
-		Position(q + 1, r - 1, s),    // Est, côté 1
-		Position(q, r - 1, s + 1),    // Sud-Est, côté 2
-		Position(q - 1, r, s + 1),    // Sud-Ouest, côté 3
-		Position(q - 1, r + 1, s),    // Ouest, côté 4
-		Position(q, r + 1, s - 1),    // Nord-Ouest, côté 5 			
+		Position(q + 1, r - 1, s),
+		Position(q + 1, r, s - 1),   
+		Position(q, r + 1, s - 1),
+		Position(q - 1, r + 1, s),
+		Position(q - 1, r, s + 1),
+		Position(q, r - 1, s + 1)		
 	};
 }
 
