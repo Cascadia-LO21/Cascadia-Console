@@ -1,0 +1,299 @@
+{
+    "tuiles_depart": [
+        {
+            "id": 1,
+            "triplet": [
+                {
+                    "tuile": {
+                        "id": 13,
+                        "habitats": [
+                            "montagne",
+                            "montagne",
+                            "montagne",
+                            "montagne",
+                            "montagne",
+                            "montagne"
+                        ],
+                        "faunes": [
+                            "ours"
+                        ],
+                        "donneJetonNature": true
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 17,
+                        "habitats": [
+                            "forêt",
+                            "marais",
+                            "marais",
+                            "marais",
+                            "forêt",
+                            "forêt"
+                        ],
+                        "faunes": [
+                            "buse",
+                            "wapiti",
+                            "renard"
+                        ],
+                        "donneJetonNature": false
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 18,
+                        "habitats": [
+                            "fleuve",
+                            "fleuve",
+                            "prairie",
+                            "prairie",
+                            "prairie",
+                            "fleuve"
+                        ],
+                        "faunes": [
+                            "saumon",
+                            "ours"
+                        ],
+                        "donneJetonNature": false
+                    }
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "triplet": [
+                {
+                    "tuile": {
+                        "id": 33,
+                        "habitats": [
+                            "marais",
+                            "marais",
+                            "marais",
+                            "marais",
+                            "marais",
+                            "marais"
+                        ],
+                        "faunes": [
+                            "buse"
+                        ],
+                        "donneJetonNature": true
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 37,
+                        "habitats": [
+                            "fleuve",
+                            "forêt",
+                            "forêt",
+                            "forêt",
+                            "fleuve",
+                            "fleuve"
+                        ],
+                        "faunes": [
+                            "saumon",
+                            "wapiti",
+                            "buse"
+                        ],
+                        "donneJetonNature": false
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 38,
+                        "habitats": [
+                            "prairie",
+                            "prairie",
+                            "montagne",
+                            "montagne",
+                            "montagne",
+                            "prairie"
+                        ],
+                        "faunes": [
+                            "ours",
+                            "renard"
+                        ],
+                        "donneJetonNature": false
+                    }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "triplet": [
+                {
+                    "tuile": {
+                        "id": 53,
+                        "habitats": [
+                            "prairie",
+                            "prairie",
+                            "prairie",
+                            "prairie",
+                            "prairie",
+                            "prairie"
+                        ],
+                        "faunes": [
+                            "renard"
+                        ],
+                        "donneJetonNature": true
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 57,
+                        "habitats": [
+                            "marais",
+                            "fleuve",
+                            "fleuve",
+                            "fleuve",
+                            "marais",
+                            "marais"
+                        ],
+                        "faunes": [
+                            "saumon",
+                            "buse",
+                            "renard"
+                        ],
+                        "donneJetonNature": false
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 58,
+                        "habitats": [
+                            "forêt",
+                            "forêt",
+                            "montagne",
+                            "montagne",
+                            "montagne",
+                            "forêt"
+                        ],
+                        "faunes": [
+                            "ours",
+                            "wapiti"
+                        ],
+                        "donneJetonNature": false
+                    }
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "triplet": [
+                {
+                    "tuile": {
+                        "id": 73,
+                        "habitats": [
+                            "fleuve",
+                            "fleuve",
+                            "fleuve",
+                            "fleuve",
+                            "fleuve",
+                            "fleuve"
+                        ],
+                        "faunes": [
+                            "saumon"
+                        ],
+                        "donneJetonNature": true
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 77,
+                        "habitats": [
+                            "prairie",
+                            "forêt",
+                            "forêt",
+                            "forêt",
+                            "prairie",
+                            "prairie"
+                        ],
+                        "faunes": [
+                            "saumon",
+                            "wapiti",
+                            "ours"
+                        ],
+                        "donneJetonNature": false
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 78,
+                        "habitats": [
+                            "montagne",
+                            "montagne",
+                            "marais",
+                            "marais",
+                            "marais",
+                            "montagne"
+                        ],
+                        "faunes": [
+                            "renard",
+                            "buse"
+                        ],
+                        "donneJetonNature": false
+                    }
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "triplet": [
+                {
+                    "tuile": {
+                        "id": 93,
+                        "habitats": [
+                            "forêt",
+                            "forêt",
+                            "forêt",
+                            "forêt",
+                            "forêt",
+                            "forêt"
+                        ],
+                        "faunes": [
+                            "wapiti"
+                        ],
+                        "donneJetonNature": true
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 97,
+                        "habitats": [
+                            "montagne",
+                            "fleuve",
+                            "fleuve",
+                            "fleuve",
+                            "montagne",
+                            "montagne"
+                        ],
+                        "faunes": [
+                            "buse",
+                            "wapiti",
+                            "ours"
+                        ],
+                        "donneJetonNature": false
+                    }
+                },
+                {
+                    "tuile": {
+                        "id": 98,
+                        "habitats": [
+                            "marais",
+                            "marais",
+                            "prairie",
+                            "prairie",
+                            "prairie",
+                            "marais"
+                        ],
+                        "faunes": [
+                            "renard",
+                            "saumon"
+                        ],
+                        "donneJetonNature": false
+                    }
+                }
+            ]
+        }
+    ]
+}
