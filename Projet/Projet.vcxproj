@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(projet/include)include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,11 +129,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cascadia.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\carte_marquage.cpp" />
+    <ClCompile Include="src\enums.cpp" />
+    <ClCompile Include="src\env_joueur.cpp" />
+    <ClCompile Include="src\gestion_pieces.cpp" />
+    <ClCompile Include="src\jeton_faune.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\partie.cpp" />
+    <ClCompile Include="src\pioche.cpp" />
+    <ClCompile Include="src\position.cpp" />
+    <ClCompile Include="src\tuile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cascadia.h" />
+    <ClInclude Include="include\carte_marquage.h" />
+    <ClInclude Include="include\enums.h" />
+    <ClInclude Include="include\env_joueur.h" />
+    <ClInclude Include="include\gestion_pieces.h" />
+    <ClInclude Include="include\jeton_faune.h" />
+    <ClInclude Include="include\json.hpp" />
+    <ClInclude Include="include\partie.h" />
+    <ClInclude Include="include\pioche.h" />
+    <ClInclude Include="include\position.h" />
+    <ClInclude Include="include\tuile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
