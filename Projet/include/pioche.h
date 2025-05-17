@@ -18,41 +18,10 @@
 class Pioche {
 private:
 	std::array<std::pair<Tuile, JetonFaune>, 4> pioche;
-	// Privation du constructeur
+	
 public:
 
-	// setterPair à indice specifique
-	void setPair(size_t indice, const Tuile& tuile, const JetonFaune& jeton) {
-		if (indice < 4) {
-			pioche[indice] = std::make_pair(tuile, jeton);
-		}
-		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
-	}
-
-	// getterPair à indice specifique
-	std::pair<Tuile, JetonFaune> getPair(size_t indice) const {
-		if (indice < 4) {
-			return pioche[indice];
-		}
-		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
-	}
-
-	// verification si pioche contient au moins un type de JetonFaune de cardinalité == nombre fois
-	// fauneCount les faunes indice dans l'ordre de Enum Class
-	bool contientJetonIdentique(int nombre) const;
-
-	int retourneIndiceFaune(Faune type) const;
-
-	bool estTroisIdentique() const;
-
-	bool estQuatreIdentique() const;
-
-	void retirerPaire(size_t indice);
-
-	Tuile& nouvelleTuile();
-	JetonFaune& nouveauJetonFaune();
-
-
+	Pioche();
 
 	/// FONCTIONS DANS LE DOC SUITE A LA REU_4, à harmoniser avec celles deja deinies ci-haut ///
 	void resetAllJetonFaune();

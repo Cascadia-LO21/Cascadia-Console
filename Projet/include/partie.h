@@ -11,8 +11,9 @@
 
 class Partie {
 private:
+    static constexpr int MAX_NB_TOURS = 20; // valeur par défaut officielle
+    static constexpr int MAX_NB_JOUEURS = 4;
     int nbJoueurs;
-    int nbTours;
     std::vector<EnvJoueur> joueurs;
     int joueurCourant;
     bool pause;
@@ -21,18 +22,30 @@ private:
     Variante variante;
     std::optional<std::vector<int>> gagnant; // pour gerer les cas d'égalité
 
-    void initialiserPioche();
+    void initialiserPioche(); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
 
 public:
 
-    Partie();
+    // TODO : reviser le constructeur pour repondre au cosntructeur de Pioche si elle a besoin de param
+    // La pioche est initialisée en même temps que Partie.
+    // Mais le vecteur de joeur est vide encore.
+    Partie(int nombreJoueurs = 1) :
+        nbJoueurs(nombreJoueurs), joueurs(), joueurCourant(0), pause(false),
+        pioche(std::make_unique<Pioche>()),
+        marquage(Marquage::A), variante(Variante::standard) {}
 
     // Configuration partie
-    void setNbTours(int i = 20);
-    void setNbJoueurs(int i = 2);
+    void setNbJoueurs(int i = 1) {
+        if (i >= 1 && i <= MAX_NB_JOUEURS) 
+            nbJoueurs = i;
+        else 
+            throw std::out_of_range("Le nombre de joueurs va de 1 à " + std::to_string(MAX_NB_JOUEURS));
+    }
+
     void ajouterJoueur(const EnvJoueur& joueur);
-    void setMarquage(bool aleatoire = false);
-    void setVariante(bool aleatoire = false);
+    void ajouterJoueur(const std::string& nom);
+    void setMarquage(Marquage m = Marquage::A) { marquage = m; }
+    void setVariante(Variante v = Variante::standard) { variante = v; }
 
     // Accès aux données
     int getNbJoueurs() const;
@@ -51,7 +64,7 @@ public:
 
     // Logique jeu
     void jouer();
-    bool verifierFinPartie() const;
+    bool verifierFinPartie() const; //d'apres les regles du jeu, c'est quand la pile des tuiles est vide
     std::vector<int> calculerGagnant() const;
 
     void afficherScores() const;
