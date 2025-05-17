@@ -52,5 +52,3 @@ namespace GestionPieces {
 }
 
 void testGestionTuiles();
-
-void testGestionTuiles2();
