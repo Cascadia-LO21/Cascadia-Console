@@ -19,10 +19,9 @@ int main() {
 	
 	//testClassePosition();
 
-	testClasseTuile();
+	//testClasseTuile();
 
 	//JetonFaune j(Faune::saumon);
 	//cout << j;
 
-	// Test des cartes
 }

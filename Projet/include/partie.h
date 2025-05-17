@@ -34,7 +34,7 @@ public:
         pioche(std::make_unique<Pioche>()),
         marquage(Marquage::A), variante(Variante::standard) {}
 
-    // Configuration partie
+ 
     void setNbJoueurs(int i = 1) {
         if (i >= 1 && i <= MAX_NB_JOUEURS) 
             nbJoueurs = i;
@@ -47,20 +47,24 @@ public:
     void setMarquage(Marquage m = Marquage::A) { marquage = m; }
     void setVariante(Variante v = Variante::standard) { variante = v; }
 
-    // Accès aux données
-    int getNbJoueurs() const;
-    int getNbTours() const;
-    const EnvJoueur& getJoueurCourant() const;
-    Marquage getMarquage() const;
-    Variante getVariante() const;
-    const Pioche& getPioche() const;
+  
+    int getNbJoueurs() const { return nbJoueurs; }
+    int getNbTours() const { return MAX_NB_TOURS; }
+    int getIndexJoueurCourant() const{ return joueurCourant; }
+    const EnvJoueur& getEnvJoueurCourant() const { return joueurs.at(joueurCourant); }
+    const std::vector<EnvJoueur>& getJoueurs() const { return joueurs; }
+    void afficheJoueurs() const;
+    Marquage getMarquage() const { return marquage; }
+    Variante getVariante() const { return variante; }
+    const Pioche& getPioche() const { return *pioche; }
+    void affichePioche() const;
 
     // Contrôle flux jeu
     void demarrer();
     void passerTour();
     void pause();
     void reprendre();
-    void reset();
+    void reset(); 
 
     // Logique jeu
     void jouer();

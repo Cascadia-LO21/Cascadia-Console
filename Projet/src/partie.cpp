@@ -23,3 +23,15 @@ void Partie::ajouterJoueur(const std::string& nom) {
     }
     joueurs.emplace_back(nom); // creation et ajout d'un EnvJoueur
 }
+
+void Partie::afficheJoueurs() const {
+    if (joueurs.empty())
+        throw std::runtime_error("Aucun joueur encore.");
+    for (const auto& j : joueurs)
+        std::cout << j << std::endl;
+}
+
+void Partie::affichePioche() const {
+    if (pioche) std::cout << *pioche;
+    else std::cout << "La pioche est à créer.";
+}

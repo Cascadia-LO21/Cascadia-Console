@@ -18,3 +18,5 @@ class EnvJoueur {
 public:
 	
 };
+
+std::ostream& operator<<(std::ostream& os, const EnvJoueur& e);
