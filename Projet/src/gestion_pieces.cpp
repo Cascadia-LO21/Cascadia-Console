@@ -181,11 +181,11 @@ void testGestionTuiles() {
 		//    cout << tuile << endl;
 		//}
 	}
-	catch (const runtime_error& e) {
-		cerr << "Error: " << e.what() << endl;
+	catch (const std::runtime_error& e) {
+		std::cerr << "Error: " << e.what() << std::endl;
 	}
-	catch (const exception& e) {
-		cerr << "Unexpected error: " << e.what() << endl;
+	catch (const std::exception& e) {
+		std::cerr << "Unexpected error: " << e.what() << std::endl;
 	}
 }
 
