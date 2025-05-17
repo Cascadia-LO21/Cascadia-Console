@@ -61,9 +61,9 @@ public:
 
     // Contrôle flux jeu
     void demarrer();
-    void passerTour();
-    void pause();
-    void reprendre();
+    void passerTour() { joueurCourant = (joueurCourant + 1) % nbJoueurs; }
+    void pause() { if (!pause) pause = true; }
+    void reprendre() { if (pause) pause = false; }
     void reset(); 
 
     // Logique jeu
