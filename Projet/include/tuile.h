@@ -33,8 +33,6 @@ public:
 			throw std::invalid_argument("Une tuile doit avoir entre 1 et 3 faunes.");
 	}
 
-	///TODO ? un constructeur specifique pour extraire JSON?
-
 	const std::array<Habitat, 6>& getHabitats() const { return habitats; }
 	const std::vector<Faune>& getFaunes() const { return faunes; }
 	bool getDonneJetonNature() const { return donneJetonNature; }
