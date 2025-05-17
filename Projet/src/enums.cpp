@@ -47,6 +47,48 @@ bool stringToBool(const std::string& str) {
 	return str == "true";
 }
 
+Marquage stringToMarquage(const std::string& s) {
+	if (s == "A" || s == "a")	return Marquage::A;
+	if (s == "B" || s == "b")	return Marquage::B;
+	if (s == "C" || s == "c")	return Marquage::C;
+	if (s == "D" || s == "d")	return Marquage::D;
+	if (s == "famille")			return Marquage::famille;
+	if (s == "intermediaire")	return Marquage::intermediaire;
+	throw std::invalid_argument("Marquage inconnu: " + s);
+}
+
+Variante stringToVariante(const std::string& s) {
+	if (s == "standard")	return Variante::standard;
+	if (s == "famille")		return Variante::famille;
+	if (s == "intermediaire")	return Variante::intermediaire;
+	throw std::invalid_argument("Variante inconnue : " + s);
+}
+
+std::string marquageToString(Marquage m) {
+	switch (m)
+	{
+	case Marquage::A:	return "A";
+	case Marquage::B:	return "B";
+	case Marquage::C:	return "C";
+	case Marquage::D:	return "D";
+	case Marquage::famille: return "famille";
+	case Marquage::intermediaire: return "intermediaire";
+	default:			
+			return "A";
+	}
+}
+
+std::string varianteToString(Variante v){
+	switch (v)
+	{
+	case Variante::standard:		return "standard";
+	case Variante::famille:			return "famille";
+	case Variante::intermediaire:	return "intermediaire";
+	default:
+		return "standar";
+	}
+}
+
 std::string directionToString(Direction dir) {
 	switch (dir) {
 	case Direction::Est:       return "Est";
