@@ -18,7 +18,7 @@ namespace GestionPieces {
 	std::vector<Tuile> instancierTuiles(const std::string& fichier = "json/tuiles_non_reperes.json");
 
 	// Instancie les tuiles de départ à partir d'un fichier JSON
-	std::vector<std::tuple<Tuile, Tuile, Tuile>> instancierTuilesDepart(const std::string& fichier = "json/tuiles_depart.json");
+	std::vector<std::vector<Tuile>> instancierTuilesDepart(const std::string& fichier = "json/tuiles_depart.json");
 
 	// Instancie tous les jetons faune 
 	std::vector<JetonFaune> instancierJetonsFaunes();

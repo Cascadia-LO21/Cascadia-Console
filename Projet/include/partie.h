@@ -8,12 +8,14 @@
 #include "enums.h"
 #include "env_joueur.h"
 #include "pioche.h"
+#include "gestion_pieces.h"
 
 class Partie {
 private:
     static constexpr int MAX_NB_TOURS = 20; // valeur par défaut officielle
     static constexpr int MAX_NB_JOUEURS = 4;
     int nbJoueurs;
+    int compteurTour;
     std::vector<EnvJoueur> joueurs;
     int joueurCourant;
     bool pause;
@@ -21,6 +23,7 @@ private:
     Marquage marquage;
     Variante variante;
     std::optional<std::vector<int>> gagnant; // pour gerer les cas d'égalité
+    std::optional<std::vector<int>> scores;
 
     void initialiserPioche(); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
 
@@ -30,7 +33,7 @@ public:
     // La pioche est initialisée en même temps que Partie.
     // Mais le vecteur de joeur est vide encore.
     Partie(int nombreJoueurs = 1) :
-        nbJoueurs(nombreJoueurs), joueurs(), joueurCourant(0), pause(false),
+        nbJoueurs(nombreJoueurs), compteurTour(0), joueurs(), joueurCourant(0), pause(false),
         pioche(std::make_unique<Pioche>()),
         marquage(Marquage::A), variante(Variante::standard) {}
 
@@ -59,20 +62,20 @@ public:
     const Pioche& getPioche() const { return *pioche; }
     void affichePioche() const;
 
-    // Contrôle flux jeu
-    void demarrer();
-    void passerTour() { joueurCourant = (joueurCourant + 1) % nbJoueurs; }
+
+    void lancer();
+    void prochainJoueur() { joueurCourant = (joueurCourant + 1) % nbJoueurs; }
     void pause() { if (!pause) pause = true; }
     void reprendre() { if (pause) pause = false; }
     void reset(); 
 
-    // Logique jeu
-    void jouer();
-    bool verifierFinPartie() const; //d'apres les regles du jeu, c'est quand la pile des tuiles est vide
-    std::vector<int> calculerGagnant() const;
 
+    void jouerTour(); // un tour fait jouer tous les joueurs
+    bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
+    void calculerScores();
     void afficherScores() const;
-
+    void calculerGagnant();
+    void afficherGagnant() const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Partie& partie);

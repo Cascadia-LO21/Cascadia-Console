@@ -18,6 +18,7 @@
 class Pioche {
 private:
 	std::array<std::pair<Tuile, JetonFaune>, 4> pioche;
+	std::stack<Tuile> tuilesDispo;
 	
 public:
 
@@ -44,6 +45,8 @@ public:
 	void remplacerJetons(int except = -1);
 	void rafraichirPioche();
 
+	int nbTuilesDispo() const { return tuilesDispo.size(); }
+	void setTuilesDispo(std::vector<Tuile>, int n);
 };
 
 std::ostream& operator<<(std::ostream& os, const Pioche& p);

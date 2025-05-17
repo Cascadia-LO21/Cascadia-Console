@@ -13,10 +13,13 @@
 class EnvJoueur {
 	std::string pseudo;
 	size_t nbJetonNature;
-	size_t scoreFinal;
+	size_t score;
 
 public:
-	
+	int getScore() const { return score; }
+	void calculScore();
+	const std::string& getPseudo() const { return pseudo; }
+	void setTuileDepart(std::vector<Tuile>);
 };
 
 std::ostream& operator<<(std::ostream& os, const EnvJoueur& e);
