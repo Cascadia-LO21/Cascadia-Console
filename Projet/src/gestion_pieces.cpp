@@ -31,24 +31,18 @@ std::vector<Tuile> GestionPieces::instancierTuiles(const std::string& fichier)
 			habitats[i] = stringToHabitat(habitat.get<std::string>());
 			i++;
 		}
-
 		if (i != 6 || i > habitats.size())
 			throw std::runtime_error("Une tuile doit possède exactement 6 habitats !");
-
 		// Extraction des faunes
 		std::vector<Faune> faunes;
 		for (auto faune : tuile["faunes"]) {
 			faunes.push_back(stringToFaune(faune.get<std::string>()));
 		}
-
 		bool donneJetonNature = tuile.value("donneJetonNature", false);
-
 		// Construction d'une Tuile directement dans le conteneur tuiles
 		tuiles.emplace_back(habitats, faunes, donneJetonNature);
 	}
-
 	return tuiles;
-
 }
 
 std::vector<std::vector<Tuile>> GestionPieces::instancierTuilesDepart(const std::string& fichier) {
@@ -193,7 +187,6 @@ void GestionPieces::adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const
     }
 }
 
-
 std::stack<Tuile> GestionPieces::vectorToStack(const std::vector<Tuile>& tuiles)
 {
     std::stack<Tuile> pile;
@@ -245,34 +238,30 @@ std::vector<Tuile> GestionPieces::piocherTuileDepart(std::vector<std::vector<Tui
 
 void testGestionTuiles()
 {
-	try {
-		// Instancier les tuiles à partir du fichier JSON
-        std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
-        //std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_non_reperes.json");
+    // instancier respectivement les pièces du jeu
+    std::vector<Tuile> tuiles_reperes = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
+    std::vector<Tuile> tuiles_non_reperes = GestionPieces::instancierTuiles("json/tuiles_non_reperes.json");
+    std::vector<std::vector<Tuile>> ensemble_tuiles_depart = GestionPieces::instancierTuilesDepart("json/tuiles_depart.json");
+    std::vector<JetonFaune> ensemble_jetons_faune = GestionPieces::instancierJetonsFaunes();
+    // regroupement
+    std::vector<Tuile> ensemble_tuiles = GestionPieces::fusionnerVecteursTuiles(tuiles_reperes, tuiles_non_reperes);
+    // melanger
+    GestionPieces::melangerTuiles(ensemble_tuiles);
+    std::cout << "Tuiles melangees." << std::endl;
+    GestionPieces::melangerJetons(ensemble_jetons_faune);
+    std::cout << "Jetons melanges." << std::endl;
+    GestionPieces::melangerTuilesDepart(ensemble_tuiles_depart);
+    std::cout << "Tuiles de depart melangees." << std::endl;
+    // conversion (en pile) + adaptation de taille
+    GestionPieces::adapterTailleVecteurTuiles(ensemble_tuiles, 2);
+    std::cout << "Taille des tuiles adaptee : " << ensemble_tuiles.size() << std::endl;
+    std::stack<Tuile> pile_tuiles = GestionPieces::vectorToStack(ensemble_tuiles);
+    std::cout << "Pile de tuiles creee avec " << pile_tuiles.size() << " tuiles." << std::endl;
 
-		// Afficher chaque tuile
-		for (const auto& tuile : tuiles) {
-			std::cout << tuile << std::endl; // Assurez-vous que l'opérateur << est surchargé pour Tuile
-		}
-	}
-	catch (const std::exception& e) {
-		std::cerr << "Erreur : " << e.what() << std::endl;
-	}
-
-
-    try {
-        // Instancier les tuiles à partir du fichier JSON
-        std::vector<std::vector<Tuile>> triplets = GestionPieces::instancierTuilesDepart("json/tuiles_depart.json");
-
-        // Afficher chaque triplet de tuiles
-        for (const auto& tuiles : triplets) {
-            for (const auto& tuile : tuiles) {
-                std::cout << tuile << std::endl; // Assurez-vous que l'opérateur << est surchargé pour Tuile
-            }
-            std::cout << "-----" << std::endl; // Séparateur pour chaque triplet
-        }
-    }
-    catch (const std::exception& e) {
-        std::cerr << "Erreur : " << e.what() << std::endl;
+    if (!pile_tuiles.empty()) {
+        std::cout << "Taille de la pile avant tirage : " << pile_tuiles.size() << std::endl;
+        auto tuile_piochee = GestionPieces::piocherTuile(pile_tuiles);
+        std::cout << tuile_piochee << std::endl;
+        std::cout << "Taille de la pile apres tirage : " << pile_tuiles.size() << std::endl;
     }
 }
