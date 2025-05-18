@@ -51,9 +51,74 @@ std::vector<Tuile> GestionPieces::instancierTuiles(const std::string& fichier)
 
 }
 
-std::vector<std::tuple<Tuile, Tuile, Tuile>> GestionPieces::instancierTuilesDepart(const std::string& fichier)
-{
-	return std::vector<std::tuple<Tuile, Tuile, Tuile>>();
+std::vector<std::vector<Tuile>> GestionPieces::instancierTuilesDepart(const std::string& fichier) {
+    std::ifstream file(fichier);
+    if (!file.is_open()) {
+        throw std::runtime_error("Impossible d'ouvrir le fichier JSON.");
+    }
+
+    json root;
+    file >> root;
+
+    // Check if the root has the expected structure
+    if (!root.contains("tuiles_depart") || !root["tuiles_depart"].is_array()) {
+        throw std::runtime_error("Format JSON incorrect : 'tuiles_depart' manquant ou non un tableau.");
+    }
+
+    std::vector<std::vector<Tuile>> ensembleTripletsDepart;
+
+    for (const auto& triplet : root["tuiles_depart"]) {
+        if (!triplet.contains("triplet") || !triplet["triplet"].is_array()) {
+            throw std::runtime_error("Format JSON incorrect : 'triplet' manquant ou non un tableau.");
+        }
+
+        std::vector<Tuile> tuiles;
+
+        for (const auto& tuile : triplet["triplet"]) {
+            if (!tuile.contains("tuile") || !tuile["tuile"].is_object()) {
+                throw std::runtime_error("Format JSON incorrect : 'tuile' manquant ou non un objet.");
+            }
+
+            const auto& donnee = tuile["tuile"];
+
+            std::array<Habitat, 6> habitats;
+            size_t i = 0;
+            if (donnee.contains("habitats") && donnee["habitats"].is_array()) {
+                for (const auto& habitat : donnee["habitats"]) {
+                    if (i < habitats.size()) {
+                        habitats[i] = stringToHabitat(habitat.get<std::string>());
+                        i++;
+                    }
+                    else {
+                        throw std::runtime_error("Trop d'habitats dans 'tuile'.");
+                    }
+                }
+            }
+            else {
+                throw std::runtime_error("Format JSON incorrect : 'habitats' manquant ou non un tableau.");
+            }
+
+            std::vector<Faune> faunes;
+            if (donnee.contains("faunes") && donnee["faunes"].is_array()) {
+                for (const auto& faune : donnee["faunes"]) {
+                    faunes.push_back(stringToFaune(faune.get<std::string>()));
+                }
+            }
+            else {
+                throw std::runtime_error("Format JSON incorrect : 'faunes' manquant ou non un tableau.");
+            }
+
+            bool donneJetonNature = donnee.value("donneJetonNature", false);
+
+            // Directly construct Tuile with parameters
+            tuiles.emplace_back(habitats, faunes, donneJetonNature);
+        }
+
+        // Add the filled vector of Tuiles to ensembleTripletsDepart
+        ensembleTripletsDepart.push_back(std::move(tuiles)); // Move to avoid copying
+    }
+
+    return ensembleTripletsDepart;
 }
 
 std::vector<JetonFaune> GestionPieces::instancierJetonsFaunes()
@@ -106,7 +171,8 @@ void testGestionTuiles()
 {
 	try {
 		// Instancier les tuiles à partir du fichier JSON
-		std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
+        std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
+        std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_non_reperes.json");
 
 		// Afficher chaque tuile
 		for (const auto& tuile : tuiles) {
@@ -116,4 +182,21 @@ void testGestionTuiles()
 	catch (const std::exception& e) {
 		std::cerr << "Erreur : " << e.what() << std::endl;
 	}
+
+
+    try {
+        // Instancier les tuiles à partir du fichier JSON
+        std::vector<std::vector<Tuile>> triplets = GestionPieces::instancierTuilesDepart("json/tuiles_depart.json");
+
+        // Afficher chaque triplet de tuiles
+        for (const auto& tuiles : triplets) {
+            for (const auto& tuile : tuiles) {
+                std::cout << tuile << std::endl; // Assurez-vous que l'opérateur << est surchargé pour Tuile
+            }
+            std::cout << "-----" << std::endl; // Séparateur pour chaque triplet
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Erreur : " << e.what() << std::endl;
+    }
 }
