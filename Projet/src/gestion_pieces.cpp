@@ -163,37 +163,63 @@ void GestionPieces::melangerTuilesDepart(std::vector<std::vector<Tuile>>& tuiles
 
 std::vector<Tuile> GestionPieces::fusionnerVecteursTuiles(const std::vector<Tuile>& v1, const std::vector<Tuile>& v2)
 {
-	return std::vector<Tuile>();
+    std::vector<Tuile> resultat;
+    resultat.reserve(v1.size() + v2.size());
+    resultat.insert(resultat.end(), v1.begin(), v1.end());
+    resultat.insert(resultat.end(), v2.begin(), v2.end());
+    return resultat;
 }
+
 
 std::stack<Tuile> GestionPieces::vectorToStack(const std::vector<Tuile>& tuiles)
 {
-	return std::stack<Tuile>();
+    std::stack<Tuile> pile;
+    for (const auto& tuile : tuiles) {
+        pile.push(tuile);
+    }
+    return pile;
 }
 
-//Tuile GestionPieces::piocherTuile(std::stack<Tuile>& pile)
-//{
-//	return Tuile();
-//}
-//
-//void GestionPieces::remettreTuile(std::stack<Tuile>& pile, const Tuile& tuile)
-//{
-//}
-//
-//JetonFaune GestionPieces::piocherJeton(std::vector<JetonFaune>& jetons)
-//{
-//	return JetonFaune();
-//}
-//
-//void GestionPieces::remettreJeton(std::vector<JetonFaune>& jetons, const JetonFaune& jeton)
-//{
-//}
-//
-//std::tuple<Tuile, Tuile, Tuile> GestionPieces::piocherTuileDepart(std::vector<std::tuple<Tuile, Tuile, Tuile>>& tuilesDepart)
-//{
-//	return std::tuple<Tuile, Tuile, Tuile>();
-//}
-//
+Tuile GestionPieces::piocherTuile(std::stack<Tuile>& pile)
+{
+    if (pile.empty()) {
+        throw std::out_of_range("La pile est vide, aucune tuile à piocher.");
+    }
+    Tuile tuile = pile.top();
+    pile.pop();
+    return tuile;
+}
+
+void GestionPieces::remettreTuile(std::stack<Tuile>& pile, const Tuile& tuile)
+{
+    pile.push(tuile);
+}
+
+JetonFaune GestionPieces::piocherJeton(std::vector<JetonFaune>& jetons)
+{
+    if (jetons.empty()) {
+        throw std::out_of_range("Le vecteur de jetons faune est vide, aucun jeton à piocher.");
+    }
+    JetonFaune jeton = jetons.back();
+    jetons.pop_back();
+    return jeton;
+}
+
+void GestionPieces::remettreJeton(std::vector<JetonFaune>& jetons, const JetonFaune& jeton)
+{
+    jetons.push_back(jeton);
+}
+
+std::vector<Tuile> GestionPieces::piocherTuileDepart(std::vector<std::vector<Tuile>>& tuilesDepart)
+{
+    if (tuilesDepart.empty()) {
+        throw std::out_of_range("Il n'y a pas de triplet de tuiles de départ.");
+    }
+    std::vector<Tuile> dernierTriplet = tuilesDepart.back();
+    tuilesDepart.pop_back();
+    return dernierTriplet;
+}
+
 void testGestionTuiles()
 {
 	try {

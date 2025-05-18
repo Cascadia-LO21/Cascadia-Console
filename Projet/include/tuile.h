@@ -18,7 +18,6 @@ class Tuile {
 	bool placementConfirme;
 
 public:
-
 	//constructeur principal
 	Tuile(const std::array<Habitat, 6>& habitats,
 		const std::vector<Faune>& faunes,
@@ -34,6 +33,27 @@ public:
 	}
 
 	///TODO ? un constructeur specifique pour extraire JSON?
+	// constructeur par copie
+	Tuile(const Tuile& other)
+		: habitats(other.habitats),
+		faunes(other.faunes),
+		donneJetonNature(other.donneJetonNature),
+		faunePlace(other.faunePlace),
+		position(other.position ? std::make_unique<Position>(*other.position) : nullptr),
+		placementConfirme(other.placementConfirme) {
+	}
+	// affectation par la surcharge de l'operateur
+	Tuile& operator=(const Tuile& other) {
+		if (this != &other) { 
+			habitats = other.habitats;
+			faunes = other.faunes;
+			donneJetonNature = other.donneJetonNature;
+			faunePlace = other.faunePlace;
+			position = other.position ? std::make_unique<Position>(*other.position) : nullptr;
+			placementConfirme = other.placementConfirme;
+		}
+		return *this;
+	}
 
 	const std::array<Habitat, 6>& getHabitats() const { return habitats; }
 	const std::vector<Faune>& getFaunes() const { return faunes; }

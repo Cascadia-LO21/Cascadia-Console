@@ -55,7 +55,7 @@ namespace GestionPieces {
 	void remettreJeton(std::vector<JetonFaune>& jetons, const JetonFaune& jeton);
 
 	// Pioche un triplet de tuiles de départ (par exemple, retire le premier du vector)
-	std::tuple<Tuile, Tuile, Tuile> piocherTuileDepart(std::vector<std::tuple<Tuile, Tuile, Tuile>>& tuilesDepart);
+	std::vector<Tuile> piocherTuileDepart(std::vector<std::vector<Tuile>>& tuilesDepart);
 }
 
 void testGestionTuiles();
