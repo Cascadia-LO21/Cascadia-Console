@@ -32,14 +32,16 @@ std::vector<Tuile> GestionPieces::instancierTuiles(const std::string& fichier)
 			i++;
 		}
 		if (i != 6 || i > habitats.size())
-			throw std::runtime_error("Une tuile doit possède exactement 6 habitats !");
-		// Extraction des faunes
+			throw std::runtime_error("Une tuile doit possï¿½de exactement 6 habitats !");
+		
+        // Extraction des faunes
 		std::vector<Faune> faunes;
 		for (auto faune : tuile["faunes"]) {
 			faunes.push_back(stringToFaune(faune.get<std::string>()));
 		}
 		bool donneJetonNature = tuile.value("donneJetonNature", false);
-		// Construction d'une Tuile directement dans le conteneur tuiles
+		
+        // Construction d'une Tuile directement dans le conteneur tuiles
 		tuiles.emplace_back(habitats, faunes, donneJetonNature);
 	}
 	return tuiles;
@@ -114,18 +116,19 @@ std::vector<std::vector<Tuile>> GestionPieces::instancierTuilesDepart(const std:
 std::vector<JetonFaune> GestionPieces::instancierJetonsFaunes()
 {
     std::vector<JetonFaune> jetonsFaune;
-    std::vector<Faune> FauneTypes = { Faune::saumon, Faune::ours, Faune::buse, Faune::renard, Faune::wapiti };
+    std::vector<Faune> fauneTypes = { Faune::saumon, Faune::ours, Faune::buse, Faune::renard, Faune::wapiti };
 
-    // Instancier 20 jetons faune pour chaque type faune
-    for (const auto& type : FauneTypes) {
+    // Instancier 20 jetons faune pour chaque type faune, d'apres les regles du jeu
+    for (auto type : fauneTypes) {
         for (int i = 0; i < 20; ++i) {
-            jetonsFaune.emplace_back(JetonFaune(type));
+            jetonsFaune.emplace_back(type); 
         }
     }
 
     return jetonsFaune;
 }
 
+// la fonction melanger peut fonctionner avec nâ€™importe quel type T, donc elle peut melanger tous les vecteurs
 template<typename T>
 void GestionPieces::melanger(std::vector<T>& items)
 {
@@ -144,9 +147,10 @@ void GestionPieces::melangerJetons(std::vector<JetonFaune>& jetons)
     melanger(jetons);
 }
 
+// melange uniquement la couche exterieure des vecteurs : l'ordre des 3 tuiles dans une tuile de dÃ©part est intact
 void GestionPieces::melangerTuilesDepart(std::vector<std::vector<Tuile>>& tuiles)
 {
-    melanger(tuiles); // melanger uniquement la couche exterieure des vecteurs
+    melanger(tuiles); 
 }
 
 std::vector<Tuile> GestionPieces::fusionnerVecteursTuiles(const std::vector<Tuile>& v1, const std::vector<Tuile>& v2)
@@ -163,6 +167,7 @@ void GestionPieces::adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const
     int tailleSouhaitee;
     switch (nombreJoueurs) {
     case 1:
+        tailleSouhaitee = 43; // prenons 43, vu que les regles officielles ne le precisent pas
     case 2:
         tailleSouhaitee = 43;
         break;
@@ -193,7 +198,7 @@ std::stack<Tuile> GestionPieces::vectorToStack(const std::vector<Tuile>& tuiles)
 Tuile GestionPieces::piocherTuile(std::stack<Tuile>& pile)
 {
     if (pile.empty()) {
-        throw std::out_of_range("La pile est vide, aucune tuile à piocher.");
+        throw std::out_of_range("La pile est vide, aucune tuile a piocher.");
     }
     Tuile tuile = pile.top();
     pile.pop();
@@ -223,7 +228,7 @@ void GestionPieces::remettreJeton(std::vector<JetonFaune>& jetons, const JetonFa
 std::vector<Tuile> GestionPieces::piocherTuileDepart(std::vector<std::vector<Tuile>>& tuilesDepart)
 {
     if (tuilesDepart.empty()) {
-        throw std::out_of_range("Il n'y a pas de triplet de tuiles de départ.");
+        throw std::out_of_range("Il n'y a pas de triplet de tuiles de dï¿½part.");
     }
     std::vector<Tuile> dernierTriplet = tuilesDepart.back();
     tuilesDepart.pop_back();
@@ -232,7 +237,7 @@ std::vector<Tuile> GestionPieces::piocherTuileDepart(std::vector<std::vector<Tui
 
 void testGestionPieces()
 {
-    // instancier respectivement les pièces du jeu
+    // instancier respectivement les piï¿½ces du jeu
     std::vector<Tuile> tuiles_reperes = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
     std::vector<Tuile> tuiles_non_reperes = GestionPieces::instancierTuiles("json/tuiles_non_reperes.json");
     std::vector<std::vector<Tuile>> ensemble_tuiles_depart = GestionPieces::instancierTuilesDepart("json/tuiles_depart.json");
