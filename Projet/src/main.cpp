@@ -20,7 +20,7 @@ int main() {
 	
 	//testClassePosition();
 
-	testClasseTuile();
+	//testClasseTuile();
 
 	testGestionTuiles();
 	//JetonFaune j(Faune::saumon);

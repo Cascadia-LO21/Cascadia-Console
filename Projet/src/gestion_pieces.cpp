@@ -106,7 +106,7 @@ void testGestionTuiles()
 {
 	try {
 		// Instancier les tuiles à partir du fichier JSON
-		std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("tuiles_non_reperes.json");
+		std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
 
 		// Afficher chaque tuile
 		for (const auto& tuile : tuiles) {
