@@ -15,7 +15,40 @@ using json = nlohmann::json;
 
 std::vector<Tuile> GestionPieces::instancierTuiles(const std::string& fichier)
 {
-	return std::vector<Tuile>();
+	std::ifstream f(fichier);
+	if (!f) throw std::runtime_error("Impossible d'ouvrir le fichier JSON : " + fichier);
+
+	std::vector <Tuile> tuiles;
+
+	json donneeJson = json::parse(f);
+
+	for (const auto& tuile : donneeJson["tuiles"]) {
+
+		// Extraction des habitats
+		std::array<Habitat, 6> habitats;
+		size_t i = 0;
+		for (auto habitat : tuile["habitats"]) {
+			habitats[i] = stringToHabitat(habitat.get<std::string>());
+			i++;
+		}
+
+		if (i != 6 || i > habitats.size())
+			throw std::runtime_error("Une tuile doit possède exactement 6 habitats !");
+
+		// Extraction des faunes
+		std::vector<Faune> faunes;
+		for (auto faune : tuile["faunes"]) {
+			faunes.push_back(stringToFaune(faune.get<std::string>()));
+		}
+
+		bool donneJetonNature = tuile.value("donneJetonNature", false);
+
+		// Construction d'une Tuile directement dans le conteneur tuiles
+		tuiles.emplace_back(habitats, faunes, donneJetonNature);
+	}
+
+	return tuiles;
+
 }
 
 std::vector<std::tuple<Tuile, Tuile, Tuile>> GestionPieces::instancierTuilesDepart(const std::string& fichier)
@@ -69,6 +102,18 @@ std::stack<Tuile> GestionPieces::vectorToStack(const std::vector<Tuile>& tuiles)
 //	return std::tuple<Tuile, Tuile, Tuile>();
 //}
 //
-//void testGestionTuiles()
-//{
-//}
+void testGestionTuiles()
+{
+	try {
+		// Instancier les tuiles à partir du fichier JSON
+		std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("tuiles_non_reperes.json");
+
+		// Afficher chaque tuile
+		for (const auto& tuile : tuiles) {
+			std::cout << tuile << std::endl; // Assurez-vous que l'opérateur << est surchargé pour Tuile
+		}
+	}
+	catch (const std::exception& e) {
+		std::cerr << "Erreur : " << e.what() << std::endl;
+	}
+}
