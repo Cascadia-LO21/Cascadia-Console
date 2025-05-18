@@ -62,4 +62,4 @@ namespace GestionPieces {
 
 }
 
-void testGestionTuiles();
+void testGestionPieces();

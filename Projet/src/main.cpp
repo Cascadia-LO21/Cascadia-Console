@@ -22,7 +22,7 @@ int main() {
 
 	//testClasseTuile();
 
-	testGestionTuiles();
+	testGestionPieces();
 	//JetonFaune j(Faune::saumon);
 	//cout << j;
 

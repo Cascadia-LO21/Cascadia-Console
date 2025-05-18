@@ -54,7 +54,6 @@ std::vector<std::vector<Tuile>> GestionPieces::instancierTuilesDepart(const std:
     json root;
     file >> root;
 
-    // Check if the root has the expected structure
     if (!root.contains("tuiles_depart") || !root["tuiles_depart"].is_array()) {
         throw std::runtime_error("Format JSON incorrect : 'tuiles_depart' manquant ou non un tableau.");
     }
@@ -103,13 +102,10 @@ std::vector<std::vector<Tuile>> GestionPieces::instancierTuilesDepart(const std:
             }
 
             bool donneJetonNature = donnee.value("donneJetonNature", false);
-
-            // Directly construct Tuile with parameters
             tuiles.emplace_back(habitats, faunes, donneJetonNature);
         }
 
-        // Add the filled vector of Tuiles to ensembleTripletsDepart
-        ensembleTripletsDepart.push_back(std::move(tuiles)); // Move to avoid copying
+        ensembleTripletsDepart.push_back(std::move(tuiles));
     }
 
     return ensembleTripletsDepart;
@@ -118,8 +114,6 @@ std::vector<std::vector<Tuile>> GestionPieces::instancierTuilesDepart(const std:
 std::vector<JetonFaune> GestionPieces::instancierJetonsFaunes()
 {
     std::vector<JetonFaune> jetonsFaune;
-
-    // 
     std::vector<Faune> FauneTypes = { Faune::saumon, Faune::ours, Faune::buse, Faune::renard, Faune::wapiti };
 
     // Instancier 20 jetons faune pour chaque type faune
@@ -214,7 +208,7 @@ void GestionPieces::remettreTuile(std::stack<Tuile>& pile, const Tuile& tuile)
 JetonFaune GestionPieces::piocherJeton(std::vector<JetonFaune>& jetons)
 {
     if (jetons.empty()) {
-        throw std::out_of_range("Le vecteur de jetons faune est vide, aucun jeton à piocher.");
+        throw std::out_of_range("Le vecteur de jetons faune est vide, aucun jeton a piocher.");
     }
     JetonFaune jeton = jetons.back();
     jetons.pop_back();
@@ -236,32 +230,73 @@ std::vector<Tuile> GestionPieces::piocherTuileDepart(std::vector<std::vector<Tui
     return dernierTriplet;
 }
 
-void testGestionTuiles()
+void testGestionPieces()
 {
     // instancier respectivement les pièces du jeu
     std::vector<Tuile> tuiles_reperes = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
     std::vector<Tuile> tuiles_non_reperes = GestionPieces::instancierTuiles("json/tuiles_non_reperes.json");
     std::vector<std::vector<Tuile>> ensemble_tuiles_depart = GestionPieces::instancierTuilesDepart("json/tuiles_depart.json");
     std::vector<JetonFaune> ensemble_jetons_faune = GestionPieces::instancierJetonsFaunes();
+
     // regroupement
     std::vector<Tuile> ensemble_tuiles = GestionPieces::fusionnerVecteursTuiles(tuiles_reperes, tuiles_non_reperes);
+
     // melanger
     GestionPieces::melangerTuiles(ensemble_tuiles);
     std::cout << "Tuiles melangees." << std::endl;
+
     GestionPieces::melangerJetons(ensemble_jetons_faune);
     std::cout << "Jetons melanges." << std::endl;
+
     GestionPieces::melangerTuilesDepart(ensemble_tuiles_depart);
     std::cout << "Tuiles de depart melangees." << std::endl;
+    std::cout << std::endl;
+
     // conversion (en pile) + adaptation de taille
     GestionPieces::adapterTailleVecteurTuiles(ensemble_tuiles, 2);
     std::cout << "Taille des tuiles adaptee : " << ensemble_tuiles.size() << std::endl;
+
     std::stack<Tuile> pile_tuiles = GestionPieces::vectorToStack(ensemble_tuiles);
     std::cout << "Pile de tuiles creee avec " << pile_tuiles.size() << " tuiles." << std::endl;
 
+    std::cout << std::endl;
+
+    // Piocher une tuile
     if (!pile_tuiles.empty()) {
         std::cout << "Taille de la pile avant tirage : " << pile_tuiles.size() << std::endl;
         auto tuile_piochee = GestionPieces::piocherTuile(pile_tuiles);
         std::cout << tuile_piochee << std::endl;
         std::cout << "Taille de la pile apres tirage : " << pile_tuiles.size() << std::endl;
+
+        // Remettre la tuile dans la pile
+        GestionPieces::remettreTuile(pile_tuiles, tuile_piochee);
+        std::cout << "Tuile remise dans la pile. Taille de la pile maintenant : " << pile_tuiles.size() << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    // Piocher un jeton
+    if (!ensemble_jetons_faune.empty()) {
+        std::cout << "Taille des jetons avant tirage : " << ensemble_jetons_faune.size() << std::endl;
+        auto jeton_pioche = GestionPieces::piocherJeton(ensemble_jetons_faune);
+        std::cout << jeton_pioche << std::endl;
+        std::cout << "Taille des jetons apres tirage : " << ensemble_jetons_faune.size() << std::endl;
+
+        // Remettre le jeton dans le vecteur
+        GestionPieces::remettreJeton(ensemble_jetons_faune, jeton_pioche);
+        std::cout << "Jeton remis dans le vecteur. Taille des jetons maintenant : " << ensemble_jetons_faune.size() << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    // Piocher un triplet de tuiles de depart
+    if (!ensemble_tuiles_depart.empty()) {
+        std::cout << "Nombre de triplets de tuiles de depart avant tirage : " << ensemble_tuiles_depart.size() << std::endl;
+        auto triplet_tuiles = GestionPieces::piocherTuileDepart(ensemble_tuiles_depart);
+        std::cout << "Triplet de tuiles pioche : " << std::endl;
+        for (const auto& tuile : triplet_tuiles) {
+            std::cout << tuile << std::endl;
+        }
+        std::cout << "Nombre de triplets de tuiles de depart apres tirage : " << ensemble_tuiles_depart.size() << std::endl;
     }
 }
