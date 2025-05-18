@@ -123,15 +123,42 @@ std::vector<std::vector<Tuile>> GestionPieces::instancierTuilesDepart(const std:
 
 std::vector<JetonFaune> GestionPieces::instancierJetonsFaunes()
 {
-	return std::vector<JetonFaune>();
+    std::vector<JetonFaune> jetonsFaune;
+
+    // 
+    std::vector<Faune> FauneTypes = { Faune::saumon, Faune::ours, Faune::buse, Faune::renard, Faune::wapiti };
+
+    // Instancier 20 jetons faune pour chaque type faune
+    for (const auto& type : FauneTypes) {
+        for (int i = 0; i < 20; ++i) {
+            jetonsFaune.emplace_back(JetonFaune(type));
+        }
+    }
+
+    return jetonsFaune;
+}
+
+template<typename T>
+void GestionPieces::melanger(std::vector<T>& items)
+{
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::shuffle(items.begin(), items.end(), eng);
 }
 
 void GestionPieces::melangerTuiles(std::vector<Tuile>& tuiles)
 {
+    melanger(tuiles);
 }
 
 void GestionPieces::melangerJetons(std::vector<JetonFaune>& jetons)
 {
+    melanger(jetons);
+}
+
+void GestionPieces::melangerTuilesDepart(std::vector<std::vector<Tuile>>& tuiles)
+{
+    melanger(tuiles); // melanger uniquement la couche exterieure des vecteurs
 }
 
 std::vector<Tuile> GestionPieces::fusionnerVecteursTuiles(const std::vector<Tuile>& v1, const std::vector<Tuile>& v2)
@@ -172,7 +199,7 @@ void testGestionTuiles()
 	try {
 		// Instancier les tuiles à partir du fichier JSON
         std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_reperes.json");
-        std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_non_reperes.json");
+        //std::vector<Tuile> tuiles = GestionPieces::instancierTuiles("json/tuiles_non_reperes.json");
 
 		// Afficher chaque tuile
 		for (const auto& tuile : tuiles) {

@@ -14,6 +14,7 @@
 
 namespace GestionPieces {
 
+
 	// Instancie toutes les tuiles à partir d'un fichier JSON
 	std::vector<Tuile> instancierTuiles(const std::string& fichier = "json/tuiles_non_reperes.json");
 
@@ -23,11 +24,17 @@ namespace GestionPieces {
 	// Instancie tous les jetons faune 
 	std::vector<JetonFaune> instancierJetonsFaunes();
 
+	template<typename T>
+	void melanger(std::vector<T>& items);
+
 	// Mélange in-place un vecteur de tuiles
 	void melangerTuiles(std::vector<Tuile>& tuiles);
 
 	// Mélange in-place un vecteur de jetons faune
 	void melangerJetons(std::vector<JetonFaune>& jetons);
+
+	// Mélange in-place un vecteur de tuiles de depart
+	void melangerTuilesDepart(std::vector<std::vector<Tuile>>& tuiles);
 
 	// Fusionne deux vecteurs de tuiles en un seul
 	std::vector<Tuile> fusionnerVecteursTuiles(const std::vector<Tuile>& v1, const std::vector<Tuile>& v2);
