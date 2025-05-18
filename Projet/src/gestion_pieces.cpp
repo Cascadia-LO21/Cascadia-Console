@@ -170,6 +170,29 @@ std::vector<Tuile> GestionPieces::fusionnerVecteursTuiles(const std::vector<Tuil
     return resultat;
 }
 
+void GestionPieces::adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const int nombreJoueurs)
+{
+    int tailleSouhaitee;
+    switch (nombreJoueurs) {
+    case 1:
+    case 2:
+        tailleSouhaitee = 43;
+        break;
+    case 3:
+        tailleSouhaitee = 63;
+        break;
+    case 4:
+        tailleSouhaitee = 83;
+        break;
+    default:
+        std::cerr << "Nombre de joueurs non valide." << std::endl;
+        return;
+    }
+    if (tuiles.size() != tailleSouhaitee) {
+        tuiles.resize(tailleSouhaitee);
+    }
+}
+
 
 std::stack<Tuile> GestionPieces::vectorToStack(const std::vector<Tuile>& tuiles)
 {

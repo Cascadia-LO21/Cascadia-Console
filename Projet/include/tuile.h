@@ -54,6 +54,12 @@ public:
 		}
 		return *this;
 	}
+	// constructeur par defaut (Debug)
+	Tuile()
+		: habitats{}, faunes{}, donneJetonNature(false),
+		faunePlace(std::nullopt), position(nullptr),
+		placementConfirme(false) {
+	}
 
 	const std::array<Habitat, 6>& getHabitats() const { return habitats; }
 	const std::vector<Faune>& getFaunes() const { return faunes; }

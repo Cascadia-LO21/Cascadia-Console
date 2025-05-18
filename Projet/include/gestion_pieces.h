@@ -39,6 +39,9 @@ namespace GestionPieces {
 	// Fusionne deux vecteurs de tuiles en un seul
 	std::vector<Tuile> fusionnerVecteursTuiles(const std::vector<Tuile>& v1, const std::vector<Tuile>& v2);
 
+	// Adapter la taille des tuiles presentes dans le jeu selon le nombre de participants
+	void adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const int nombreJoueurs);
+
 	// Convertit un vecteur de tuiles en pile (stack)
 	std::stack<Tuile> vectorToStack(const std::vector<Tuile>& tuiles);
 
@@ -56,6 +59,7 @@ namespace GestionPieces {
 
 	// Pioche un triplet de tuiles de départ (par exemple, retire le premier du vector)
 	std::vector<Tuile> piocherTuileDepart(std::vector<std::vector<Tuile>>& tuilesDepart);
+
 }
 
 void testGestionTuiles();
