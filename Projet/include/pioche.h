@@ -1,5 +1,6 @@
 #pragma once
-
+#include <optional>
+#include <utility>
 #include <vector>
 #include <array>
 #include <stack>
@@ -17,12 +18,18 @@
 
 class Pioche {
 private:
-	std::array<std::pair<Tuile, JetonFaune>, 4> pioche;
+	std::array<std::optional<std::pair<Tuile, JetonFaune>>, 4> pioche;
 	// a titre indicatif de visibilite des pieces dans la pioche pour QT
-	std::array<std::pair<int, int>, 4> visibilite;
+	std::array<std::pair<bool, bool>, 4> visibilite;
 public:
 	// constructeur = initiation des attributs
-
+	Pioche() : visibilite{ {{false, false}, {false, false}, {false, false}, {false, false}} },
+		pioche{} // Default initialization for pioche
+	{
+		for (size_t i = 0; i < pioche.size(); ++i) {
+			pioche[i] = std::make_pair(Tuile(), JetonFaune()); // Assuming default constructors exist
+		}
+	}
 	// setPaire(ancienneTuile, nouveauJeton) <- getPaire
 	void resetAllJetonFaune();
 
@@ -44,18 +51,22 @@ public:
 	void retirerJetonVisible(int indexJeton);
 	// setter Paire
 	void setPaire(unsigned int indice, const Tuile& tuile, const JetonFaune& jeton) {
+		// Vérifie si l'indice est valide
 		if (indice < 4) {
 			pioche[indice] = std::make_pair(tuile, jeton);
+			return; 
 		}
 		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
-	};
+	}
 	// accesseur Paire
-	std::pair<Tuile, JetonFaune> getPaire(int indice) const {
-		if (indice < 4) {
-			return pioche[indice];
+	std::pair<Tuile, JetonFaune> getPaire(unsigned int indice) const {
+		if (indice >= pioche.size()) {
+			throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
 		}
-		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
-
+		if (pioche[indice]) {
+			return *pioche[indice]; // deferencer pour avoir la paire
+		}
+		throw std::logic_error("Aucune paire disponible à cet indice");
 	};
 
 	// Verifications
@@ -68,7 +79,6 @@ public:
 	void slideApresJetonNature(int t, int j);
 	// remplir pioche selon visibilite
 	void rafraichirPioche();
-
 };
 
 std::ostream& operator<<(std::ostream& os, const Pioche& p);

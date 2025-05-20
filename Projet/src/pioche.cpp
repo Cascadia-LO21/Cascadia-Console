@@ -7,7 +7,6 @@
 
 
 // les methodes de la classe Pioche
-// les methodes de la classe Pioche
 void Pioche::resetAllJetonFaune() {
 
 }
@@ -21,7 +20,8 @@ void Pioche::removePair(size_t indiceTuile, size_t indiceJetonFaune) {
 }
 
 void Pioche::removeLastPair() {
-
+	// retirer indice = 3
+	// update Visibilite
 }
 
 
@@ -40,8 +40,10 @@ void Pioche::retirerJetonVisible(int indexJeton)
 bool Pioche::jetonsIdentiques(int nb) const {
 	std::array<int, 5> fauneCount{ 0 };
 	// compter respectivement le nb de chaque faune presente
-	for (const auto& pair : pioche) {
-		fauneCount[retourneIndiceFaune(pair.second.getType())]++;
+	for (const auto& optionalPair : pioche) {
+		if (optionalPair) { // Verification d'existence de Paire
+			fauneCount[retourneIndiceFaune(optionalPair->second.getType())]++;
+		}
 	}
 	// verification du nombre
 	for (const auto& value : fauneCount) {
