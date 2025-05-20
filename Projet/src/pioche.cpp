@@ -37,25 +37,39 @@ void Pioche::retirerJetonVisible(int indexJeton)
 {
 }
 
-void Pioche::setPaire(int i, const Tuile& tuile, const JetonFaune& jeton) {
-
+bool Pioche::jetonsIdentiques(int nb) const {
+	std::array<int, 5> fauneCount{ 0 };
+	// compter respectivement le nb de chaque faune presente
+	for (const auto& pair : pioche) {
+		fauneCount[retourneIndiceFaune(pair.second.getType())]++;
+	}
+	// verification du nombre
+	for (const auto& value : fauneCount) {
+		if (value == nb) {
+			return true;
+		}
+	}
+	return false;
 }
 
-std::pair<Tuile, JetonFaune> Pioche::getPaire(int i) const {
-
-}
-
-
-bool Pioche::jetonsIdentiques(int i) const {
-
+int Pioche::retourneIndiceFaune(Faune type) const
+{
+	switch (type) {
+	case Faune::saumon: return 0;
+	case Faune::ours:   return 1;
+	case Faune::buse:   return 2;
+	case Faune::renard: return 3;
+	case Faune::wapiti: return 4;
+	default: throw std::invalid_argument("Type de Faune Inconnu");
+	}
 }
 
 bool Pioche::quatreJetonsIdentiques() const {
-
+	return jetonsIdentiques(4);
 }
 
 bool Pioche::troisJetonsIdentiques() const {
-
+	return jetonsIdentiques(3);
 }
 
 void Pioche::slideApresJetonNature(int t, int j) {

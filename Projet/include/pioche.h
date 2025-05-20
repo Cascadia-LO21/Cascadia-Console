@@ -43,12 +43,24 @@ public:
 	// Update visibilite
 	void retirerJetonVisible(int indexJeton);
 	// setter Paire
-	void setPaire(int i, const Tuile& tuile, const JetonFaune& jeton);
+	void setPaire(unsigned int indice, const Tuile& tuile, const JetonFaune& jeton) {
+		if (indice < 4) {
+			pioche[indice] = std::make_pair(tuile, jeton);
+		}
+		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
+	};
 	// accesseur Paire
-	std::pair<Tuile, JetonFaune> getPaire(int i) const;
+	std::pair<Tuile, JetonFaune> getPaire(int indice) const {
+		if (indice < 4) {
+			return pioche[indice];
+		}
+		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
+
+	};
 
 	// Verifications
-	bool jetonsIdentiques(int i) const;
+	bool jetonsIdentiques(int nb) const;
+	int retourneIndiceFaune(Faune type) const;
 	bool quatreJetonsIdentiques() const;
 	bool troisJetonsIdentiques() const;
 
