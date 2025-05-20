@@ -29,19 +29,19 @@ void Pioche::retirerPaire(int i) {
 
 }
 
-void Pioche::retirerTuileVisible(int indexTuile, int j) {
-
+void Pioche::retirerTuileVisible(int indexTuile)
+{
 }
 
-void Pioche::retirerJetonVisible(int i, int j) {
-
+void Pioche::retirerJetonVisible(int indexJeton)
+{
 }
 
 void Pioche::setPaire(int i, const Tuile& tuile, const JetonFaune& jeton) {
 
 }
 
-std::pair<Tuile, JetonFaune> getPaire(int i) const {
+std::pair<Tuile, JetonFaune> Pioche::getPaire(int i) const {
 
 }
 
@@ -62,7 +62,7 @@ void Pioche::slideApresJetonNature(int t, int j) {
 
 }
 
-void Pioche::remplacerJetons(int except = -1) {
+void Pioche::remplacerJetons(int except) {
 
 }
 

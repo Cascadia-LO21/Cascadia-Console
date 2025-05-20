@@ -18,51 +18,43 @@
 class Pioche {
 private:
 	std::array<std::pair<Tuile, JetonFaune>, 4> pioche;
-	// Privation du constructeur
+	// a titre indicatif de visibilite des pieces dans la pioche pour QT
+	std::array<std::pair<int, int>, 4> visibilite;
 public:
+	// constructeur = initiation des attributs
 
-	// setterPair à indice specifique
-	void setPair(size_t indice, const Tuile& tuile, const JetonFaune& jeton) const{}
-
-	// getterPair à indice specifique
-	std::pair<Tuile, JetonFaune> getPair(size_t indice) const {}
-
-	// verification si pioche contient au moins un type de JetonFaune de cardinalité == nombre fois
-	// fauneCount les faunes indice dans l'ordre de Enum Class
-	bool contientJetonIdentique(int nombre) const;
-
-	int retourneIndiceFaune(Faune type) const;
-
-	bool estTroisIdentique() const;
-
-	bool estQuatreIdentique() const;
-
-	void retirerPaire(size_t indice);
-
-	Tuile& nouvelleTuile();
-	JetonFaune& nouveauJetonFaune();
-
-
-
-	/// FONCTIONS DANS LE DOC SUITE A LA REU_4, à harmoniser avec celles deja deinies ci-haut ///
+	// setPaire(ancienneTuile, nouveauJeton) <- getPaire
 	void resetAllJetonFaune();
+
+	// reset les Paires dont l'indice est dans quiEnleverIndices
 	void resetJetonFaune(const std::vector<int>& quiEnleverIndices);
+
+	// alternative de resetJetonFaune (son complement)
+	void remplacerJetons(int except = -1);
+	// Dans le cas de l'utilisation du jeton nature
 	void removePair(size_t indiceTuile, size_t indiceJetonFaune);
+	// simulation d'un joueur IA qui par defaut retire la derniere paire dans la pioche
 	void removeLastPair();
 
-
+	// Dans le cas usuel
 	void retirerPaire(int i);
-	void retirerTuileVisible(int indexTuile, int j);
-	void retirerJetonVisible(int i, int j);
+	// Update visibilite
+	void retirerTuileVisible(int indexTuile);
+	// Update visibilite
+	void retirerJetonVisible(int indexJeton);
+	// setter Paire
 	void setPaire(int i, const Tuile& tuile, const JetonFaune& jeton);
+	// accesseur Paire
 	std::pair<Tuile, JetonFaune> getPaire(int i) const;
 
+	// Verifications
 	bool jetonsIdentiques(int i) const;
 	bool quatreJetonsIdentiques() const;
 	bool troisJetonsIdentiques() const;
 
+	// Simulation du fonctionnement de piles dans la pioche apres choix de paire
 	void slideApresJetonNature(int t, int j);
-	void remplacerJetons(int except = -1);
+	// remplir pioche selon visibilite
 	void rafraichirPioche();
 
 };
