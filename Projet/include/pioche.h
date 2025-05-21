@@ -31,11 +31,11 @@ public:
 		}
 	}
 	// setPaire(ancienneTuile, nouveauJeton) <- getPaire
-	void resetAllJetonFaune();
+	void resetAllJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons);
 	void removeAllJetonFaune();
 
 	// reset les Paires dont l'indice est dans quiEnleverIndices
-	void resetJetonFaune(const std::vector<int>& quiEnleverIndices);
+	void resetJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, const std::vector<int>& quiEnleverIndices);
 	void removeJetonFaune(const std::vector<int>& quiEnleverIndices);
 	// alternative de resetJetonFaune (son complement)
 	void remplacerJetons(int except = -1);

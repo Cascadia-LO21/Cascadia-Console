@@ -8,8 +8,9 @@
 
 
 // les methodes de la classe Pioche
-void Pioche::resetAllJetonFaune() {
-	
+void Pioche::resetAllJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons) {
+	removeAllJetonFaune();
+	rafraichirPioche(pileTuiles, sachetJetons);
 }
 
 void Pioche::removeAllJetonFaune() {
@@ -19,8 +20,9 @@ void Pioche::removeAllJetonFaune() {
 	}
 }
 
-void Pioche::resetJetonFaune(const std::vector<int>& quiEnleverIndices) {
-
+void Pioche::resetJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, const std::vector<int>& quiEnleverIndices) {
+	removeJetonFaune(quiEnleverIndices);
+	rafraichirPioche(pileTuiles, sachetJetons);
 }
 
 void Pioche::removeJetonFaune(const std::vector<int>& quiEnleverIndices) {
@@ -78,7 +80,6 @@ void Pioche::retirerPaire(int indice) {
 		throw std::out_of_range("Indice hors intervalle pour retirer la paire");
 	}
 
-	// verif existence
 	if (pioche[indice]) {
 		pioche[indice] = std::nullopt;
 
@@ -112,13 +113,14 @@ void Pioche::retirerJetonVisible(unsigned int indexJeton)
 
 bool Pioche::jetonsIdentiques(int nb) const {
 	std::array<int, 5> fauneCount{ 0 };
-	// compter respectivement le nb de chaque faune presente
 	for (const auto& optionalPair : pioche) {
-		if (optionalPair) { // Verification d'existence de Paire
-			fauneCount[retourneIndiceFaune(optionalPair->second.getType())]++;
+		if (optionalPair) {
+			const auto& jetonFaune = optionalPair->second;
+			if (jetonFaune) {
+				fauneCount[retourneIndiceFaune(jetonFaune->getType())]++;
+			}
 		}
 	}
-	// verification du nombre
 	for (const auto& value : fauneCount) {
 		if (value == nb) {
 			return true;

@@ -220,9 +220,13 @@ JetonFaune GestionPieces::piocherJeton(std::vector<JetonFaune>& jetons)
     return jeton;
 }
 
-void GestionPieces::remettreJeton(std::vector<JetonFaune>& jetons, const JetonFaune& jeton)
-{
-    jetons.push_back(jeton);
+void GestionPieces::remettreJeton(std::vector<JetonFaune>& jetons, const JetonFaune& jeton) {
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::uniform_int_distribution<> distr(0, jetons.size());
+
+    int randomIndex = distr(eng);
+    jetons.insert(jetons.begin() + randomIndex, jeton);
 }
 
 std::vector<Tuile> GestionPieces::piocherTuileDepart(std::vector<std::vector<Tuile>>& tuilesDepart)
