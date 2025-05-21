@@ -18,7 +18,7 @@
 
 class Pioche {
 private:
-	std::array<std::optional<std::pair<Tuile, JetonFaune>>, 4> pioche;
+	std::array<std::optional<std::pair<std::optional<Tuile>, std::optional<JetonFaune>>>, 4> pioche;
 	// a titre indicatif de visibilite des pieces dans la pioche pour QT
 	std::array<std::pair<bool, bool>, 4> visibilite;
 public:
@@ -32,10 +32,11 @@ public:
 	}
 	// setPaire(ancienneTuile, nouveauJeton) <- getPaire
 	void resetAllJetonFaune();
+	void removeAllJetonFaune();
 
 	// reset les Paires dont l'indice est dans quiEnleverIndices
 	void resetJetonFaune(const std::vector<int>& quiEnleverIndices);
-
+	void removeJetonFaune(const std::vector<int>& quiEnleverIndices);
 	// alternative de resetJetonFaune (son complement)
 	void remplacerJetons(int except = -1);
 	// Dans le cas de l'utilisation du jeton nature
@@ -46,28 +47,32 @@ public:
 	// Dans le cas usuel
 	void retirerPaire(int i);
 	// Update visibilite
-	void retirerTuileVisible(int indexTuile);
+	void retirerTuileVisible(unsigned int indexTuile);
 	// Update visibilite
-	void retirerJetonVisible(int indexJeton);
+	void retirerJetonVisible(unsigned int indexJeton);
 	// setter Paire
-	void setPaire(unsigned int indice, const Tuile& tuile, const JetonFaune& jeton) {
-		// Vérifie si l'indice est valide
+	void setPaire(unsigned int indice, const std::optional<Tuile>& tuile, const std::optional<JetonFaune>& jeton) {
 		if (indice < 4) {
 			pioche[indice] = std::make_pair(tuile, jeton);
-			return; 
+			return;
 		}
 		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
 	}
 	// accesseur Paire
-	std::pair<Tuile, JetonFaune> getPaire(unsigned int indice) const {
-		if (indice >= pioche.size()) {
+	std::pair<std::optional<Tuile>, std::optional<JetonFaune>> getPaire(int indice) const {
+		if (indice < 0 || indice >= pioche.size()) {
 			throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
 		}
-		if (pioche[indice]) {
-			return *pioche[indice]; // deferencer pour avoir la paire
+
+		if (pioche[indice]) { // Vérifie si l'option a une valeur
+			return *pioche[indice]; // Déréférence pour obtenir la paire
 		}
+
 		throw std::logic_error("Aucune paire disponible à cet indice");
-	};
+	}
+	const std::array<std::optional<std::pair<std::optional<Tuile>, std::optional<JetonFaune>>>, 4>& getPioche() const {
+		return pioche;
+	}
 
 	// Verifications
 	bool jetonsIdentiques(int nb) const;
@@ -78,7 +83,7 @@ public:
 	// Simulation du fonctionnement de piles dans la pioche apres choix de paire
 	void slideApresJetonNature(int t, int j);
 	// remplir pioche selon visibilite
-	void rafraichirPioche();
+	void rafraichirPioche(std::stack<Tuile>& pile, std::vector<JetonFaune>& jetons);
 };
 
 std::ostream& operator<<(std::ostream& os, const Pioche& p);
