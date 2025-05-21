@@ -151,68 +151,83 @@ bool Pioche::troisJetonsIdentiques() const {
 
 // exe : removePair() + slideApresJetonNature() + Rafraichir()
 void Pioche::slideApresJetonNature(int i, bool isTuile) {
-	// Base condition: if i is less than 1, terminate recursion
+	// Condition de base : si i est inférieur à 1, on arrête la récursion
 	if (i < 1) {
 		return;
 	}
-
-	// Check if visibility is true
+	// Vérifie si la visibilité est vraie
 	if (isTuile) {
 		if (visibilite[i].first) {
-			slideApresJetonNature(i - 1, isTuile); // Recursive call for the previous index
+			slideApresJetonNature(i - 1, isTuile); // Appel récursif pour l'indice précédent
 		}
 		else {
-			// Slide backwards to find the first visible index
+			// On glisse en arrière pour trouver le premier indice visible
 			for (int j = i; j >= 0; --j) {
 				if (visibilite[j].first) {
-					// Use a temporary variable to ensure correct swapping
-					auto& tmp = pioche[i]->first; // Store the current item in a temporary variable
-					pioche[i]->first = pioche[j]->first; // Replace the tile
-					pioche[j]->first = tmp; // Move the original item to the j index
+					// On utilise une variable temporaire pour l'échange
+					auto& tmp = pioche[i]->first; // On garde l'élément actuel dans une variable temporaire
+					pioche[i]->first = pioche[j]->first; // Remplace la tuile
+					pioche[j]->first = tmp; // Déplace l'élément original à l'indice j
 
-					// Update visibility
-					visibilite[i].first = true; // Update visibility for current index
-					visibilite[j].first = false; // Update visibility of the original index
-					break; // Exit the loop after sliding
+					// Met à jour la visibilité
+					visibilite[i].first = true; // Met à jour la visibilité pour l'indice actuel
+					visibilite[j].first = false; // Met à jour la visibilité de l'indice original
+					break; // On sort de la boucle après le glissement
 				}
 			}
-			slideApresJetonNature(i - 1, isTuile); // Continue with the previous index
+			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice précédent
 		}
 	}
 	else {
 		if (visibilite[i].second) {
-			slideApresJetonNature(i - 1, isTuile); // Recursive call for the previous index
+			slideApresJetonNature(i - 1, isTuile); // Appel récursif pour l'indice précédent
 		}
 		else {
-			// Slide backwards to find the first visible index
+			// On glisse en arrière pour trouver le premier indice visible
 			for (int j = i; j >= 0; --j) {
 				if (visibilite[j].second) {
-					// Use a temporary variable to ensure correct swapping
-					auto& tmp = pioche[i]->second; // Store the current item in a temporary variable
-					pioche[i]->second = pioche[j]->second; // Replace the tile
-					pioche[j]->second = tmp; // Move the original item to the j index
+					// On utilise une variable temporaire pour l'échange
+					auto& tmp = pioche[i]->second; // On garde l'élément actuel dans une variable temporaire
+					pioche[i]->second = pioche[j]->second; // Remplace la tuile
+					pioche[j]->second = tmp; // Déplace l'élément original à l'indice j
 
-					// Update visibility
-					visibilite[i].second = true; // Update visibility for current index
-					visibilite[j].second = false; // Update visibility of the original index
-					break; // Exit the loop after sliding
+					// Met à jour la visibilité
+					visibilite[i].second = true; // Met à jour la visibilité pour l'indice actuel
+					visibilite[j].second = false; // Met à jour la visibilité de l'indice original
+					break; // On sort de la boucle après le glissement
 				}
 			}
-			slideApresJetonNature(i - 1, isTuile); // Continue with the previous index
+			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice précédent
 		}
 	}
 }
 
 void Pioche::slideTuile(int i) {
-	slideApresJetonNature(i, true); // Appel de la méthode slide pour les tuiles
+	slideApresJetonNature(i, true);
 }
 
 void Pioche::slideJeton(int i) {
-	slideApresJetonNature(i, false); // Appel de la méthode slide pour les jetons
+	slideApresJetonNature(i, false); 
 }
 
-void Pioche::remplacerJetons(int except) {
+void Pioche::remplacerJetons(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, int except) {
+	if (except == -1) {
+		removeAllJetonFaune(); 
+	}
+	else if (except >= 0 && except < pioche.size()) {
+		std::vector<int> indicesToRemove;
+		for (int i = 0; i < pioche.size(); ++i) {
+			if (i != except) {
+				indicesToRemove.push_back(i);
+			}
+		}
+		removeJetonFaune(indicesToRemove); 
+	}
+	else {
+		throw std::out_of_range("Indice hors intervalle pour remplacer les jetons");
+	}
 
+	rafraichirPioche(pileTuiles, sachetJetons); 
 }
 
 void Pioche::rafraichirPioche(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons) {

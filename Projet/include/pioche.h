@@ -38,7 +38,7 @@ public:
 	void resetJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, const std::vector<int>& quiEnleverIndices);
 	void removeJetonFaune(const std::vector<int>& quiEnleverIndices);
 	// alternative de resetJetonFaune (son complement)
-	void remplacerJetons(int except = -1);
+	void remplacerJetons(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, int except = -1);
 	// Dans le cas de l'utilisation du jeton nature
 	void removePair(unsigned int indiceTuile, unsigned int indiceJetonFaune);
 	// simulation d'un joueur IA qui par defaut retire la derniere paire dans la pioche
