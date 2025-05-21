@@ -14,7 +14,7 @@ void Pioche::resetAllJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<Jeton
 }
 
 void Pioche::removeAllJetonFaune() {
-	for (size_t i = 0; i < pioche.size(); ++i) {
+	for (int i = 0; i < pioche.size(); ++i) {
 		pioche[i]->second = std::nullopt;
 		retirerJetonVisible(i);
 	}
@@ -39,7 +39,7 @@ void Pioche::removeJetonFaune(const std::vector<int>& quiEnleverIndices) {
 	}
 }
 
-void Pioche::removePair(size_t indiceTuile, size_t indiceJetonFaune) {
+void Pioche::removePair(unsigned int indiceTuile, unsigned int indiceJetonFaune) {
 	// verification des parametres en entree
 	if (indiceTuile >= pioche.size()) {
 		throw std::out_of_range("Indice de tuile hors intervalle");
@@ -75,7 +75,7 @@ void Pioche::removeLastPair() {
 }
 
 
-void Pioche::retirerPaire(int indice) {
+void Pioche::retirerPaire(unsigned int indice) {
 	if (indice < 0 || indice >= pioche.size()) {
 		throw std::out_of_range("Indice hors intervalle pour retirer la paire");
 	}
@@ -149,8 +149,66 @@ bool Pioche::troisJetonsIdentiques() const {
 	return jetonsIdentiques(3);
 }
 
-void Pioche::slideApresJetonNature(int t, int j) {
+// exe : removePair() + slideApresJetonNature() + Rafraichir()
+void Pioche::slideApresJetonNature(int i, bool isTuile) {
+	// Base condition: if i is less than 1, terminate recursion
+	if (i < 1) {
+		return;
+	}
 
+	// Check if visibility is true
+	if (isTuile) {
+		if (visibilite[i].first) {
+			slideApresJetonNature(i - 1, isTuile); // Recursive call for the previous index
+		}
+		else {
+			// Slide backwards to find the first visible index
+			for (int j = i; j >= 0; --j) {
+				if (visibilite[j].first) {
+					// Use a temporary variable to ensure correct swapping
+					auto& tmp = pioche[i]->first; // Store the current item in a temporary variable
+					pioche[i]->first = pioche[j]->first; // Replace the tile
+					pioche[j]->first = tmp; // Move the original item to the j index
+
+					// Update visibility
+					visibilite[i].first = true; // Update visibility for current index
+					visibilite[j].first = false; // Update visibility of the original index
+					break; // Exit the loop after sliding
+				}
+			}
+			slideApresJetonNature(i - 1, isTuile); // Continue with the previous index
+		}
+	}
+	else {
+		if (visibilite[i].second) {
+			slideApresJetonNature(i - 1, isTuile); // Recursive call for the previous index
+		}
+		else {
+			// Slide backwards to find the first visible index
+			for (int j = i; j >= 0; --j) {
+				if (visibilite[j].second) {
+					// Use a temporary variable to ensure correct swapping
+					auto& tmp = pioche[i]->second; // Store the current item in a temporary variable
+					pioche[i]->second = pioche[j]->second; // Replace the tile
+					pioche[j]->second = tmp; // Move the original item to the j index
+
+					// Update visibility
+					visibilite[i].second = true; // Update visibility for current index
+					visibilite[j].second = false; // Update visibility of the original index
+					break; // Exit the loop after sliding
+				}
+			}
+			slideApresJetonNature(i - 1, isTuile); // Continue with the previous index
+		}
+	}
+}
+
+void Pioche::slideTuile(int i) {
+	slideApresJetonNature(i, true); // Appel de la méthode slide pour les tuiles
+}
+
+void Pioche::slideJeton(int i) {
+	slideApresJetonNature(i, false); // Appel de la méthode slide pour les jetons
 }
 
 void Pioche::remplacerJetons(int except) {
@@ -158,7 +216,7 @@ void Pioche::remplacerJetons(int except) {
 }
 
 void Pioche::rafraichirPioche(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons) {
-	for (size_t i = 0; i < pioche.size(); ++i) {
+	for (unsigned int i = 0; i < pioche.size(); ++i) {
 		auto [ancienTuile, ancienJeton] = getPaire(i);
 		if (!visibilite[i].first) {
 			if (!pileTuiles.empty()) {
@@ -179,7 +237,7 @@ void Pioche::rafraichirPioche(std::stack<Tuile>& pileTuiles, std::vector<JetonFa
 
 std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 	os << "Pioche :\n";
-	for (size_t i = 0; i < p.getPioche().size(); ++i) {
+	for (unsigned int i = 0; i < p.getPioche().size(); ++i) {
 		os << "Index " << i << ": ";
 		try {
 			auto [tuile, jeton] = p.getPaire(i); // Utilisation de getPaire

@@ -26,7 +26,7 @@ public:
 	Pioche() : visibilite{ {{false, false}, {false, false}, {false, false}, {false, false}} },
 		pioche{} // Default initialization for pioche
 	{
-		for (size_t i = 0; i < pioche.size(); ++i) {
+		for (unsigned int i = 0; i < pioche.size(); ++i) {
 			pioche[i] = std::make_pair(Tuile(), JetonFaune()); // Assuming default constructors exist
 		}
 	}
@@ -40,12 +40,12 @@ public:
 	// alternative de resetJetonFaune (son complement)
 	void remplacerJetons(int except = -1);
 	// Dans le cas de l'utilisation du jeton nature
-	void removePair(size_t indiceTuile, size_t indiceJetonFaune);
+	void removePair(unsigned int indiceTuile, unsigned int indiceJetonFaune);
 	// simulation d'un joueur IA qui par defaut retire la derniere paire dans la pioche
 	void removeLastPair();
 
 	// Dans le cas usuel
-	void retirerPaire(int i);
+	void retirerPaire(unsigned int i);
 	// Update visibilite
 	void retirerTuileVisible(unsigned int indexTuile);
 	// Update visibilite
@@ -59,7 +59,7 @@ public:
 		throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
 	}
 	// accesseur Paire
-	std::pair<std::optional<Tuile>, std::optional<JetonFaune>> getPaire(int indice) const {
+	std::pair<std::optional<Tuile>, std::optional<JetonFaune>> getPaire(unsigned int indice) const {
 		if (indice < 0 || indice >= pioche.size()) {
 			throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
 		}
@@ -81,7 +81,9 @@ public:
 	bool troisJetonsIdentiques() const;
 
 	// Simulation du fonctionnement de piles dans la pioche apres choix de paire
-	void slideApresJetonNature(int t, int j);
+	void slideApresJetonNature(int i, bool isTuile);
+	void slideTuile(int i);
+	void slideJeton(int i);
 	// remplir pioche selon visibilite
 	void rafraichirPioche(std::stack<Tuile>& pile, std::vector<JetonFaune>& jetons);
 };
