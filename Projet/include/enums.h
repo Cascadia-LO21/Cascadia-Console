@@ -9,8 +9,10 @@ enum class Direction { NordEst = 0, Est = 1, SudEst = 2, SudOuest = 3, Ouest = 4
 
 std::string habitatToString(Habitat habitat);
 std::string fauneToString(Faune faune);
-Faune stringToFaune(const std::string& s);
 std::string directionToString(Direction dir);
+Faune stringToFaune(const std::string& s);
+Habitat stringToHabitat(const std::string& s);
+bool stringToBool(const std::string& str);
 
 std::ostream& operator<<(std::ostream& flux, Habitat h);
 std::ostream& operator<<(std::ostream& flux, Faune f);

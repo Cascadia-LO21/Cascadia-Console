@@ -34,6 +34,19 @@ Faune stringToFaune(const std::string& s) {
 	throw std::invalid_argument("Faune inconnu : " + s);
 }
 
+Habitat stringToHabitat(const std::string& s) {
+	if (s == "marais")		return Habitat::marais;
+	if (s == "fleuve")		return Habitat::fleuve;
+	if (s == "montagne")	return Habitat::montagne;
+	if (s == "prairie")		return Habitat::prairie;
+	if (s == "forêt")		return Habitat::foret;
+	throw std::invalid_argument("Habitat inconnu: " + s);
+}
+
+bool stringToBool(const std::string& str) {
+	return str == "true";
+}
+
 std::string directionToString(Direction dir) {
 	switch (dir) {
 	case Direction::Est:       return "Est";
