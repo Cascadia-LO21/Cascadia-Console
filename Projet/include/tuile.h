@@ -66,6 +66,7 @@ public:
 		placementConfirme(false) {
 	}
 
+
 	const std::array<Habitat, 6>& getHabitats() const { return habitats; }
 	const std::vector<Faune>& getFaunes() const { return faunes; }
 	bool getDonneJetonNature() const { return donneJetonNature; }
