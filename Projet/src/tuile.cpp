@@ -3,6 +3,7 @@
 #include <array>
 #include <optional>
 #include <stdexcept>
+#include <memory>
 #include "tuile.h"
 
 
@@ -36,6 +37,15 @@ std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
 	return flux;
 }
 
+std::ostream& operator<<(std::ostream& flux, const std::vector<Tuile>& tuileDepart)
+{
+	flux << "TUILE DE DEPART : \n" << std::endl;
+	for (const auto& tuile : tuileDepart) {
+		flux << "\t" << tuile << "\n";
+	}
+	return flux;
+}
+
 void Tuile::placerJetonFaune(Faune faune) {
 	if (!JetonFaunePresent() && find(faunes.begin(), faunes.end(), faune) != faunes.end())
 		faunePlace = faune;
@@ -54,10 +64,11 @@ void Tuile::pivoterAntiHoraire() {
 
 void testClasseTuile() {
 	std::array<Habitat, 6> hab = { Habitat::fleuve, Habitat::fleuve, Habitat::fleuve,
-							Habitat::foret, Habitat::foret, Habitat::foret };
-	std::vector<Faune> fau = { Faune::buse,Faune::renard,Faune::ours };
+								   Habitat::foret, Habitat::foret, Habitat::foret };
+	std::vector<Faune> fau = { Faune::buse, Faune::renard, Faune::ours };
 
-	Tuile t = Tuile(hab, fau);
+	std::unique_ptr<Position> p = std::make_unique<Position>(0, 1, -1);
+	Tuile t(hab, fau, false, std::move(p));
 
 	try {
 		t.placerJetonFaune(Faune::buse);
@@ -66,7 +77,7 @@ void testClasseTuile() {
 		std::cout << e;
 	}
 
-	t.setPosition(0, 1, -1);
+	//t.setPosition(0, 1, -1);
 	t.confirmerPlacement();
 	t.pivoterHoraire();
 	t.pivoterAntiHoraire();

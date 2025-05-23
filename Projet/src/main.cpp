@@ -8,10 +8,11 @@
 #include "position.h"
 #include "tuile.h"
 #include "jeton_faune.h"
-#include "pioche.h"
+//#include "pioche.h"
 #include "env_joueur.h"
 #include "partie.h"
 #include "carte_marquage.h"
+#include "gestion_pieces.h"
 
 
 int main() {
@@ -19,8 +20,10 @@ int main() {
 	
 	//testClassePosition();
 
-	testClasseTuile();
+	//testClasseTuile();
 
+	testGestionPieces();
+	
 	//JetonFaune j(Faune::saumon);
 	//cout << j;
 
