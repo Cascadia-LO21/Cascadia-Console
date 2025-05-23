@@ -76,7 +76,7 @@ int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 int CarteBuse::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
 	//initialisations
 	std::unordered_set<Position> PositionsVisitees;
-	int scoreTotal = 0;
+	int nb_buses_isolees = 0;
 
 	//parcourt des tuiles de carte
 	for (const auto& [position, tuile] : carte) { // [cle,valeur] appartenant à carte
@@ -89,8 +89,37 @@ int CarteBuse::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 			continue;
 		}
 
-		//on vérifie s'il y a d'autres buses adjacents
-		
-		
+		//on vérifie s'il y a d'autres buses adjacentes
+		int nb_buses_adj = 0;
+		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
+		for (unsigned int i = 0; i < 6; i++) {
+			Position pos_voisine = vec[i];
+
+			if (carte.count(pos_voisine) == 1) {
+				const Tuile& tuile_voisine = carte.at(pos_voisine);
+				PositionsVisitees.insert(pos_voisine);
+
+				if (tuile_voisine.JetonFaunePresent() && tuile_voisine.getFaunePlace() == Faune::buse) {
+					nb_buses_adj++;
+				}
+			}
+		}
+		PositionsVisitees.insert(position); //position actuelle
+
+		if (nb_buses_adj == 0) {
+			nb_buses_isolees++;
+		}
+	}
+
+	//Calcul du score total
+	switch (nb_buses_isolees) {
+	case 0: return 0;
+	case 2: return 5;
+	case 3: return 8;
+	case 4: return 11;
+	case 5: return 14;
+	case 6: return 18;
+	case 7: return 22;
+	default: return 26; //8+ buses
 	}
 }
