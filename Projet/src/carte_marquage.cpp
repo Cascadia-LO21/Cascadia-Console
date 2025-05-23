@@ -1,66 +1,96 @@
 #include <iostream>
 #include "carte_marquage.h"
+#include <unordered_map>
+#include <unordered_set>
 
-int CarteSaumon::methodeCalcul(int count) const {
+int CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {};
 
-	switch (count) {
-		case 0: return 0;
-		case 1: return 2;
-		case 2: return 4;
-		case 3: return 7;
-		case 4: return 11;
-		case 5: return 15;
-		case 6: return 20;
-		default: return 26;  // 7+ saumons
-	}
-}
+int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
 
-int CarteOurs::methodeCalcul(int count) const
-{
-	//À voir si l'implémentation est correcte, car le concept est différent des classes saumon, buse, renard
-	switch (count) {
-		case 0: return 0;
-		case 1: return 4;
-		case 2: return 11;
-		case 3: return 19;
-		default: return 27; // 4+ paires d'ours
+	std::unordered_set<Position> PositionsVisitees;
+	int nb_paires_ours = 0;
+
+	//parcourt des tuiles de carte
+	for (const auto& [position, tuile] : carte) { // [cle,valeur] appartenant à carte
+
+		//on ignore la tuile si deja visitée
+		if (PositionsVisitees.count(position) == 1) continue;
+		//on ignre la tuile si pas de jeton faune ou jeton non ours, et on la marque comme visitee
+		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::ours) {
+			PositionsVisitees.insert(position);
+			continue;
 		}
-}
 
-int CarteBuse::methodeCalcul(int count) const
-{
-	switch (count) {
-		case 0: return 0;
-		case 2: return 5;
-		case 3: return 8;
-		case 4: return 11;
-		case 5: return 14;
-		case 6: return 18;
-		case 7: return 22;
-		default: return 26; //8+ buses
+		//on vérifie s'il y a d'autres ours adjacents
+		int nb_ours_adj =0;
+		Position pos_ours_adj_unique; //sera instancié plus tard s'il y a un ours adjacent
+
+		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
+
+		for (unsigned int i = 0; i < 6; i++) {
+			Position pos_voisine = vec[i];
+
+			if (carte.count(pos_voisine) == 1 && PositionsVisitees.count(pos_voisine) == 0) {
+				const Tuile& tuile_voisine = carte.at(pos_voisine);
+
+				if (tuile_voisine.JetonFaunePresent() && tuile_voisine.getFaunePlace() == Faune::ours) {
+					nb_ours_adj++;
+					pos_ours_adj_unique = pos_voisine;
+				}
+				PositionsVisitees.insert(pos_voisine);
+			}
+		}
+		PositionsVisitees.insert(position); //position actuelle
+
+		//on vérifie si l'unique ours adj à la position courante n'est pas adjacent à un autre ours
+		if (nb_ours_adj == 1) {
+			int nb_ours_adj_2 = 0; 
+			std::vector<Position> vec = pos_ours_adj_unique.getVecteurPositionsAdjacentes();
+			for (unsigned int i = 0; i < 6; i++) {
+				Position pos_voisine = vec[i];
+				if (carte.count(pos_voisine) == 1) { //il ne faut pas vérifier si elle a déjà été visitée
+					const Tuile& tuile_voisine = carte.at(pos_voisine);
+					if (tuile_voisine.JetonFaunePresent() && tuile_voisine.getFaunePlace() == Faune::ours) {
+						nb_ours_adj_2++;
+						PositionsVisitees.insert(pos_voisine);
+					}
+				}
+			}
+			if (nb_ours_adj_2 == 1) {
+				nb_paires_ours++;
+			}
+		}
+
+	}
+
+	//Calcul du score total
+	switch (nb_paires_ours) {
+	case 0: return 0;
+	case 1: return 4;
+	case 2: return 11;
+	case 3: return 19;
+	default: return 27; // 4+ paires d'ours
 	}
 }
 
-int CarteWapiti::methodeCalcul(int count) const
-{
-	switch (count) {
-		case 0: return 0;
-		case 1: return 2;
-		case 2: return 5;
-		case 3: return 9;
-		default: return 13; //4 et plus
+int CarteBuse::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
+	//initialisations
+	std::unordered_set<Position> PositionsVisitees;
+	int scoreTotal = 0;
+
+	//parcourt des tuiles de carte
+	for (const auto& [position, tuile] : carte) { // [cle,valeur] appartenant à carte
+
+		//on ignore la tuile si deja visitée
+		if (PositionsVisitees.count(position) == 1) continue;
+		//on ignre la tuile si pas de jeton faune ou jeton non buse
+		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::buse) {
+			PositionsVisitees.insert(position);
+			continue;
+		}
+
+		//on vérifie s'il y a d'autres buses adjacents
+		
+		
 	}
 }
-
-int CarteRenard::methodeCalcul(int count) const
-{
-	switch (count) {
-		case 0: return 0;
-		case 1: return 1;
-		case 2: return 2;
-		case 3: return 3;
-		case 4: return 4;
-		default: return 5; //5 et plus
-	}
-}
-
