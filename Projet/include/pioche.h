@@ -39,15 +39,18 @@ private:
 
 public:
 
-	//TODO: CONSTRUCTEUR: revoir apres les setters
-	Pioche();
-	//	visibilite{ { {false, false}, {false, false}, {false, false}, {false, false} } },
-	//	pioche() // Toutes les cases sont vides
-	//{
-	//	//for (unsigned int i = 0; i < MAX; ++i) {
-	//	//	pioche[i] = std::make_pair(Tuile(), JetonFaune()); // Assuming default constructors exist
-	//	//}
-	//}
+	Pioche(unsigned int nbJoueurs = 1) :
+		tuilesVisibles{ true }, // par defaut, tout est visible dans piocheVisible
+		tuilesDispo{},
+		jetonsDispo{},
+		tuilesDepartDispo{}
+	{
+		setTuilesDispo(nbJoueurs);
+		setJetonsDispo();
+		setTuilesDepartDispo();
+		setPiocheVisible();
+	}
+
 
 	/// SETTERS ///
 

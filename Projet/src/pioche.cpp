@@ -7,6 +7,7 @@
 #include "gestion_pieces.h"
 using namespace GestionPieces;
 
+
 void Pioche::setTuilesDispo(unsigned int nbJoueurs) {
 	std::vector<Tuile> tuiles_reperes = instancierTuiles("json/tuiles_reperes.json");
 	std::vector<Tuile> tuiles_non_reperes = instancierTuiles("json/tuiles_non_reperes.json");

@@ -9,7 +9,7 @@ public:
 	JetonFaune(Faune type) : type(type) {}
 	Faune getType() const { return type; };
 	// constructeur par defaut pour Pioche
-	//JetonFaune() : type(Faune::rien) {}
+	JetonFaune() : type(Faune::rien) {}
 };
 
 std::ostream& operator<<(std::ostream& os, const JetonFaune& j);
