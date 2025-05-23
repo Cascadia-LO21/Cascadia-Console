@@ -4,6 +4,7 @@
 #include "enums.h"
 #include "position.h"
 #include "tuile.h"
+#include <unordered_map>
 
 /// Classe abstraite avec méthode virtuelle pure methode calcul
 class CarteMarquage {

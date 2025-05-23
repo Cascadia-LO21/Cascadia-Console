@@ -2,8 +2,19 @@
 #include "carte_marquage.h"
 #include <unordered_map>
 #include <unordered_set>
+#include <functional>
 
-int CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {};
+// le placer peutetre dans .h ?
+namespace std {
+	template <>
+	struct hash<Position> {
+		size_t operator()(const Position& p) const {
+			return hash<int>()(p.getQ()) ^ hash<int>()(p.getR()) ^ hash<int>()(p.getS());
+		}
+	};
+}
+
+// int CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {};
 
 int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
 
