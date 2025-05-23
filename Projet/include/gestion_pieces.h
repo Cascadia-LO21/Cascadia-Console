@@ -36,13 +36,13 @@ namespace GestionPieces {
 	void melangerTuilesDepart(std::vector<std::vector<Tuile>>& tuiles);
 
 	// Fusionne deux vecteurs de tuiles en un seul
-	std::vector<Tuile> fusionnerVecteursTuiles(const std::vector<Tuile>& v1, const std::vector<Tuile>& v2);
+	std::vector<Tuile> fusionnerVecteursTuiles(std::vector<Tuile>& v1, std::vector<Tuile>& v2);
 
 	// Adapter la taille des tuiles presentes dans le jeu selon le nombre de participants
 	void adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const int nombreJoueurs = 2);
 
 	// Convertit un vecteur de tuiles en pile (stack)
-	std::stack<Tuile> vectorToStack(const std::vector<Tuile>& tuiles);
+	std::stack<Tuile> vectorToStack(std::vector<Tuile>& tuiles);
 
 	// Pioche une tuile du dessus de la pile (stack)
 	Tuile piocherTuile(std::stack<Tuile>& pile);
