@@ -37,6 +37,15 @@ std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
 	return flux;
 }
 
+std::ostream& operator<<(std::ostream& flux, const std::vector<Tuile>& tuileDepart)
+{
+	flux << "TUILE DE DEPART : \n" << std::endl;
+	for (const auto& tuile : tuileDepart) {
+		flux << "\t" << tuile << "\n";
+	}
+	return flux;
+}
+
 void Tuile::placerJetonFaune(Faune faune) {
 	if (!JetonFaunePresent() && find(faunes.begin(), faunes.end(), faune) != faunes.end())
 		faunePlace = faune;

@@ -66,6 +66,7 @@ public:
 		placementConfirme(false) {
 	}
 
+
 	const std::array<Habitat, 6>& getHabitats() const { return habitats; }
 	const std::vector<Faune>& getFaunes() const { return faunes; }
 	bool getDonneJetonNature() const { return donneJetonNature; }
@@ -91,5 +92,7 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& flux, const Tuile& tuile);
+std::ostream& operator<<(std::ostream& flux, const std::vector<Tuile>& tuileDepart);
+
 
 void testClasseTuile();

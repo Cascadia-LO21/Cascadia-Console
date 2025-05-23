@@ -20,9 +20,9 @@ int main() {
 	
 	//testClassePosition();
 
-	testClasseTuile();
+	//testClasseTuile();
 
-	//testGestionPieces();
+	testGestionPieces();
 	
 	//JetonFaune j(Faune::saumon);
 	//cout << j;
