@@ -5,7 +5,46 @@
 #include <stdexcept>
 #include "pioche.h"
 #include "gestion_pieces.h"
+using namespace GestionPieces;
 
+void Pioche::setTuilesDispo(unsigned int nbJoueurs) {
+	std::vector<Tuile> tuiles_reperes = instancierTuiles("json/tuiles_reperes.json");
+	std::vector<Tuile> tuiles_non_reperes = instancierTuiles("json/tuiles_non_reperes.json");
+	std::vector<Tuile> ensemble_tuiles = fusionnerVecteursTuiles(tuiles_reperes, tuiles_non_reperes); 
+	GestionPieces::melangerTuiles(ensemble_tuiles); 
+	adapterTailleVecteurTuiles(ensemble_tuiles, nbJoueurs);
+	tuilesDispo = vectorToStack(ensemble_tuiles);
+}
+
+void Pioche::setJetonsDispo() {
+	jetonsDispo = instancierJetonsFaunes();
+	melangerJetons(jetonsDispo); 
+}
+
+void Pioche::setTuilesDepartDispo() {
+	tuilesDepartDispo = instancierTuilesDepart();
+	melangerTuilesDepart(tuilesDepartDispo);
+}
+
+void Pioche::setTuilesVisibles(unsigned int i, bool vue) {
+	if (i >= MAX)
+		throw std::out_of_range("L'indice maximal supportÃ© est : " + std::to_string(MAX));
+	
+	if (tuilesVisibles.at(i) != vue) {
+		tuilesVisibles.at(i) = vue;
+	}
+}
+
+// Pour instancier toute la pioche visible, 
+// cela suppose d'avoir les tuilesDispo et jetonDispo correctement instanciÃ©s au bon nombre
+void Pioche::setPiocheVisible() {
+	if (tuilesDispo.empty() || jetonsDispo.empty())
+		throw std::runtime_error("Les piles de tuiles et l'ensemble des jetons faunes ne sont pas encore instanciÃ©.");
+	
+	for (unsigned int i = 0; i < MAX; i++) {
+		setPaire(i, piocherTuile(tuilesDispo), piocherJeton(jetonsDispo));
+	}
+}
 
 // les methodes de la classe Pioche
 void Pioche::resetAllJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons) {
@@ -56,7 +95,7 @@ void Pioche::removePair(unsigned int indiceTuile, unsigned int indiceJetonFaune)
 		retirerJetonVisible(indiceJetonFaune);
 	}
 	else {
-		throw std::logic_error("Aucune paire disponible à l'indice de tuile donné");
+		throw std::logic_error("Aucune paire disponible ï¿½ l'indice de tuile donnï¿½");
 	}
 }
 
@@ -70,7 +109,7 @@ void Pioche::removeLastPair() {
 		retirerJetonVisible(3);
 	}
 	else {
-		throw std::logic_error("Aucune paire à retirer à l'indice 3");
+		throw std::logic_error("Aucune paire ï¿½ retirer ï¿½ l'indice 3");
 	}
 }
 
@@ -87,7 +126,7 @@ void Pioche::retirerPaire(unsigned int indice) {
 		retirerJetonVisible(indice);
 	}
 	else {
-		throw std::logic_error("Aucune paire disponible à cet indice");
+		throw std::logic_error("Aucune paire disponible ï¿½ cet indice");
 	}
 }
 
@@ -151,53 +190,53 @@ bool Pioche::troisJetonsIdentiques() const {
 
 // exe : removePair() + slideApresJetonNature() + Rafraichir()
 void Pioche::slideApresJetonNature(int i, bool isTuile) {
-	// Condition de base : si i est inférieur à 1, on arrête la récursion
+	// Condition de base : si i est infï¿½rieur ï¿½ 1, on arrï¿½te la rï¿½cursion
 	if (i < 1) {
 		return;
 	}
-	// Vérifie si la visibilité est vraie
+	// Vï¿½rifie si la visibilitï¿½ est vraie
 	if (isTuile) {
 		if (visibilite[i].first) {
-			slideApresJetonNature(i - 1, isTuile); // Appel récursif pour l'indice précédent
+			slideApresJetonNature(i - 1, isTuile); // Appel rï¿½cursif pour l'indice prï¿½cï¿½dent
 		}
 		else {
-			// On glisse en arrière pour trouver le premier indice visible
+			// On glisse en arriï¿½re pour trouver le premier indice visible
 			for (int j = i; j >= 0; --j) {
 				if (visibilite[j].first) {
-					// On utilise une variable temporaire pour l'échange
-					auto& tmp = pioche[i]->first; // On garde l'élément actuel dans une variable temporaire
+					// On utilise une variable temporaire pour l'ï¿½change
+					auto& tmp = pioche[i]->first; // On garde l'ï¿½lï¿½ment actuel dans une variable temporaire
 					pioche[i]->first = pioche[j]->first; // Remplace la tuile
-					pioche[j]->first = tmp; // Déplace l'élément original à l'indice j
+					pioche[j]->first = tmp; // Dï¿½place l'ï¿½lï¿½ment original ï¿½ l'indice j
 
-					// Met à jour la visibilité
-					visibilite[i].first = true; // Met à jour la visibilité pour l'indice actuel
-					visibilite[j].first = false; // Met à jour la visibilité de l'indice original
-					break; // On sort de la boucle après le glissement
+					// Met ï¿½ jour la visibilitï¿½
+					visibilite[i].first = true; // Met ï¿½ jour la visibilitï¿½ pour l'indice actuel
+					visibilite[j].first = false; // Met ï¿½ jour la visibilitï¿½ de l'indice original
+					break; // On sort de la boucle aprï¿½s le glissement
 				}
 			}
-			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice précédent
+			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice prï¿½cï¿½dent
 		}
 	}
 	else {
 		if (visibilite[i].second) {
-			slideApresJetonNature(i - 1, isTuile); // Appel récursif pour l'indice précédent
+			slideApresJetonNature(i - 1, isTuile); // Appel rï¿½cursif pour l'indice prï¿½cï¿½dent
 		}
 		else {
-			// On glisse en arrière pour trouver le premier indice visible
+			// On glisse en arriï¿½re pour trouver le premier indice visible
 			for (int j = i; j >= 0; --j) {
 				if (visibilite[j].second) {
-					// On utilise une variable temporaire pour l'échange
-					auto& tmp = pioche[i]->second; // On garde l'élément actuel dans une variable temporaire
+					// On utilise une variable temporaire pour l'ï¿½change
+					auto& tmp = pioche[i]->second; // On garde l'ï¿½lï¿½ment actuel dans une variable temporaire
 					pioche[i]->second = pioche[j]->second; // Remplace la tuile
-					pioche[j]->second = tmp; // Déplace l'élément original à l'indice j
+					pioche[j]->second = tmp; // Dï¿½place l'ï¿½lï¿½ment original ï¿½ l'indice j
 
-					// Met à jour la visibilité
-					visibilite[i].second = true; // Met à jour la visibilité pour l'indice actuel
-					visibilite[j].second = false; // Met à jour la visibilité de l'indice original
-					break; // On sort de la boucle après le glissement
+					// Met ï¿½ jour la visibilitï¿½
+					visibilite[i].second = true; // Met ï¿½ jour la visibilitï¿½ pour l'indice actuel
+					visibilite[j].second = false; // Met ï¿½ jour la visibilitï¿½ de l'indice original
+					break; // On sort de la boucle aprï¿½s le glissement
 				}
 			}
-			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice précédent
+			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice prï¿½cï¿½dent
 		}
 	}
 }
@@ -258,14 +297,14 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 			auto [tuile, jeton] = p.getPaire(i); // Utilisation de getPaire
 			os << "Tuile : ";
 			if (tuile) {
-				os << *tuile; // Utilisation de l'opérateur << pour Tuile
+				os << *tuile; // Utilisation de l'opï¿½rateur << pour Tuile
 			}
 			else {
 				os << "Aucune";
 			}
 			os << ", JetonFaune : ";
 			if (jeton) {
-				os << *jeton; // Utilisation de l'opérateur << pour JetonFaune
+				os << *jeton; // Utilisation de l'opï¿½rateur << pour JetonFaune
 			}
 			else {
 				os << "Aucun";
