@@ -72,23 +72,39 @@ public:
 
 	/// GETTERS ///
 
-	// accesseur Paire
-	std::pair<std::optional<Tuile>, std::optional<JetonFaune>> getPaire(unsigned int indice) const {
-		if (indice < 0 || indice >= pioche.size()) {
-			throw std::out_of_range("Indice hors intervalle de la taille de la pioche");
+	// type const auto& en retour, car autorise la lecture seulement
+	const std::pair<Tuile,JetonFaune>& getPaire(unsigned int indice) const {
+		if (indice >= MAX) {
+			throw std::out_of_range("Indice " + std::to_string(indice) +
+				" hors intervalle de la taille de la pioche (max = " +
+				std::to_string(MAX) + ")");
 		}
 
-		if (pioche[indice]) { // Vérifie si l'option a une valeur
-			return *pioche[indice]; // Déréférence pour obtenir la paire
-		}
-
-		throw std::logic_error("Aucune paire disponible à cet indice");
+		return piocheVisible.at(indice);
 	}
 
-	const std::array<std::optional<std::pair<std::optional<Tuile>, std::optional<JetonFaune>>>, 4>& getPioche() const {
-		return pioche;
+	//acces en lecture de la pioche visible
+	const std::array<std::pair<Tuile, JetonFaune>, MAX>& getPiocheVisible() const {
+		return piocheVisible;
 	}
 
+	const std::array<bool, 4>& getTuilesVisibles() const { return tuilesVisibles; }
+
+	// donne l'info sur le nombre de pieces restantes, mais ne va pas reveler ce qu'il reste, puisque c'est une pioche cachée
+	int getNbTuilesDispo() const {
+		if (!tuilesDispo.empty()) return tuilesDispo.size();
+	}
+
+	int getNbJetonsDispo() const {
+		if (!jetonsDispo.empty()) return jetonsDispo.size();
+	}
+
+	// methode qui sera appelée par Partie, pour distribuer ces TuilesDepart a chaque EnvJoueur
+	const std::vector<std::vector<Tuile>>& getTuilesDepartDispo() { return tuilesDepartDispo; }
+
+
+
+	/// AUTRES METHODES ///
 
 	void resetAllJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons);
 	void removeAllJetonFaune();
