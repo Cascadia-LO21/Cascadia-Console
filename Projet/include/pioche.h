@@ -87,7 +87,7 @@ public:
 		return piocheVisible;
 	}
 
-	const std::array<std::pair<bool,bool>, 4>& getVisibilite() const { return visibilite; }
+	const std::array<std::pair<bool,bool>, 4>& getTuilesVisibles() const { return visibilite; }
 
 	// donne l'info sur le nombre de pieces restantes, mais ne va pas reveler ce qu'il reste, puisque c'est une pioche cachée
 	size_t getNbTuilesDispo() const {
@@ -113,7 +113,7 @@ public:
 	void retirerJetonVisible(unsigned int indexJeton, bool remettre = false);
 
 
-	void retirerTuileJetonDebut(); // simulation d'un joueur robot qui par defaut retire la 1e tuile et 1e jeton visible dans la pioche
+	void retirePaireExtreme(); // simulation d'un joueur robot qui par defaut retire la derniere paire extreme dans la pioche
 	void retirerPaire(unsigned int i); // retirer un couple fixe
 	void retirerPaire(unsigned int i, unsigned int j); //retirer un couple libre par action Jeton Nature
 
@@ -123,8 +123,11 @@ public:
 	bool troisJetonsIdentiques() const;
 
 
+	// TODO : review pending 
 	// Simulation du fonctionnement (graphique) dans la pioche apres choix de paire
-	void slide(unsigned int i = 0, bool tuile = false);
+	void slideApresJetonNature(int i, bool isTuile);
+	void slideTuile(int i);
+	void slideJeton(int i);
 
 
 	void rafraichirPioche();
