@@ -3,6 +3,7 @@
 #include <array>
 #include <stack>
 #include <stdexcept>
+#include <utility>
 #include "pioche.h"
 #include "enums.h"
 #include "gestion_pieces.h"
@@ -107,7 +108,7 @@ void Pioche::retirerTuileVisible(unsigned int indexTuile)
 	visibilite.at(indexTuile).first = false;
 }
 
-// rend invisible un JetonFaune
+// rend invisible un JetonFaune, et le remet dans la pioche cachée si remettre = true
 void Pioche::retirerJetonVisible(unsigned int i, bool remettre)
 {
 	checkIndex(i);
@@ -138,72 +139,45 @@ bool Pioche::quatreJetonsIdentiques() const { return jetonsIdentiques(4); }
 
 bool Pioche::troisJetonsIdentiques() const { return jetonsIdentiques(3); }
 
-// TODO : review pending
-// exe : removePair() + slideApresJetonNature() + Rafraichir()
-//void Pioche::slideApresJetonNature(int i, bool isTuile) {
-//	// Condition de base : si i est inf�rieur � 1, on arr�te la r�cursion
-//	if (i < 1) {
-//		return;
-//	}
-//	// V�rifie si la visibilit� est vraie
-//	if (isTuile) {
-//		if (visibilite[i].first) {
-//			slideApresJetonNature(i - 1, isTuile); // Appel r�cursif pour l'indice pr�c�dent
-//		}
-//		else {
-//			// On glisse en arri�re pour trouver le premier indice visible
-//			for (int j = i; j >= 0; --j) {
-//				if (visibilite[j].first) {
-//					// On utilise une variable temporaire pour l'�change
-//					auto& tmp = pioche[i]->first; // On garde l'�l�ment actuel dans une variable temporaire
-//					pioche[i]->first = pioche[j]->first; // Remplace la tuile
-//					pioche[j]->first = tmp; // D�place l'�l�ment original � l'indice j
-//
-//					// Met � jour la visibilit�
-//					visibilite[i].first = true; // Met � jour la visibilit� pour l'indice actuel
-//					visibilite[j].first = false; // Met � jour la visibilit� de l'indice original
-//					break; // On sort de la boucle apr�s le glissement
-//				}
-//			}
-//			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice pr�c�dent
-//		}
-//	}
-//	else {
-//		if (visibilite[i].second) {
-//			slideApresJetonNature(i - 1, isTuile); // Appel r�cursif pour l'indice pr�c�dent
-//		}
-//		else {
-//			// On glisse en arri�re pour trouver le premier indice visible
-//			for (int j = i; j >= 0; --j) {
-//				if (visibilite[j].second) {
-//					// On utilise une variable temporaire pour l'�change
-//					auto& tmp = pioche[i]->second; // On garde l'�l�ment actuel dans une variable temporaire
-//					pioche[i]->second = pioche[j]->second; // Remplace la tuile
-//					pioche[j]->second = tmp; // D�place l'�l�ment original � l'indice j
-//
-//					// Met � jour la visibilit�
-//					visibilite[i].second = true; // Met � jour la visibilit� pour l'indice actuel
-//					visibilite[j].second = false; // Met � jour la visibilit� de l'indice original
-//					break; // On sort de la boucle apr�s le glissement
-//				}
-//			}
-//			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice pr�c�dent
-//		}
-//	}
-//}
 
-//void Pioche::slideTuile(int i) {
-//	slideApresJetonNature(i, true);
-//}
-//
-//void Pioche::slideJeton(int i) {
-//	slideApresJetonNature(i, false); 
-//}
+// Param i : la place vide dans la ligne des Tuiles ou des Jetons
+// Param tuile : indique si on traite les tuiles ou les jetons de la pioche visible
+// But : Decale les elements visibles apres i jusqu'à i, et donc la fin regroupe les elements non visibles
+// Exemple : slide(1, true) : decalage fait au niveau des Tuiles de la piocheVisible
+// WARNING : ne conserve pas l'ordre des elements non visibles, mais seulement des elements visibles
+// REMARQUE : dans une optique d'extension, cette fonction marche pour toute taille du tableau considere
+void Pioche::slide(unsigned int i, bool tuile) {
+	checkIndex(i);
+	if (tuile) {
+		unsigned int j = i;
+		while (j < MAX && !visibilite[j].first) ++j; // recherche du premier element visible apres i
+		for (; j < MAX; ++j) {  // on décale tous les éléments visibles vers i
+			if (visibilite[j].first) {
+				std::swap(piocheVisible[i].first, piocheVisible[j].first);
+				std::swap(visibilite[i].first, visibilite[j].first);
+				++i;
+			}
+		}
+	}
+	else {
+		unsigned int j = i;
+		while (j < MAX && !visibilite[j].second) ++j;
+		for (; j < MAX; ++j) {
+			if (visibilite[j].second) {
+				std::swap(piocheVisible[i].second, piocheVisible[j].second);
+				std::swap(visibilite[i].second, visibilite[j].second);
+				++i;
+			}
+		}
+	}
+}
 
 
-
-// simule un robot qui retire une paire en cas de joueur solitaire
-void Pioche::retirePaireExtreme() {
+// simule un "robot" qui retire une paire en cas de joueur solitaire
+// cela s'applique aussi bien, quand un joueur chosit une paire fixe ou libre (après jeton nature)
+// Mais de toute maniere, on utilisera cette fonction pour retirer la premiere paire, apres avoir "Slider" toute la piocheVisbile vers le debut, 
+// de sorte à avoir les places vides à la fin du tableau
+void Pioche::retirerTuileJetonDebut() {
 	// Retire la première tuile visible
 	for (int i = 0; i < MAX; ++i) {
 		if (visibilite.at(i).first) {
@@ -249,18 +223,69 @@ void Pioche::rafraichirPioche() {
 
 }
 
+
+// Affiche la pioche visible, où la visibilite de chaque elemennt est controlé par visibilite
+// PIOCHE :
+// T1  T2  X   T3
+// J1  J2  J3  J4
+//
+// T1 :
+// <description de la tuile 1>
+// etc...
+// J4:
+// <description du jeton 4>
 std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 	os << "PIOCHE :\n";
-	for (unsigned int i = 0; i < p.getPiocheVisible().size(); ++i) {
-		os << "Index " << i << ": ";
-		try {
-			auto [tuile, jeton] = p.getPaire(i);
-			os << "Tuile : " << tuile << ", JetonFaune : " << jeton;
+	
+	const auto& visibilite = p.getVisibilite();
+	unsigned int n = p.getPiocheVisible().size();
+
+	// Affichage des Tuiles visibles (T1, T2, X, T3)
+	for (unsigned int i = 0; i < n; ++i) {
+		if (visibilite[i].first) {
+			os << "T" << (i + 1) << "\t";
 		}
-		catch (const std::logic_error& e) {
-			os << "Erreur : " << e.what();
+		else {
+			os << "X\t";
 		}
-		os << '\n';
 	}
+	os << "\n";
+
+	// Affichage des Jetons visibles (J1, J2, J3, J4)
+	for (unsigned int i = 0; i < n; ++i) {
+		if (visibilite[i].second) {
+			os << "J" << (i + 1) << "\t";
+		}
+		else {
+			os << "X\t";
+		}
+	}
+	os << "\n\n";
+
+	// Détail des Tuiles Visibles
+	for (unsigned int i = 0; i < n; ++i) {
+		if (visibilite[i].first) {
+			os << "T" << (i + 1) << ":\n";
+			try { os << p.getPaire(i).first << "\n";
+			}
+			catch (const std::exception& e) {
+				os << "Erreur : " << e.what() << "\n";
+			}
+		}
+	}
+
+	// Détail des Jetons
+	for (unsigned int i = 0; i < n; ++i) {
+		if (visibilite[i].second) {
+			os << "J" << (i + 1) << ":\n";
+			try { os << p.getPaire(i).second << "\n";
+			}
+			catch (const std::exception& e) {
+				os << "Erreur : " << e.what() << "\n";
+			}
+		}
+	}
+
 	return os;
 }
+
