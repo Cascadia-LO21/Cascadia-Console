@@ -25,22 +25,27 @@ private:
 
 	// Voici un tableau qui decrit la presence de Tuile ou Jeton au sein de la pioche visible
 	// false = invisible ; true = visible
-	//std::array<std::pair<bool, bool>, 4> visibilite;
+	// Permet de "cacher" temporairement une Tuile ou Jeton qui est posée sur le plateau, 
+	std::array<std::pair<bool, bool>, 4> visibilite;
 	
-	// Permet de "cacher" temporairement une Tuile qui est posée sur le plateau, 
-	// mais dont le JetonFaune associé n'est pas encore placé.
-	std::array<bool, 4> tuilesVisibles; 
-
 	// Les stocks suivants de Tuile et de JetonFaune forment la pioche cachée, 
 	// dans laquelle on piochera des nouveaux elements.
 	std::stack<Tuile> tuilesDispo;
 	std::vector<JetonFaune> jetonsDispo;
 	std::vector<std::vector<Tuile>> tuilesDepartDispo;
 
+	// Pour factoriser la verification d'indice ; methode pas necessaire de rendre disponible à tout utilisateur
+	void checkIndex(unsigned int indice) const {
+		if (indice >= MAX) {
+			throw std::out_of_range("Indice " + std::to_string(indice) +
+				" hors intervalle (max = " + std::to_string(MAX) + ")");
+		}
+	}
+
 public:
 
 	Pioche(unsigned int nbJoueurs = 1) :
-		tuilesVisibles{ true }, // par defaut, tout est visible dans piocheVisible
+		visibilite{ {{true,true}} }, // par defaut, tout est visible dans piocheVisible
 		tuilesDispo{},
 		jetonsDispo{},
 		tuilesDepartDispo{}
@@ -57,15 +62,11 @@ public:
 	void setTuilesDispo(unsigned int nbJoueurs = 1);
 	void setJetonsDispo();
 	void setTuilesDepartDispo();
-	void setTuilesVisibles(unsigned int i, bool vue);
+	void setVisibilite(unsigned int i, bool vue, bool tuile = true);
 
 	// Definit un couple (Tuile,JetonFaune) à la case [indice] de piocheVisible
 	void setPaire(unsigned int indice, const Tuile& tuile, const JetonFaune& jeton) {
-		if (indice >= MAX) {
-			throw std::out_of_range("Indice " + std::to_string(indice) +
-				" hors intervalle de la taille de la pioche (max = " +
-				std::to_string(MAX) + ")");
-		}
+		checkIndex(indice);
 		piocheVisible[indice] = std::make_pair(tuile, jeton); 
 	}
 
@@ -77,12 +78,7 @@ public:
 
 	// type const auto& en retour, car autorise la lecture seulement
 	const std::pair<Tuile,JetonFaune>& getPaire(unsigned int indice) const {
-		if (indice >= MAX) {
-			throw std::out_of_range("Indice " + std::to_string(indice) +
-				" hors intervalle de la taille de la pioche (max = " +
-				std::to_string(MAX) + ")");
-		}
-
+		checkIndex(indice);
 		return piocheVisible.at(indice);
 	}
 
@@ -91,14 +87,14 @@ public:
 		return piocheVisible;
 	}
 
-	const std::array<bool, 4>& getTuilesVisibles() const { return tuilesVisibles; }
+	const std::array<std::pair<bool,bool>, 4>& getTuilesVisibles() const { return visibilite; }
 
 	// donne l'info sur le nombre de pieces restantes, mais ne va pas reveler ce qu'il reste, puisque c'est une pioche cachée
-	int getNbTuilesDispo() const {
+	size_t getNbTuilesDispo() const {
 		if (!tuilesDispo.empty()) return tuilesDispo.size();
 	}
 
-	int getNbJetonsDispo() const {
+	size_t getNbJetonsDispo() const {
 		if (!jetonsDispo.empty()) return jetonsDispo.size();
 	}
 
@@ -109,39 +105,32 @@ public:
 
 	/// AUTRES METHODES ///
 
-	void resetAllJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons);
-	void removeAllJetonFaune();
+	void resetAllJetonFaune();
+	void resetJetonFaune(const std::vector<int>& indices);
 
-	// reset les Paires dont l'indice est dans quiEnleverIndices
-	void resetJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, const std::vector<int>& quiEnleverIndices);
-	void removeJetonFaune(const std::vector<int>& quiEnleverIndices);
-	// alternative de resetJetonFaune (son complement)
-	void remplacerJetons(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, int except = -1);
-	// Dans le cas de l'utilisation du jeton nature
-	void removePair(unsigned int indiceTuile, unsigned int indiceJetonFaune);
-	// simulation d'un joueur IA qui par defaut retire la derniere paire dans la pioche
-	void removeLastPair();
 
-	// Dans le cas usuel
-	void retirerPaire(unsigned int i);
-	// Update visibilite
 	void retirerTuileVisible(unsigned int indexTuile);
-	// Update visibilite
-	void retirerJetonVisible(unsigned int indexJeton);
-	
-	// Verifications
+	void retirerJetonVisible(unsigned int indexJeton, bool remettre = false);
+
+
+	void retirePaireExtreme(); // simulation d'un joueur robot qui par defaut retire la derniere paire extreme dans la pioche
+	void retirerPaire(unsigned int i); // retirer un couple fixe
+	void retirerPaire(unsigned int i, unsigned int j); //retirer un couple libre par action Jeton Nature
+
+
 	bool jetonsIdentiques(int nb) const;
-	int retourneIndiceFaune(Faune type) const; //WARNING: definir dans le enum. Faire des static_cast
 	bool quatreJetonsIdentiques() const;
 	bool troisJetonsIdentiques() const;
 
-	// Simulation du fonctionnement de piles dans la pioche apres choix de paire
+
+	// TODO : review pending 
+	// Simulation du fonctionnement (graphique) dans la pioche apres choix de paire
 	void slideApresJetonNature(int i, bool isTuile);
 	void slideTuile(int i);
 	void slideJeton(int i);
 
-	// remplir pioche selon visibilite
-	void rafraichirPioche(std::stack<Tuile>& pile, std::vector<JetonFaune>& jetons);
+
+	void rafraichirPioche();
 };
 
 std::ostream& operator<<(std::ostream& os, const Pioche& p);

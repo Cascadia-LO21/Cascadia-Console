@@ -4,6 +4,7 @@
 #include <stack>
 #include <stdexcept>
 #include "pioche.h"
+#include "enums.h"
 #include "gestion_pieces.h"
 using namespace GestionPieces;
 
@@ -27,12 +28,21 @@ void Pioche::setTuilesDepartDispo() {
 	melangerTuilesDepart(tuilesDepartDispo);
 }
 
-void Pioche::setTuilesVisibles(unsigned int i, bool vue) {
+// permet de changer la visibilite à l'index i : 
+// si le param tuile est vrai, alors la visibilite de la tuile est changée
+// sinon c'est celle du jeton faune
+void Pioche::setVisibilite(unsigned int i, bool vue, bool tuile) {
 	if (i >= MAX)
 		throw std::out_of_range("L'indice maximal supporté est : " + std::to_string(MAX));
 	
-	if (tuilesVisibles.at(i) != vue) {
-		tuilesVisibles.at(i) = vue;
+	if (tuile) {
+		if (visibilite.at(i).first != vue)
+			visibilite.at(i).first = vue;
+	}
+
+	else {
+		if (visibilite.at(i).second != vue)
+			visibilite.at(i).second = vue;
 	}
 }
 
@@ -47,274 +57,210 @@ void Pioche::setPiocheVisible() {
 	}
 }
 
-// les methodes de la classe Pioche
-void Pioche::resetAllJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons) {
-	removeAllJetonFaune();
-	rafraichirPioche(pileTuiles, sachetJetons);
+
+/// AUTRES METHODES ///
+
+// Cas où la pioche presente 4 mêmes JetonFaune : dans ce cas, il faut automatiqument remplacer TOUS les jetons
+// Rend invisible TOUS les jetons faunes, et les remplace par de nouveaux
+void Pioche::resetAllJetonFaune() {
+	for (int i = 0; i < MAX; ++i) retirerJetonVisible(i, true); // true : remet les jetons dans la pioche
+	rafraichirPioche();
 }
 
-void Pioche::removeAllJetonFaune() {
-	for (int i = 0; i < pioche.size(); ++i) {
-		pioche[i]->second = std::nullopt;
-		retirerJetonVisible(i);
-	}
-}
-
-void Pioche::resetJetonFaune(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, const std::vector<int>& quiEnleverIndices) {
-	removeJetonFaune(quiEnleverIndices);
-	rafraichirPioche(pileTuiles, sachetJetons);
-}
-
-void Pioche::removeJetonFaune(const std::vector<int>& quiEnleverIndices) {
-	for (int indice : quiEnleverIndices) {
-		if (indice >= 0 && indice < pioche.size()) {
-			if (pioche[indice]) {
-				pioche[indice]->second = std::nullopt;
-				retirerJetonVisible(indice);
+// Cas où la pioche presente 3 mêmes JetonFaune : dans ce cas, il est tolerer de les remplacer UNE FOIS
+// Cas où coup Jeton Nature : le joeur selectionne les jetons faunes qu'ils veut remplacer
+void Pioche::resetJetonFaune(const std::vector<int>& indices) {
+	for (int i : indices) {
+		if (i >= 0 && i < MAX) {
+			if (visibilite.at(i).second) {
+				retirerJetonVisible(i, true); //remet dans la pioche
 			}
 		}
 		else {
 			throw std::out_of_range("Indice hors intervalle pour retirer le jeton Faune");
 		}
 	}
+	rafraichirPioche();
 }
 
-void Pioche::removePair(unsigned int indiceTuile, unsigned int indiceJetonFaune) {
-	// verification des parametres en entree
-	if (indiceTuile >= pioche.size()) {
-		throw std::out_of_range("Indice de tuile hors intervalle");
-	}
-	if (indiceJetonFaune >= pioche.size()) {
-		throw std::out_of_range("Indice de jeton Faune hors intervalle");
-	}
-
-	// verification d'existences
-	if (pioche[indiceTuile] && pioche[indiceJetonFaune]) {
-		pioche[indiceTuile]->first = std::nullopt; // Retire la Tuile
-		pioche[indiceTuile]->second = std::nullopt; // Retire le JetonFaune
-		retirerTuileVisible(indiceTuile);
-		retirerJetonVisible(indiceJetonFaune);
-	}
-	else {
-		throw std::logic_error("Aucune paire disponible � l'indice de tuile donn�");
-	}
+// retire une paire fixe : coup "normal"
+// ne pas remettre la Tuile et le JetonFaune dans la pioche, car le joueur en sera en possession
+void Pioche::retirerPaire(unsigned int i) {
+	checkIndex(i);
+	retirerTuileVisible(i);
+	retirerJetonVisible(i); 
 }
 
-void Pioche::removeLastPair() {
-	if (pioche[3]) {
-		// retirer paire indice = 3
-		pioche[3] = std::nullopt; // optional
-
-		// MAJ visibilite
-		retirerTuileVisible(3);
-		retirerJetonVisible(3);
-	}
-	else {
-		throw std::logic_error("Aucune paire � retirer � l'indice 3");
-	}
+// retire une paire libre : coup "Jeton Nature"
+// ne pas remettre la Tuile et le JetonFaune dans la pioche, car le joueur en sera en possession
+void Pioche::retirerPaire(unsigned int i, unsigned int j) {
+	checkIndex(i);
+	checkIndex(j);
+	retirerTuileVisible(i);
+	retirerJetonVisible(j);
 }
 
-
-void Pioche::retirerPaire(unsigned int indice) {
-	if (indice < 0 || indice >= pioche.size()) {
-		throw std::out_of_range("Indice hors intervalle pour retirer la paire");
-	}
-
-	if (pioche[indice]) {
-		pioche[indice] = std::nullopt;
-
-		retirerTuileVisible(indice);
-		retirerJetonVisible(indice);
-	}
-	else {
-		throw std::logic_error("Aucune paire disponible � cet indice");
-	}
-}
-
+// rend invisible une Tuile 
 void Pioche::retirerTuileVisible(unsigned int indexTuile)
 {
-	if (indexTuile < visibilite.size()) {
-		visibilite[indexTuile].first = false;
-	}
-	else {
-		throw std::out_of_range("Indice hors intervalle pour retirer la tuile visible");
-	}
+	checkIndex(indexTuile);
+	visibilite.at(indexTuile).first = false;
 }
 
-void Pioche::retirerJetonVisible(unsigned int indexJeton)
+// rend invisible un JetonFaune
+void Pioche::retirerJetonVisible(unsigned int i, bool remettre)
 {
-	if (indexJeton < visibilite.size()) {
-		visibilite[indexJeton].second = false;
-	}
-	else {
-		throw std::out_of_range("Indice hors intervalle pour retirer le jeton visible");
-	}
+	checkIndex(i);
+	if (visibilite.at(i).second) visibilite.at(i).second = false;
+
+	if(remettre)
+		remettreJeton(jetonsDispo, piocheVisible.at(i).second);
 }
 
-bool Pioche::jetonsIdentiques(int nb) const {
-	std::array<int, 5> fauneCount{ 0 };
-	for (const auto& optionalPair : pioche) {
-		if (optionalPair) {
-			const auto& jetonFaune = optionalPair->second;
-			if (jetonFaune) {
-				fauneCount[retourneIndiceFaune(jetonFaune->getType())]++;
-			}
-		}
+// test s'il y a n jetons faunes identiques dans la pioche visible
+bool Pioche::jetonsIdentiques(int n) const {
+	std::array<int, 5> fauneCount{ 0 }; // initialise les compteurs à 0
+	for (const auto& paire: piocheVisible) {
+		int indiceFaune = static_cast<int>(paire.second.getType());
+		fauneCount[indiceFaune]++;
 	}
-	for (const auto& value : fauneCount) {
-		if (value == nb) {
+
+	for (int value : fauneCount) {
+		if (value == n) {
 			return true;
 		}
 	}
+
 	return false;
 }
 
-int Pioche::retourneIndiceFaune(Faune type) const
-{
-	switch (type) {
-	case Faune::saumon: return 0;
-	case Faune::ours:   return 1;
-	case Faune::buse:   return 2;
-	case Faune::renard: return 3;
-	case Faune::wapiti: return 4;
-	default: throw std::invalid_argument("Type de Faune Inconnu");
-	}
-}
+bool Pioche::quatreJetonsIdentiques() const { return jetonsIdentiques(4); }
 
-bool Pioche::quatreJetonsIdentiques() const {
-	return jetonsIdentiques(4);
-}
+bool Pioche::troisJetonsIdentiques() const { return jetonsIdentiques(3); }
 
-bool Pioche::troisJetonsIdentiques() const {
-	return jetonsIdentiques(3);
-}
-
+// TODO : review pending
 // exe : removePair() + slideApresJetonNature() + Rafraichir()
-void Pioche::slideApresJetonNature(int i, bool isTuile) {
-	// Condition de base : si i est inf�rieur � 1, on arr�te la r�cursion
-	if (i < 1) {
-		return;
-	}
-	// V�rifie si la visibilit� est vraie
-	if (isTuile) {
-		if (visibilite[i].first) {
-			slideApresJetonNature(i - 1, isTuile); // Appel r�cursif pour l'indice pr�c�dent
-		}
-		else {
-			// On glisse en arri�re pour trouver le premier indice visible
-			for (int j = i; j >= 0; --j) {
-				if (visibilite[j].first) {
-					// On utilise une variable temporaire pour l'�change
-					auto& tmp = pioche[i]->first; // On garde l'�l�ment actuel dans une variable temporaire
-					pioche[i]->first = pioche[j]->first; // Remplace la tuile
-					pioche[j]->first = tmp; // D�place l'�l�ment original � l'indice j
+//void Pioche::slideApresJetonNature(int i, bool isTuile) {
+//	// Condition de base : si i est inf�rieur � 1, on arr�te la r�cursion
+//	if (i < 1) {
+//		return;
+//	}
+//	// V�rifie si la visibilit� est vraie
+//	if (isTuile) {
+//		if (visibilite[i].first) {
+//			slideApresJetonNature(i - 1, isTuile); // Appel r�cursif pour l'indice pr�c�dent
+//		}
+//		else {
+//			// On glisse en arri�re pour trouver le premier indice visible
+//			for (int j = i; j >= 0; --j) {
+//				if (visibilite[j].first) {
+//					// On utilise une variable temporaire pour l'�change
+//					auto& tmp = pioche[i]->first; // On garde l'�l�ment actuel dans une variable temporaire
+//					pioche[i]->first = pioche[j]->first; // Remplace la tuile
+//					pioche[j]->first = tmp; // D�place l'�l�ment original � l'indice j
+//
+//					// Met � jour la visibilit�
+//					visibilite[i].first = true; // Met � jour la visibilit� pour l'indice actuel
+//					visibilite[j].first = false; // Met � jour la visibilit� de l'indice original
+//					break; // On sort de la boucle apr�s le glissement
+//				}
+//			}
+//			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice pr�c�dent
+//		}
+//	}
+//	else {
+//		if (visibilite[i].second) {
+//			slideApresJetonNature(i - 1, isTuile); // Appel r�cursif pour l'indice pr�c�dent
+//		}
+//		else {
+//			// On glisse en arri�re pour trouver le premier indice visible
+//			for (int j = i; j >= 0; --j) {
+//				if (visibilite[j].second) {
+//					// On utilise une variable temporaire pour l'�change
+//					auto& tmp = pioche[i]->second; // On garde l'�l�ment actuel dans une variable temporaire
+//					pioche[i]->second = pioche[j]->second; // Remplace la tuile
+//					pioche[j]->second = tmp; // D�place l'�l�ment original � l'indice j
+//
+//					// Met � jour la visibilit�
+//					visibilite[i].second = true; // Met � jour la visibilit� pour l'indice actuel
+//					visibilite[j].second = false; // Met � jour la visibilit� de l'indice original
+//					break; // On sort de la boucle apr�s le glissement
+//				}
+//			}
+//			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice pr�c�dent
+//		}
+//	}
+//}
 
-					// Met � jour la visibilit�
-					visibilite[i].first = true; // Met � jour la visibilit� pour l'indice actuel
-					visibilite[j].first = false; // Met � jour la visibilit� de l'indice original
-					break; // On sort de la boucle apr�s le glissement
-				}
-			}
-			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice pr�c�dent
+//void Pioche::slideTuile(int i) {
+//	slideApresJetonNature(i, true);
+//}
+//
+//void Pioche::slideJeton(int i) {
+//	slideApresJetonNature(i, false); 
+//}
+
+
+
+// simule un robot qui retire une paire en cas de joueur solitaire
+void Pioche::retirePaireExtreme() {
+	// Retire la première tuile visible
+	for (int i = 0; i < MAX; ++i) {
+		if (visibilite.at(i).first) {
+			visibilite.at(i).first = false;
+			break;
 		}
 	}
-	else {
-		if (visibilite[i].second) {
-			slideApresJetonNature(i - 1, isTuile); // Appel r�cursif pour l'indice pr�c�dent
-		}
-		else {
-			// On glisse en arri�re pour trouver le premier indice visible
-			for (int j = i; j >= 0; --j) {
-				if (visibilite[j].second) {
-					// On utilise une variable temporaire pour l'�change
-					auto& tmp = pioche[i]->second; // On garde l'�l�ment actuel dans une variable temporaire
-					pioche[i]->second = pioche[j]->second; // Remplace la tuile
-					pioche[j]->second = tmp; // D�place l'�l�ment original � l'indice j
-
-					// Met � jour la visibilit�
-					visibilite[i].second = true; // Met � jour la visibilit� pour l'indice actuel
-					visibilite[j].second = false; // Met � jour la visibilit� de l'indice original
-					break; // On sort de la boucle apr�s le glissement
-				}
-			}
-			slideApresJetonNature(i - 1, isTuile); // On continue avec l'indice pr�c�dent
+	// Retire le premier jeton visible
+	for (int j = 0; j < MAX; ++j) {
+		if (visibilite.at(j).second) {
+			visibilite.at(j).second = false;
+			break;
 		}
 	}
 }
 
-void Pioche::slideTuile(int i) {
-	slideApresJetonNature(i, true);
-}
 
-void Pioche::slideJeton(int i) {
-	slideApresJetonNature(i, false); 
-}
+// permet de boucher les "trous" dans la piocheVisible
+void Pioche::rafraichirPioche() {
+	if (tuilesDispo.empty() || jetonsDispo.empty())
+		throw std::runtime_error("La pioche cachée est vidée, impossible de completer la pioche visible pour les joueurs.");
 
-void Pioche::remplacerJetons(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons, int except) {
-	if (except == -1) {
-		removeAllJetonFaune(); 
-	}
-	else if (except >= 0 && except < pioche.size()) {
-		std::vector<int> indicesToRemove;
-		for (int i = 0; i < pioche.size(); ++i) {
-			if (i != except) {
-				indicesToRemove.push_back(i);
-			}
-		}
-		removeJetonFaune(indicesToRemove); 
-	}
-	else {
-		throw std::out_of_range("Indice hors intervalle pour remplacer les jetons");
-	}
-
-	rafraichirPioche(pileTuiles, sachetJetons); 
-}
-
-void Pioche::rafraichirPioche(std::stack<Tuile>& pileTuiles, std::vector<JetonFaune>& sachetJetons) {
-	for (unsigned int i = 0; i < pioche.size(); ++i) {
-		auto [ancienTuile, ancienJeton] = getPaire(i);
+	// boucher les "trous" au niveau des Tuiles presentees
+	for (unsigned int i = 0; i < MAX; ++i) {
+		auto [ancienneTuile, ancienJeton] = getPaire(i);
 		if (!visibilite[i].first) {
-			if (!pileTuiles.empty()) {
-				Tuile nouvelleTuile = GestionPieces::piocherTuile(pileTuiles);
-				visibilite[i].first = true;
-				setPaire(i, nouvelleTuile, ancienJeton);
-			}
-		}
-		if (!visibilite[i].second) {
-			if (!sachetJetons.empty()) {
-				JetonFaune nouveauJeton = GestionPieces::piocherJeton(sachetJetons);
-				visibilite[i].second = true;
-				setPaire(i, ancienTuile, nouveauJeton);
-			}
+			Tuile nouvelleTuile = piocherTuile(tuilesDispo);
+			visibilite[i].first = true;
+			setPaire(i, nouvelleTuile, ancienJeton);
+			
 		}
 	}
+
+	// boucher les "trous" au niveau des jetons presentes
+	for (unsigned int i = 0; i < MAX; ++i) {
+		auto [ancienneTuile, ancienJeton] = getPaire(i);
+		if (!visibilite[i].second) {
+			JetonFaune nouveauJeton = piocherJeton(jetonsDispo);
+			visibilite[i].second = true;
+			setPaire(i, ancienneTuile, nouveauJeton); 
+		}
+	}
+
 }
 
 std::ostream& operator<<(std::ostream& os, const Pioche& p) {
-	os << "Pioche :\n";
-	for (unsigned int i = 0; i < p.getPioche().size(); ++i) {
+	os << "PIOCHE :\n";
+	for (unsigned int i = 0; i < p.getPiocheVisible().size(); ++i) {
 		os << "Index " << i << ": ";
 		try {
-			auto [tuile, jeton] = p.getPaire(i); // Utilisation de getPaire
-			os << "Tuile : ";
-			if (tuile) {
-				os << *tuile; // Utilisation de l'op�rateur << pour Tuile
-			}
-			else {
-				os << "Aucune";
-			}
-			os << ", JetonFaune : ";
-			if (jeton) {
-				os << *jeton; // Utilisation de l'op�rateur << pour JetonFaune
-			}
-			else {
-				os << "Aucun";
-			}
+			auto [tuile, jeton] = p.getPaire(i);
+			os << "Tuile : " << tuile << ", JetonFaune : " << jeton;
 		}
 		catch (const std::logic_error& e) {
-			os << "Erreur : " << e.what(); // Gestion des erreurs
+			os << "Erreur : " << e.what();
 		}
-		os << '\n'; // Utilisation de '\n' pour une meilleure performance
+		os << '\n';
 	}
 	return os;
 }
