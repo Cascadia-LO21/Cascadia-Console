@@ -42,10 +42,17 @@ private:
 		}
 	}
 
+	/// SETTERS PRIVES ///
+	void setTuilesDispo(unsigned int nbJoueurs = 1);
+	void setJetonsDispo();
+	void setTuilesDepartDispo();
+	void setVisibilite(unsigned int i, bool vue, bool tuile = true); // prive car les users manipule la visibilite via les methodes retirerXXX()
+	void setPiocheVisible();
+
 public:
 
 	Pioche(unsigned int nbJoueurs = 1) :
-		visibilite{ {{true,true}} }, // par defaut, tout est visible dans piocheVisible
+		visibilite{ {{true,true},{true,true},{true,true},{true,true} } }, // par defaut, tout est visible dans piocheVisible
 		tuilesDispo{},
 		jetonsDispo{},
 		tuilesDepartDispo{}
@@ -57,21 +64,13 @@ public:
 	}
 
 
-	/// SETTERS ///
-
-	void setTuilesDispo(unsigned int nbJoueurs = 1);
-	void setJetonsDispo();
-	void setTuilesDepartDispo();
-	void setVisibilite(unsigned int i, bool vue, bool tuile = true);
+	/// SETTER PUBLIC ///
 
 	// Definit un couple (Tuile,JetonFaune) à la case [indice] de piocheVisible
 	void setPaire(unsigned int indice, const Tuile& tuile, const JetonFaune& jeton) {
 		checkIndex(indice);
 		piocheVisible[indice] = std::make_pair(tuile, jeton); 
 	}
-
-	void setPiocheVisible();
-
 
 
 	/// GETTERS ///
@@ -131,3 +130,5 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& os, const Pioche& p);
+
+void testPioche(int nbJoueur);

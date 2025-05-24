@@ -14,22 +14,17 @@
 #include "carte_marquage.h"
 #include "gestion_pieces.h"
 
-void testPioche() {
-
-}
-
-
 int main() {
-	std::cout << "hello world\n" << std::endl;
+	//std::cout << "hello world\n" << std::endl;
 	
 	//testClassePosition();
 
 	//testClasseTuile();
 
-	testGestionPieces();
+	//testGestionPieces();
 	
 	//JetonFaune j(Faune::saumon);
 	//cout << j;
 
-	// Test des cartes
+	testPioche(1);
 }

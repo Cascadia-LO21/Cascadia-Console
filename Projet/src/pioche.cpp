@@ -235,10 +235,10 @@ void Pioche::rafraichirPioche() {
 // J4:
 // <description du jeton 4>
 std::ostream& operator<<(std::ostream& os, const Pioche& p) {
-	os << "PIOCHE :\n";
+	os << "========= PIOCHE ========= \n";
 	
 	const auto& visibilite = p.getVisibilite();
-	unsigned int n = p.getPiocheVisible().size();
+	size_t n = p.getPiocheVisible().size();
 
 	// Affichage des Tuiles visibles (T1, T2, X, T3)
 	for (unsigned int i = 0; i < n; ++i) {
@@ -261,11 +261,12 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 		}
 	}
 	os << "\n\n";
+	os << "--- Infos Tuiles --- \n";
 
 	// Détail des Tuiles Visibles
 	for (unsigned int i = 0; i < n; ++i) {
-		if (visibilite[i].first) {
-			os << "T" << (i + 1) << ":\n";
+		if (visibilite[i].first) { 
+			os << "T" << (i + 1) << ": ";
 			try { os << p.getPaire(i).first << "\n";
 			}
 			catch (const std::exception& e) {
@@ -274,10 +275,11 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 		}
 	}
 
+	os << "--- Infos Jetons Faunes --- \n";
 	// Détail des Jetons
 	for (unsigned int i = 0; i < n; ++i) {
 		if (visibilite[i].second) {
-			os << "J" << (i + 1) << ":\n";
+			os << "J" << (i + 1) << ": ";
 			try { os << p.getPaire(i).second << "\n";
 			}
 			catch (const std::exception& e) {
@@ -286,6 +288,61 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 		}
 	}
 
+	os << "\n======= FIN PIOCHE ======= \n" << std::endl;
+
 	return os;
 }
 
+
+void testPioche(int n) {
+	Pioche p = Pioche(n);
+	std::cout << p;
+	//std::cout << p.troisJetonsIdentiques() << std::endl;
+
+	/// RETIRE UN COUPLE FIXE
+	//p.retirerPaire(3);
+	//std::cout << p;
+
+	/// RETIRE UN COUPLE LIBRE
+	p.retirerPaire(0, 3);
+	std::cout << p;
+	/// SLIDE 
+	p.slide(0,true);
+	p.slide(3,false);
+	std::cout << p;
+
+	/// RETIRE UNE seule TUILE 
+	//p.retirerTuileVisible(1); //tuile 1 devient invisible
+	//std::cout << p;
+
+	//std::cout << "Nb tuiles dispo au depart : " << p.getNbTuilesDispo() << std::endl;
+	//std::cout << "Nb jetons faunes dispo au depart : " << p.getNbJetonsDispo() << std::endl;
+
+	/// JETON NATURE : RETIRE 4 JETONS, OU 4jetonsIdentiques
+	//p.resetAllJetonFaune();
+	//std::cout << p;
+
+	/// JETON NATURE : RETIRE certains JETONS
+	//p.resetJetonFaune({ 1,3 });
+	//std::cout << p;
+
+
+	/// COUP IA 
+	p.retirerTuileJetonDebut();
+	std::cout << p;
+
+
+	/// RAFRAICHIR PIOCHE
+	//p.rafraichirPioche();
+	//std::cout << p;
+	//std::cout << "Nb tuiles dispo au depart : " << p.getNbTuilesDispo() << std::endl;
+	//std::cout << "Nb jetons faunes dispo au depart : " << p.getNbJetonsDispo() << std::endl;
+
+
+	/// TEST TUILES DE DEPART
+	//std::cout << "Tuiles depart dispo : " << std::endl;
+	//for (const auto& t : p.getTuilesDepartDispo()) std::cout << t;
+
+
+
+}
