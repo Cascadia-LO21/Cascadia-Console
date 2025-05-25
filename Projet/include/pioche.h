@@ -26,7 +26,7 @@ private:
 	// Voici un tableau qui decrit la presence de Tuile ou Jeton au sein de la pioche visible
 	// false = invisible ; true = visible
 	// Permet de "cacher" temporairement une Tuile ou Jeton qui est posée sur le plateau, 
-	std::array<std::pair<bool, bool>, 4> visibilite;
+	std::array<std::pair<bool, bool>, MAX> visibilite;
 	
 	// Les stocks suivants de Tuile et de JetonFaune forment la pioche cachée, 
 	// dans laquelle on piochera des nouveaux elements.
@@ -87,7 +87,7 @@ public:
 		return piocheVisible;
 	}
 
-	const std::array<std::pair<bool,bool>, 4>& getVisibilite() const { return visibilite; }
+	const std::array<std::pair<bool,bool>, MAX>& getVisibilite() const { return visibilite; }
 
 	// donne l'info sur le nombre de pieces restantes, mais ne va pas reveler ce qu'il reste, puisque c'est une pioche cachée
 	size_t getNbTuilesDispo() const {
