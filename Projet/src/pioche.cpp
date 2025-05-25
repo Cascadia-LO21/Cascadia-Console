@@ -87,7 +87,6 @@ void Pioche::resetJetonFaune(const std::vector<int>& indices) {
 // retire une paire fixe : coup "normal"
 // ne pas remettre la Tuile et le JetonFaune dans la pioche, car le joueur en sera en possession
 void Pioche::retirerPaire(unsigned int i) {
-	checkIndex(i);
 	retirerTuileVisible(i);
 	retirerJetonVisible(i); 
 }
@@ -95,8 +94,6 @@ void Pioche::retirerPaire(unsigned int i) {
 // retire une paire libre : coup "Jeton Nature"
 // ne pas remettre la Tuile et le JetonFaune dans la pioche, car le joueur en sera en possession
 void Pioche::retirerPaire(unsigned int i, unsigned int j) {
-	checkIndex(i);
-	checkIndex(j);
 	retirerTuileVisible(i);
 	retirerJetonVisible(j);
 }
