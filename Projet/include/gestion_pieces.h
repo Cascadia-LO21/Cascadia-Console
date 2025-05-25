@@ -11,8 +11,10 @@
 #include "tuile.h"
 #include "jeton_faune.h"
 
-
+// TODO : faire des verif sur la cardinalite de l'ensemble de tuiles extraites, pour voir si c'est conforme au MAX_TUILES défini 
 namespace GestionPieces {
+
+	constexpr int MAX_TUILES = 85; // nombre maximum de Tuiles Reperes et Non reperes prévu par le jeu
 
 	// Instancie toutes les tuiles à partir d'un fichier JSON
 	std::vector<Tuile> instancierTuiles(const std::string& fichier = "json/tuiles_non_reperes.json");
@@ -40,6 +42,9 @@ namespace GestionPieces {
 
 	// Adapter la taille des tuiles presentes dans le jeu selon le nombre de participants
 	void adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const int nombreJoueurs = 2);
+
+	// Retourne le nombre de Tuiles qu'il faut en fonction du nombre de Joueurs présents
+	int nombreTuiles(int nbJoueurs);
 
 	// Convertit un vecteur de tuiles en pile (stack)
 	std::stack<Tuile> vectorToStack(std::vector<Tuile>& tuiles);

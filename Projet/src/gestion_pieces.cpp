@@ -195,6 +195,22 @@ void GestionPieces::adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const
     }
 }
 
+int GestionPieces::nombreTuiles(int nombreJoueurs)
+{
+    switch (nombreJoueurs) {
+    case 1:
+         return 43; // prenons 43, vu que les regles officielles ne le precisent pas
+    case 2:
+        return 43;
+    case 3:
+        return 63;
+    case 4:
+        return 83;
+    default:
+        return MAX_TUILES;
+    }
+}
+
 // Fait une pile de Tuile, a partir d'un vecteur de Tuile, deja melangé : cela est utile pour la Pioche
 std::stack<Tuile> GestionPieces::vectorToStack(std::vector<Tuile>& tuiles)
 {
@@ -237,9 +253,16 @@ JetonFaune GestionPieces::piocherJeton(std::vector<JetonFaune>& jetons)
     return jeton;
 }
 
-void GestionPieces::remettreJeton(std::vector<JetonFaune>& jetons, const JetonFaune& jeton)
-{
-    jetons.push_back(jeton);
+// Une insertion aléatoire dans le vecteur de JetonFaune permet de simuler le sac de JetonFaune
+// dans la vie reelle. Cela garantit que la prochain tirage d'un JetonFaune n'est pas forcement
+// celui qu'on vient de remettre dans le "sac".
+void GestionPieces::remettreJeton(std::vector<JetonFaune>& jetons, const JetonFaune& jeton) {
+    std::random_device rd;
+    std::mt19937 eng(rd());
+    std::uniform_int_distribution<size_t> distr(0, jetons.size());
+
+    size_t randomIndex = distr(eng);
+    jetons.insert(jetons.begin() + randomIndex, jeton);
 }
 
 std::vector<Tuile> GestionPieces::piocherTuileDepart(std::vector<std::vector<Tuile>>& tuilesDepart)
