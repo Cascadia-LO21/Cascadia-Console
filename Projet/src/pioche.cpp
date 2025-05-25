@@ -288,7 +288,7 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 		}
 	}
 
-	os << "\n======= FIN PIOCHE ======= \n" << std::endl;
+	os << "\n======= FIN PIOCHE ======= \n\n" << std::endl;
 
 	return os;
 }
@@ -343,6 +343,57 @@ void testPioche(int n) {
 	//std::cout << "Tuiles depart dispo : " << std::endl;
 	//for (const auto& t : p.getTuilesDepartDispo()) std::cout << t;
 
+}
 
+void testPioche1joueur() {
+	Pioche p(1);
+	std::cout << p;
+	p.retirerPaire(2); //joueur joue 1 coup nomal
+	std::cout << "le joueur a joue" << std::endl << p;
+	p.retirerTuileJetonDebut(); //extraction artificielle d'une paire
+	std::cout << "l'IA a joué" << std::endl << p;
+	p.slide(0, true); //slide tuiles
+	p.slide(0, false); //slide jetons
+	std::cout << "apres slide" << std::endl << p;
+	p.rafraichirPioche();
+	std::cout << "rafraichissement : " << std::endl << p;
+}
+
+void testPiocheBcpJoeurs(int n) {
+	// joueur 1 joue
+	Pioche p(n);
+	std::cout << p;
+	p.retirerPaire(3); //joueur 1 joue 1 coup nomal
+	std::cout << "le joueur 1 a joue" << std::endl << p;
+	p.slide(0, true); //slide tuiles
+	p.slide(0, false); //slide jetons
+	std::cout << "apres slide" << std::endl << p;
+	p.rafraichirPioche();
+	std::cout << "rafraichissement : " << std::endl << p;
+
+	// joueur 2 joue : meme flow que joueur 1, sauf si use Jeton Nature
+	p.retirerPaire(0, 2); 
+	std::cout << "Joueur 2 utilise JetonNature : " << std::endl << p;
+	p.slide(0, true); //slide tuiles
+	p.slide(0, false); //slide jetons
+	std::cout << "apres slide" << std::endl << p;
+	p.rafraichirPioche();
+	std::cout << "rafraichissement : " << std::endl << p;
+}
+
+void testPiocheJoueurUndo(int n) {
+	Pioche p(n);
+	std::cout << p;
+	p.retirerTuileVisible(1); // retire 1e tuile
+	std::cout << "joueur a retire une Tuile" << std::endl << p;
+
+	std::cout << "voulez-vous annuler la tuile (o/n): ";
+	char r;
+	std::cin >> r;
+	if (r == 'o') {
+		p.setVisibilite(1, true); //rendre la tuile visible
+	}
+
+	std::cout << "le joueur a remis sa Tuile" << std::endl << p;
 
 }

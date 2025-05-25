@@ -26,5 +26,9 @@ int main() {
 	//JetonFaune j(Faune::saumon);
 	//cout << j;
 
-	testPioche(1);
+	/// TEST PIOCHE
+	//testPioche(1);
+	//testPioche1joueur();
+	testPiocheBcpJoeurs(2);
+	//testPiocheJoueurUndo(1);
 }

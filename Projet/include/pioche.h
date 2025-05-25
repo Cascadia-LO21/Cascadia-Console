@@ -46,7 +46,6 @@ private:
 	void setTuilesDispo(unsigned int nbJoueurs = 1);
 	void setJetonsDispo();
 	void setTuilesDepartDispo();
-	void setVisibilite(unsigned int i, bool vue, bool tuile = true); // prive car les users manipule la visibilite via les methodes retirerXXX()
 	void setPiocheVisible();
 
 public:
@@ -71,6 +70,8 @@ public:
 		checkIndex(indice);
 		piocheVisible[indice] = std::make_pair(tuile, jeton); 
 	}
+
+	void setVisibilite(unsigned int i, bool vue, bool tuile = true); // utile pour EnvJoueur quand un joueur veut annuler la tuile choisie
 
 
 	/// GETTERS ///
@@ -132,3 +133,6 @@ public:
 std::ostream& operator<<(std::ostream& os, const Pioche& p);
 
 void testPioche(int nbJoueur);
+void testPioche1joueur();
+void testPiocheBcpJoeurs(int n);
+void testPiocheJoueurUndo(int n);
