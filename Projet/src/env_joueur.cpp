@@ -22,7 +22,15 @@ bool EnvJoueur::aTuileConfirmee(const Position& coord) const {
 };
 
 //get pointeur de la tuile à cette coordonnée (retourne nullptr si pas de tuile à cette coordonnée)
-Tuile* EnvJoueur::getTuile(const Position& coord) {
+const Tuile* EnvJoueur::getTuile(const Position& coord) const {
+	auto it = tuiles.find(coord);//on trouve la paire <Position,Tuile>
+	if (it != tuiles.end()) {//si elle existe, alors on retourne pointeur vers la tuile
+		return &(it->second);
+	}
+	return nullptr;
+}
+//version non-const de getTuile, pour permettre la modification de la tuile
+Tuile* EnvJoueur::getTuileNonConst(const Position& coord){
 	auto it = tuiles.find(coord);//on trouve la paire <Position,Tuile>
 	if (it != tuiles.end()) {//si elle existe, alors on retourne pointeur vers la tuile
 		return &(it->second);
@@ -129,7 +137,7 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 	if (!aTuileConfirmee(coord)) {
 		return 0; //jeton ne peut pas etre placé
 	}
-	Tuile* tuilePtr = getTuile(coord);
+	Tuile* tuilePtr = getTuileNonConst(coord);
 	if (!tuilePtr) {
 		throw std::logic_error("Aucune tuile à cette position");
 	}

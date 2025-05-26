@@ -42,7 +42,10 @@ public:
 	};
 
 	//get pointeur de la tuile à cette coordonnée
-	Tuile* getTuile(const Position& coord);
+	const Tuile* getTuile(const Position& coord) const;
+
+	//get pointeur de la tuile à cette coordonnée version non-const, pour permettre la modification de la tuile
+	Tuile* getTuileNonConst(const Position& coord);
 
 	//est ce qu'on peut placer une tuile à cette coordonnée?
 	bool positionTuileValide(const Position& coord) const;
