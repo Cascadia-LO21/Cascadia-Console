@@ -22,7 +22,7 @@ bool EnvJoueur::aTuileConfirmee(const Position& coord) const {
 };
 
 //get pointeur de la tuile à cette coordonnée (retourne nullptr si pas de tuile à cette coordonnée)
-const Tuile* EnvJoueur::getTuile(const Position& coord) const {
+Tuile* EnvJoueur::getTuile(const Position& coord) {
 	auto it = tuiles.find(coord);//on trouve la paire <Position,Tuile>
 	if (it != tuiles.end()) {//si elle existe, alors on retourne pointeur vers la tuile
 		return &(it->second);
@@ -31,7 +31,7 @@ const Tuile* EnvJoueur::getTuile(const Position& coord) const {
 }
 
 //est ce qu'on peut placer une tuile à cette coordonnée?
-bool EnvJoueur::positionValide(const Position& coord) const {
+bool EnvJoueur::positionTuileValide(const Position& coord) const {
 	//hyp: une tuile pour être placé, doit être au moins adjacente à une autre tuile
 	//est ce qu'il y a déjà une tuile dans cette position?
 	if (tuiles.find(coord) != tuiles.end()) {
@@ -105,4 +105,49 @@ bool EnvJoueur::undoDernierPlacement() {
 void EnvJoueur::placerTuileDefinitive(const Position& coord, const Tuile& tuile) {
 	placerTuile(coord, tuile);
 	confirmerPlacement();
+}
+
+//retourne -1 si le jeton ne peut être placé nulpart, 0 si le jeton ne peut etre placé à cette position, 1 si le jeton est placé avec succès
+int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) {
+
+	//étape 1: vérification primitive, est-ce qu'on peut placer le jeton sur une tuile quelconque dans la map?
+	// (oui si il y a au moins une tuile qui a parmi son vecteur faunes le type du jeton passé en paramètre et
+	// qui n'a pas de jeton déjà placé dessus)
+	for (const auto& [pos, tuile] : tuiles) {
+		if (!tuile.JetonFaunePresent()) { // est ce qu'il y a un jeton placé déjà sur cette tuile?
+			const auto& faunes = tuile.getFaunes();
+			if (!std::any_of(faunes.begin(), faunes.end(),
+				[&](const JetonFaune& j) { return j.getType() == jeton.getType(); })) {// Vérifie si faunes contient le type du jeton entrée
+
+				return -1; //jeton ne peut pas etre placé sur aucunes tuiles dans la map
+				//IL FAUDRA PERMETTRE A L'UTILISATEUR DE L'ENLEVER DE LA PIOCHE, ou de choisir une autre paire tuile/jeton
+			}
+		}
+	}
+
+	//étape 2: est-ce qu'il y a une tuile confirmée libre à cette coordonnée?
+	if (!aTuileConfirmee(coord)) {
+		return 0; //jeton ne peut pas etre placé
+	}
+	Tuile* tuilePtr = getTuile(coord);
+	if (!tuilePtr) {
+		throw std::logic_error("Aucune tuile à cette position");
+	}
+	if (tuilePtr->JetonFaunePresent()) {
+		return 0; //jeton ne peut pas etre placé, il y a déjà un jeton sur cette tuile
+	}
+
+	//étape 3: si la tuile à cette coordonnée a parmis son vecteur faunes le type du jeton passé en paramètre
+	if (!std::any_of(tuilePtr->getFaunes().begin(), tuilePtr->getFaunes().end(), 
+			[&](const JetonFaune& j) { return j.getType() == jeton.getType(); })) {
+		return 0; //jeton ne peut pas etre placé
+	}
+
+	//étape 4: on place le jeton sur la tuile à cette coordonnée
+	tuilePtr->placerJetonFaune(jeton.getType());
+	if (tuilePtr->getDonneJetonNature()) {
+		//si la tuile donne un jeton nature, on incrémente le nombre de jeton nature du joueur
+		nbJetonNature++;
+	}
+	return 1; //jeton placé avec succès
 }

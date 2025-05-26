@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <optional>
 #include <ostream>
+#include <stdexcept>
+#include <algorithm>
+#include <iostream>
 #include "position.h"
 #include "tuile.h"
 #include "jeton_faune.h"
@@ -39,10 +42,10 @@ public:
 	};
 
 	//get pointeur de la tuile à cette coordonnée
-	const Tuile* getTuile(const Position& coord) const;
+	Tuile* getTuile(const Position& coord);
 
 	//est ce qu'on peut placer une tuile à cette coordonnée?
-	bool positionValide(const Position& coord) const;
+	bool positionTuileValide(const Position& coord) const;
 
 
 	//=============debut systeme placement tuile + undo
@@ -60,6 +63,9 @@ public:
 	void placerTuileDefinitive(const Position& coord, const Tuile& tuile);
 
 	//=============fin systeme placement tuile + undo
+
+	//pour placer un jeton faune, on ne peut pas undo cette opération
+	int placerJetonFaune(const Position& coord, const JetonFaune& jeton);
 
 	//GETTERS & SETTERS
 	std::string getPseudo() const { return pseudo; };
