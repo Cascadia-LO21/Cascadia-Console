@@ -50,7 +50,7 @@ bool EnvJoueur::positionTuileValide(const Position& coord) const {
 };
 
 void EnvJoueur::placerTuile(const Position& coord, const Tuile& tuile) {
-	if (!positionValide(coord)) {
+	if (!positionTuileValide(coord)) {
 		throw std::invalid_argument("Position invalide pour placer la tuile");
 	}
 

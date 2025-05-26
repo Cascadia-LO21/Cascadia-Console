@@ -50,7 +50,7 @@ public:
 
 	//=============debut systeme placement tuile + undo
 
-	//étape 1: placer une tuile, peu etre undone
+	//étape 1: placer une tuile, peut etre undone
 	void placerTuile(const Position& coord, const Tuile& tuile);
 
 	//étape 2: confirmer le placement de la tuile
@@ -59,7 +59,7 @@ public:
 	//annuler le dernier placement
 	bool undoDernierPlacement();
 
-	//alternative pour debug rapide
+	//alternative combine étapes 1 et 2, placer une tuile et confirmer son placement
 	void placerTuileDefinitive(const Position& coord, const Tuile& tuile);
 
 	//=============fin systeme placement tuile + undo
