@@ -16,14 +16,26 @@ class EnvJoueur {
 	size_t nbJetonNature;
 	size_t scoreFinal;
 
+	// Undo system
+	std::optional<Position> dernierePosition; //la dernière position jouée
+	std::optional<Tuile> derniereTuile; // derniere tuile placee
+	bool placementEnAttente = false; //est ce qu'il y a un placement en attente de confirmation?
+
 public:
-	void placerTuile(const Position& coord, const Tuile& tuile) {
-		tuiles[coord] = tuile;
+	//constructeur principal!!!!!!!!!!!!!!!!TO LOOK AT AGAIN
+	EnvJoueur(const std::string& pseudo, size_t nbJetonNature = 0, size_t scoreFinal = 0)
+		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
 	};
 
-	//check si ya uen tuile sur cette case
-	bool aTuile(const Position& coord) const {
-		return tuiles.find(coord) != tuiles.end(); //find trouve la tuile avec la clé coord (renvoie tuiles.end() sinon), end renvoie pointeur vers l'élément après le dernier de tuiles
+	//check si ya uen tuile sur cette case (tuile non confirmée inclus)
+	bool aTuile(const Position& coord) const;
+
+	//check si il y a une tuile confirmée à cette position
+	bool aTuileConfirmee(const Position& coord) const;
+
+	//est-ce qu'il y a un placement en attente de confirmation?
+	bool aPlacementEnAttente() const {
+		return placementEnAttente;
 	};
 
 	//get pointeur de la tuile à cette coordonnée
@@ -31,4 +43,35 @@ public:
 
 	//est ce qu'on peut placer une tuile à cette coordonnée?
 	bool positionValide(const Position& coord) const;
+
+
+	//=============debut systeme placement tuile + undo
+
+	//étape 1: placer une tuile, peu etre undone
+	void placerTuile(const Position& coord, const Tuile& tuile);
+
+	//étape 2: confirmer le placement de la tuile
+	void confirmerPlacement();
+
+	//annuler le dernier placement
+	bool undoDernierPlacement();
+
+	//alternative pour debug rapide
+	void placerTuileDefinitive(const Position& coord, const Tuile& tuile);
+
+	//=============fin systeme placement tuile + undo
+
+	//GETTERS & SETTERS
+	std::string getPseudo() const { return pseudo; };
+	void setPseudo(const std::string& pseudo) {
+		this->pseudo = pseudo;
+	};
+	size_t getScore() const { return scoreFinal; };
+	void setScore(size_t score) { scoreFinal = score; };
+	size_t getNbJetonsNature() const { return nbJetonNature; };
+	void setNbJetonsNature(size_t nb) { nbJetonNature = nb; };
+	std::optional<Position> getDernierePosition() const { return dernierePosition; };
+	std::optional<Tuile> getDerniereTuile() const { return derniereTuile; };
+	
+
 };
