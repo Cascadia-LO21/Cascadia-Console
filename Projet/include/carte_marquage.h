@@ -6,6 +6,20 @@
 #include "tuile.h"
 #include <unordered_map>
 
+//fonction de hashage pour Position
+namespace std {
+	template <>
+	struct hash<Position> {
+		size_t operator()(const Position& coord) const {
+			//on n'utilise que q et r pcq s=-q-r
+			size_t h1 = std::hash<int>{}(coord.getQ()); //donne un hash pour q
+			size_t h2 = std::hash<int>{}(coord.getR()); //donne un hash pour r
+			return h1 ^ (h2 << 1); //combiner deux valeurs hash avec XOR
+		}
+	};
+}
+
+
 /// Classe abstraite avec méthode virtuelle pure methode calcul
 class CarteMarquage {
 	Faune faune;
@@ -20,7 +34,7 @@ class CarteSaumon : public CarteMarquage {
 public:
 	CarteSaumon() : CarteMarquage(Faune::saumon) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	//int calculerScore(const unordered_map<Position, Tuile>& map) const;
+	int explorerChaineA(); //fct recursive qui sera appelée dans methodeCalculA, retourn la taille d'une chaine
 };
 
 class CarteOurs : public CarteMarquage {
@@ -62,16 +76,6 @@ BUSE :
 	default: return 26; //8+ buses
 	}
 
-RENARD :
-	switch (count) {
-	case 0: return 0;
-	case 1: return 1;
-	case 2: return 2;
-	case 3: return 3;
-	case 4: return 4;
-	default: return 5; //5 et plus
-	}
-
 WAPITI :
 	switch (count) {
 	case 0: return 0;
@@ -84,6 +88,6 @@ WAPITI :
 
 OURS : c'est bon
 
-SAUMON : jsp
+SAUMON : done
 
 */

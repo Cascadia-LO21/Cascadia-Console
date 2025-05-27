@@ -4,18 +4,6 @@
 #include <unordered_set>
 #include <functional>
 
-// le placer peutetre dans .h ?
-namespace std {
-	template <>
-	struct hash<Position> {
-		size_t operator()(const Position& p) const {
-			return hash<int>()(p.getQ()) ^ hash<int>()(p.getR()) ^ hash<int>()(p.getS());
-		}
-	};
-}
-
-// int CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {};
-
 int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
 
 	std::unordered_set<Position> PositionsVisitees;
@@ -133,4 +121,132 @@ int CarteBuse::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 	case 7: return 22;
 	default: return 26; //8+ buses
 	}
+}
+
+
+
+int CarteRenard::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const
+{
+	int scoreTotal = 0;
+	std::unordered_set<Position> PositionsVisitees;
+	std::vector<int> AdjRenards;
+
+	//parcourt des tuiles de carte
+	for (const auto& [position, tuile] : carte) { 
+		std::unordered_set<Faune> FaunesAdjacentes; //afin de stocker les faunes sans duplication, puis avoir la taille
+
+		//on ignore la tuile si deja visitée
+		if (PositionsVisitees.count(position) == 1) continue;
+		//on ignre la tuile si pas de jeton faune ou jeton non renard
+		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::renard) {
+			PositionsVisitees.insert(position);
+			continue;
+		}
+
+		//parcourir les tuiles adjacentes à la tuile renard
+		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
+		for (unsigned int i = 0; i < 6; i++) {
+
+			Position pos_voisine = vec[i];
+			if (carte.count(pos_voisine) == 1) {
+				const Tuile& tuile_voisine = carte.at(pos_voisine);
+
+				if (tuile_voisine.JetonFaunePresent()) {
+					FaunesAdjacentes.insert(tuile_voisine.getFaunePlace());
+				}
+			}
+		}
+		//on compte le nombre de types adj pour chaque renard et on l'ajoute à AdjRenards
+		AdjRenards.push_back(FaunesAdjacentes.size());
+		PositionsVisitees.insert(position);
+	}
+	//insert boucle pour parcourir le vecteur ou set, puis le switch
+	for (int renard : AdjRenards) {
+		switch (renard) {
+		case 1: scoreTotal += 1; break;
+		case 2: scoreTotal += 2; break;
+		case 3: scoreTotal += 3; break;
+		case 4: scoreTotal += 4; break;
+		case 5: scoreTotal += 5; break;
+		default: break; //cas 0
+		}
+	}
+	return scoreTotal;
+}
+
+int CarteWapiti::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const
+{
+	//penser aux methodes get Q, get R, get S pour les lignes
+	//SURTOUT la fct cote tangeant
+	return 0;
+}
+
+int CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const
+{
+	std::unordered_set<Position> PositionsVisitees;
+	std::vector<int> taillesChaines;
+	int scoreTotal = 0;
+
+	for (const auto& [position, tuile] : carte) {
+		int longueur_chaine = 0;
+
+		//on ignore la tuile si deja visitée
+		if (PositionsVisitees.count(position) == 1) continue;
+		//on ignore la tuile si pas de jeton faune ou jeton non saumon
+		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::saumon) {
+			PositionsVisitees.insert(position);
+			continue;
+		}
+
+		int tailleChaine = explorerChaineA();
+		if (tailleChaine > 0) {
+			taillesChaines.push_back(tailleChaine);
+		}
+
+		/*
+		std::unordered_set<Position> PositionsAdjacentes; //les pos adj au saumon courant
+		//QST: est ce quil faudra parcourir les positions adjacentes et comparer leurs directions 
+
+		//on vérifie s'il y a des saumons adjacents
+		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
+		for (unsigned int i = 0; i < 6; i++) {
+			Position pos_voisine = vec[i];
+			if (carte.count(pos_voisine) == 1) {
+				const Tuile& tuile_voisine = carte.at(pos_voisine);
+				if (tuile_voisine.JetonFaunePresent() && tuile_voisine.getFaunePlace() == Faune::saumon) {
+					PositionsAdjacentes.insert(pos_voisine);
+					PositionsVisitees.insert(pos_voisine);
+				}
+			}
+		}//là on a recup les pos adj de current
+
+		if (PositionsAdjacentes.size() > 2) {
+			PositionsVisitees.insert(position);
+			continue;
+		}
+		//else :
+		.....
+		PositionsVisitees.insert(position);
+		*/
+	}
+
+	for (int chaine : taillesChaines) {
+		switch (chaine) {
+		case 0: scoreTotal += 0; break;
+		case 1: scoreTotal += 2; break;
+		case 2: scoreTotal += 4; break;
+		case 3: scoreTotal += 7; break;
+		case 4: scoreTotal += 11; break;
+		case 5: scoreTotal += 15; break;
+		case 6: scoreTotal += 20; break;
+		default: scoreTotal += 26; break; // pour 7+ 
+		}
+	}
+	return scoreTotal;
+}
+
+int CarteSaumon::explorerChaineA() //recursivité
+{
+
+	return 0;
 }
