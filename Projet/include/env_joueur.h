@@ -8,6 +8,9 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iostream>
+#include "enums.h"
+#include "unordered_set"
+
 #include "position.h"
 #include "tuile.h"
 #include "jeton_faune.h"
@@ -16,6 +19,8 @@
 class EnvJoueur {
 	std::string pseudo;
 	std::unordered_map<Position, Tuile> tuiles;//la map, pas beosin de désallouer à la fin, on stocke directement les tuiles dans unordered map par valeur
+	std::unordered_map<Faune, std::unordered_set<Position>> mapPositionsJetons; //map de clé type faune vers un set de positions où le jeton est placé
+	
 	size_t nbJetonNature;
 	size_t scoreFinal;
 
@@ -69,6 +74,13 @@ public:
 
 	//pour placer un jeton faune, on ne peut pas undo cette opération
 	int placerJetonFaune(const Position& coord, const JetonFaune& jeton);
+
+	void setTuilesDepart(std::vector<std::vector<Tuile>>& tuilesDepart);
+
+	void choisirPaire(const Position& coord, const JetonFaune& jeton);
+	
+	//pour utiliser un jeton nature, on ne peut pas undo cette opération
+	void utiliserJetonNature(const Position& coord, const JetonFaune& jeton);
 
 	//GETTERS & SETTERS
 	std::string getPseudo() const { return pseudo; };

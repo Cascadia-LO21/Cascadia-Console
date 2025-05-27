@@ -153,9 +153,14 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 
 	//étape 4: on place le jeton sur la tuile à cette coordonnée
 	tuilePtr->placerJetonFaune(jeton.getType());
+	//on ajoute la position du jeton dans la map de positions des jetons
+	mapPositionsJetons[jeton.getType()].insert(coord);
 	if (tuilePtr->getDonneJetonNature()) {
 		//si la tuile donne un jeton nature, on incrémente le nombre de jeton nature du joueur
 		nbJetonNature++;
 	}
 	return 1; //jeton placé avec succès
 }
+
+
+
