@@ -8,7 +8,6 @@
 #include "tuile.h"
 #include "env_joueur.h"
 
-
 bool EnvJoueur::aTuile(const Position& coord) const {
 	return tuiles.find(coord) != tuiles.end(); //find trouve la tuile avec la clé coord (renvoie tuiles.end() sinon), end renvoie pointeur vers l'élément après le dernier de tuiles
 };
@@ -163,4 +162,24 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 }
 
 
+//reset l'envJoueur et y ajoute les tuiles de départ
+void EnvJoueur::setTuilesDepart(std::vector<std::vector<Tuile>>& tuilesDepart) {
+	if (tuilesDepart.empty()) {
+		throw std::invalid_argument("Le vecteur de tuiles de départ possibles est vide.");
+	}
 
+	// On vide les tuiles existantes
+	tuiles.clear();
+
+	// On ajoute les tuiles de départ
+	int index = std::rand() % tuilesDepart.size(); // indice aléatoire
+	std::vector<Tuile> selection = tuilesDepart[index];
+
+	if (selection.size() < 3) {
+		throw std::invalid_argument("La sélection de tuiles n'a pas 3 tuiles.");
+	}
+
+	placerTuileDefinitive(Position(0,-1,1), selection[0]);
+	placerTuileDefinitive(Position(-1, 0, 1), selection[1]);
+	placerTuileDefinitive(Position(0, 0, 0), selection[2]);
+}
