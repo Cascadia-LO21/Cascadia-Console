@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <optional>
 #include <stdexcept>
+#include <random>
 #include "position.h"
 #include "tuile.h"
 #include "env_joueur.h"
@@ -171,14 +172,20 @@ void EnvJoueur::setTuilesDepart(std::vector<std::vector<Tuile>>& tuilesDepart) {
 	// On vide les tuiles existantes
 	tuiles.clear();
 
-	// On ajoute les tuiles de départ
-	int index = std::rand() % tuilesDepart.size(); // indice aléatoire
-	std::vector<Tuile> selection = tuilesDepart[index];
+	// Générateur aléatoire moderne
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> distrib(0, tuilesDepart.size() - 1);
+	int index = distrib(gen);
+		// On ajoute les tuiles de départ
+	const std::vector<Tuile>& selection = tuilesDepart[index];
 
 	if (selection.size() < 3) {
 		throw std::invalid_argument("La sélection de tuiles n'a pas 3 tuiles.");
 	}
 
+	// Placer les 3 tuiles selon les positions définies
+	// Ordre attendu : haut, gauche, droite(centre)
 	placerTuileDefinitive(Position(0,-1,1), selection[0]);
 	placerTuileDefinitive(Position(-1, 0, 1), selection[1]);
 	placerTuileDefinitive(Position(0, 0, 0), selection[2]);
