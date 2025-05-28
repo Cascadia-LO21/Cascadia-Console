@@ -175,7 +175,7 @@ void EnvJoueur::setTuilesDepart(std::vector<std::vector<Tuile>>& tuilesDepart) {
 	// Générateur aléatoire moderne
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> distrib(0, tuilesDepart.size() - 1);
+	std::uniform_int_distribution<size_t> distrib(0, tuilesDepart.size() - 1);
 	int index = distrib(gen);
 		// On ajoute les tuiles de départ
 	const std::vector<Tuile>& selection = tuilesDepart[index];

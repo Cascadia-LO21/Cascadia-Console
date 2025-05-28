@@ -93,6 +93,9 @@ public:
 	void setNbJetonsNature(size_t nb) { nbJetonNature = nb; };
 	std::optional<Position> getDernierePosition() const { return dernierePosition; };
 	std::optional<Tuile> getDerniereTuile() const { return derniereTuile; };
-	
+
+	const std::unordered_map<Position, Tuile>& getTuiles() const { return tuiles; }
+	const std::unordered_map<Faune, std::unordered_set<Position>>& getMapPositionsJetons() const { return mapPositionsJetons; }
+	bool getPlacementEnAttente() const { return placementEnAttente; }
 
 };
