@@ -16,7 +16,6 @@ int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 		if (PositionsVisitees.count(position) == 1) continue;
 		//on ignre la tuile si pas de jeton faune ou jeton non ours, et on la marque comme visitee
 		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::ours) {
-			PositionsVisitees.insert(position);
 			continue;
 		}
 
@@ -84,7 +83,6 @@ int CarteBuse::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 		if (PositionsVisitees.count(position) == 1) continue;
 		//on ignre la tuile si pas de jeton faune ou jeton non buse
 		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::buse) {
-			PositionsVisitees.insert(position);
 			continue;
 		}
 
@@ -139,7 +137,6 @@ int CarteRenard::methodeCalculA(const std::unordered_map<Position, Tuile>& carte
 		if (PositionsVisitees.count(position) == 1) continue;
 		//on ignre la tuile si pas de jeton faune ou jeton non renard
 		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::renard) {
-			PositionsVisitees.insert(position);
 			continue;
 		}
 
@@ -194,40 +191,14 @@ int CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte
 		if (PositionsVisitees.count(position) == 1) continue;
 		//on ignore la tuile si pas de jeton faune ou jeton non saumon
 		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::saumon) {
-			PositionsVisitees.insert(position);
 			continue;
 		}
 
-		int tailleChaine = explorerChaineA();
+		//position actuelle contient saumon
+		int tailleChaine = explorerChaineA(carte, position,PositionsVisitees, nullptr); //nullptr car premier element n'a pas de pere
 		if (tailleChaine > 0) {
 			taillesChaines.push_back(tailleChaine);
 		}
-
-		/*
-		std::unordered_set<Position> PositionsAdjacentes; //les pos adj au saumon courant
-		//QST: est ce quil faudra parcourir les positions adjacentes et comparer leurs directions 
-
-		//on vérifie s'il y a des saumons adjacents
-		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
-		for (unsigned int i = 0; i < 6; i++) {
-			Position pos_voisine = vec[i];
-			if (carte.count(pos_voisine) == 1) {
-				const Tuile& tuile_voisine = carte.at(pos_voisine);
-				if (tuile_voisine.JetonFaunePresent() && tuile_voisine.getFaunePlace() == Faune::saumon) {
-					PositionsAdjacentes.insert(pos_voisine);
-					PositionsVisitees.insert(pos_voisine);
-				}
-			}
-		}//là on a recup les pos adj de current
-
-		if (PositionsAdjacentes.size() > 2) {
-			PositionsVisitees.insert(position);
-			continue;
-		}
-		//else :
-		.....
-		PositionsVisitees.insert(position);
-		*/
 	}
 
 	for (int chaine : taillesChaines) {
@@ -245,8 +216,36 @@ int CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte
 	return scoreTotal;
 }
 
-int CarteSaumon::explorerChaineA() //recursivité
+int CarteSaumon::explorerChaineA(const std::unordered_map<Position,Tuile>& carte,const Position& position, std::unordered_set<Position>& PositionsVisitees, const Position* pos_pere) const
 {
+	PositionsVisitees.insert(position);
+	int nb_saumons_adj = 0;
+	int taille = 1; //la chaine contient au moins 1 saumon (current)
 
-	return 0;
+	std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
+
+	//parcourir les positions adjacentes
+	for (const Position& pos_voisine : vec) {
+		//verif pr ne pas faire le chemin inverse
+		if (pos_pere && pos_voisine == *pos_pere) {
+			continue;
+		}
+		//verif si elle existe bien dans la carte
+		if (carte.count(pos_voisine) == 0) continue;
+		const Tuile& tuile_voisine = carte.at(pos_voisine);
+
+		if (tuile_voisine.JetonFaunePresent() && tuile_voisine.getFaunePlace() == Faune::saumon) {
+			nb_saumons_adj++;
+			if (nb_saumons_adj > 2) return 0; //chaine annulée
+			if (PositionsVisitees.count(pos_voisine) == 0) {
+				//appel récursif sur la position voisine, et la position actuelle est l'argument pere
+				int taille_suite = explorerChaineA(carte, pos_voisine, PositionsVisitees, &position);
+				if (taille_suite == 0) return 0; //la chaine est invalide, donc on arrete
+				//else
+				taille += taille_suite;
+			}
+		}
+	}
+	
+	return taille;
 }

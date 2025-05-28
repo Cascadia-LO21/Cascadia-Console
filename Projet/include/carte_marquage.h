@@ -5,6 +5,7 @@
 #include "position.h"
 #include "tuile.h"
 #include <unordered_map>
+#include <unordered_set>
 
 //fonction de hashage pour Position
 namespace std {
@@ -34,7 +35,7 @@ class CarteSaumon : public CarteMarquage {
 public:
 	CarteSaumon() : CarteMarquage(Faune::saumon) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int explorerChaineA(); //fct recursive qui sera appelée dans methodeCalculA, retourn la taille d'une chaine
+	int explorerChaineA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& positionsVisitees, const Position* pere) const; //fct recursive qui sera appelée dans methodeCalculA, retourn la taille d'une chaine
 };
 
 class CarteOurs : public CarteMarquage {
