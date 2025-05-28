@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdexcept>
 #include <ostream>
+#include <functional>
 #include "enums.h"
 
 class Position {
@@ -48,3 +49,15 @@ Direction getDirectionOpposee(Direction dir);
 Direction coteTangent(const Position& a, const Position& b);
 
 void testClassePosition();
+
+namespace std {
+	template<>
+	struct hash<Position> {
+		size_t operator()(const Position& pos) const {
+			size_t h1 = std::hash<int>{}(pos.getQ());
+			size_t h2 = std::hash<int>{}(pos.getR());
+			size_t h3 = std::hash<int>{}(pos.getS());
+			return h1 ^ (h2 << 1) ^ (h3 << 2); // ou une meilleure combinaison
+		}
+	};
+}
