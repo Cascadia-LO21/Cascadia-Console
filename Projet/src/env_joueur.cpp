@@ -164,7 +164,7 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 
 
 //reset l'envJoueur et y ajoute les tuiles de départ
-void EnvJoueur::setTuilesDepart(std::vector<std::vector<Tuile>>& tuilesDepart) {
+void EnvJoueur::setTuilesDepart(std::vector<Tuile>& tuilesDepart) {
 	if (tuilesDepart.empty()) {
 		throw std::invalid_argument("Le vecteur de tuiles de départ possibles est vide.");
 	}
@@ -172,21 +172,13 @@ void EnvJoueur::setTuilesDepart(std::vector<std::vector<Tuile>>& tuilesDepart) {
 	// On vide les tuiles existantes
 	tuiles.clear();
 
-	// Générateur aléatoire moderne
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<size_t> distrib(0, tuilesDepart.size() - 1);
-	int index = distrib(gen);
-		// On ajoute les tuiles de départ
-	const std::vector<Tuile>& selection = tuilesDepart[index];
-
-	if (selection.size() < 3) {
-		throw std::invalid_argument("La sélection de tuiles n'a pas 3 tuiles.");
+	if (tuilesDepart.size() < 3) {
+		throw std::invalid_argument("Le vecteur de tuiles de départ n'a pas 3 tuiles.");
 	}
 
 	// Placer les 3 tuiles selon les positions définies
 	// Ordre attendu : haut, gauche, droite(centre)
-	placerTuileDefinitive(Position(0,-1,1), selection[0]);
-	placerTuileDefinitive(Position(-1, 0, 1), selection[1]);
-	placerTuileDefinitive(Position(0, 0, 0), selection[2]);
+	placerTuileDefinitive(Position(0,-1,1), tuilesDepart[0]);
+	placerTuileDefinitive(Position(-1, 0, 1), tuilesDepart[1]);
+	placerTuileDefinitive(Position(0, 0, 0), tuilesDepart[2]);
 }

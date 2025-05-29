@@ -75,7 +75,7 @@ public:
 	//pour placer un jeton faune, on ne peut pas undo cette opération
 	int placerJetonFaune(const Position& coord, const JetonFaune& jeton);
 
-	void setTuilesDepart(std::vector<std::vector<Tuile>>& tuilesDepart);
+	void setTuilesDepart(std::vector<Tuile>& tuilesDepart);
 
 	void choisirPaire(const Position& coord, const JetonFaune& jeton);
 	
