@@ -274,38 +274,6 @@ int CarteWapiti::methodeCalculA(const std::unordered_map<Position, Tuile>& carte
 
 int CarteWapiti::explorerChaineWapitiA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, std::optional<Direction> direction) const
 {
-	/*
-	PositionsVisitees.insert(position);
-	int taille = 1;
-
-	//parcourir les tuiles adjacentes
-	std::vector<Position> adjacents = position.getVecteurPositionsAdjacentes();
-	for (const Position& posVoisine : adjacents) {
-
-		//verif si elle existe bien dans la carte
-		if (carte.count(posVoisine) == 0) continue;
-
-		const Tuile& tuileVoisine = carte.at(posVoisine);
-		if (!tuileVoisine.JetonFaunePresent() || tuileVoisine.getFaunePlace() != Faune::wapiti) continue;
-
-		if (PositionsVisitees.count(posVoisine)) continue; //wapiti déjà utilisé pour une autre chaîne
-
-		Direction dirVoisin = coteTangent(position, posVoisine); //direction du wapiti voisin
-		if (!direction.has_value()) {
-			//si on n'a pas encore la direction (premier elt), on la recupere
-			direction = dirVoisin;
-		}
-		else if (dirVoisin != direction.value()) {
-			//si la direction n'est pas la meme, la chaine est invalide et on arrete
-			return 0;
-		}
-
-		int tailleSuite = explorerChaineWapitiA(carte, posVoisine, PositionsVisitees, direction);
-		if (tailleSuite == 0) return 0;
-		taille += tailleSuite;
-	}
-	return taille;
-	*/
 	if (PositionsVisitees.count(position)) return 0;
 	if (carte.count(position) == 0) return 0;
 
