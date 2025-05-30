@@ -101,3 +101,4 @@ public:
 
 //tests
 void testHexagonalDisplay();
+void testDivers();

@@ -47,9 +47,10 @@ bool EnvJoueur::positionTuileValide(const Position& coord) const {
 		return false;
 	}
 	//est ce qu'il y a au moins une tuile adjacente à cette position? si oui donc valide
-	auto voisins = coord.getVecteurPositionsAdjacentes();
-	for (const auto& v : voisins) {
-		if (getTuile(v)) {
+	std::vector<Position> voisins = coord.getVecteurPositionsAdjacentes();
+	for (const Position& v : voisins) {
+		//std::cout << "Checking position: " << v << std::endl; // Debugging line
+		if (aTuile(v)) {
 			return true;
 		}
 	}
@@ -276,13 +277,13 @@ void testHexagonalDisplay() {
 	EnvJoueur joueur2("Bob", 3, 25);
 
 	// Create sample tiles (you can uncomment and modify these)
-	
+
 	// Example tile 1: Forest/Prairie mix with bear and elk
 	std::array<Habitat, 6> habitats1 = {
 		Habitat::foret, Habitat::montagne, Habitat::prairie,
 		Habitat::prairie, Habitat::foret, Habitat::prairie
 	};
-	std::vector<Faune> faunes1 = {Faune::ours, Faune::wapiti};
+	std::vector<Faune> faunes1 = { Faune::ours, Faune::wapiti };
 	Tuile tuile1(habitats1, faunes1, false);
 	Tuile& tuile1Ref = tuile1;
 
@@ -291,7 +292,7 @@ void testHexagonalDisplay() {
 		Habitat::fleuve, Habitat::fleuve, Habitat::marais,
 		Habitat::marais, Habitat::fleuve, Habitat::marais
 	};
-	std::vector<Faune> faunes2 = {Faune::saumon};
+	std::vector<Faune> faunes2 = { Faune::saumon };
 	Tuile tuile2(habitats2, faunes2, true); // Gives nature token
 	Tuile& tuile2Ref = tuile2;
 
@@ -307,11 +308,11 @@ void testHexagonalDisplay() {
 	JetonFaune jetonSaumon(Faune::saumon);
 
 	joueur2.placerJetonFaune(Position(0, 0, 0), jetonOurs);
-		//std::cout << "\n\n\n\n\n";
-		//std::cout << tuile1;
-		//std::cout << "\n\n\n\n\n";
+	//std::cout << "\n\n\n\n\n";
+	//std::cout << tuile1;
+	//std::cout << "\n\n\n\n\n";
 	joueur2.placerJetonFaune(Position(1, -1, 0), jetonSaumon);
-	
+
 
 	std::cout << joueur2 << "\n";
 	std::cout << std::string(50, '-') << "\n\n";
@@ -322,18 +323,62 @@ void testHexagonalDisplay() {
 	EnvJoueur joueur3("Charlie", 2, 10);
 
 	// Test pending placement
-	
+
 	std::array<Habitat, 6> habitats3 = {
 		Habitat::montagne, Habitat::montagne, Habitat::montagne,
-		Habitat::montagne, Habitat::montagne, Habitat::montagne
+		Habitat::montagne, Habitat::montagne, Habitat::montagne //TEST 3 IS THE PROBLEM
 	};
-	std::vector<Faune> faunes3 = {Faune::buse, Faune::renard};
+	std::vector<Faune> faunes3 = { Faune::buse, Faune::renard };
 	Tuile tuile3(habitats3, faunes3);
-
+	
+	
 	// Place without confirming to test pending placement display
-	joueur3.placerTuile(Position(1, 0, -1), tuile3);
-	
+	//std::cout<<"\n\n\n position est valide?"<<joueur2.positionTuileValide(Position(1, 0, -1));
+	//std::cout << "\n\n\n A tuile a 000?"<< joueur2.aTuile(Position(0,0,0));
+	//joueur3.placerTuile(Position(1, 0, -1), tuile3);
 
-	std::cout << joueur3 << "\n";
-	
+
+	//std::cout << joueur3 << "\n";
+
+}
+
+void testDivers(){
+	// Test 2: Environment with sample tiles
+	std::cout << "Test 2: Environnement avec tuiles d'exemple\n";
+	EnvJoueur joueur2("Bob", 3, 25);
+
+	// Example tile 1: Forest/Prairie mix with bear and elk
+	std::array<Habitat, 6> habitats1 = {
+		Habitat::foret, Habitat::montagne, Habitat::prairie,
+		Habitat::prairie, Habitat::foret, Habitat::prairie
+	};
+	std::vector<Faune> faunes1 = { Faune::ours, Faune::wapiti };
+	Tuile tuile1(habitats1, faunes1, false);
+	Tuile& tuile1Ref = tuile1;
+
+	// Example tile 2: River/Marsh with salmon
+	std::array<Habitat, 6> habitats2 = {
+		Habitat::fleuve, Habitat::fleuve, Habitat::marais,
+		Habitat::marais, Habitat::fleuve, Habitat::marais
+	};
+	std::vector<Faune> faunes2 = { Faune::saumon };
+	Tuile tuile2(habitats2, faunes2, true); // Gives nature token
+	Tuile& tuile2Ref = tuile2;
+
+	std::vector<Tuile> mesTuiles = { tuile1, tuile2, tuile1 };
+
+	// Place tiles on the map
+	joueur2.setTuilesDepart(mesTuiles);// Set initial tiles for the player
+	//joueur2.placerTuileDefinitive(Position(0, 0, 0), tuile1);
+	//joueur2.placerTuileDefinitive(Position(1, -1, 0), tuile2);
+
+	JetonFaune jetonOurs(Faune::ours);
+	JetonFaune jetonSaumon(Faune::saumon);
+
+	joueur2.placerJetonFaune(Position(0, 0, 0), jetonOurs);
+	std::cout << joueur2.placerJetonFaune(Position(1, -1, 0), jetonSaumon) << "\n\n";//False
+
+	std::cout << joueur2;
+	//std::cout << joueur2 << "\n";
+	std::cout << std::string(50, '-') << "\n\n";
 }
