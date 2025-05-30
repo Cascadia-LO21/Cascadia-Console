@@ -25,7 +25,7 @@ private:
     std::optional<std::vector<int>> gagnant; // pour gerer les cas d'égalité
     std::optional<std::vector<int>> scores;
 
-    void initialiserPioche(); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
+    void initialiserPioche(int nbJoueur = 1); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
 
 public:
 
@@ -69,7 +69,8 @@ public:
     void reset(); 
 
 
-    void jouerTour(); // un tour fait jouer tous les joueurs
+    void jouerTourIndividuel();
+    void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
     void calculerScores();
     void afficherScores() const;

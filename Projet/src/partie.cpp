@@ -5,13 +5,14 @@
 #include <stack>
 #include <algorithm>
 #include "partie.h"
+#include "gestion_pieces.h"
 
 // Avant le démarrage d'une partie, la pioche doit être initialiser.
-void Partie::initialiserPioche() {
-	pioche = std::make_unique<Pioche>();
+void Partie::initialiserPioche(int nbJoueur) {
+	pioche = std::make_unique<Pioche>(nbJoueur);
 }
 
-// Ajoute un nouveua EnvJoueur aux vecteur de EnvJoueur/
+// Ajoute un nouveau EnvJoueur aux vecteur de EnvJoueur
 void Partie::ajouterJoueur(const EnvJoueur& joueur) {
     if (joueurs.size() >= nbJoueurs) {
         throw std::runtime_error("Impossible d'ajouter un joueur : nombre maximum atteint (" + std::to_string(nbJoueurs) + ")");
@@ -40,14 +41,30 @@ void Partie::affichePioche() const {
     else std::cout << "La pioche est à créer.";
 }
 
-void Partie::jouerTour() {
+//TODO
+void Partie::jouerTourIndividuel() {
+    if (nbJoueurs == 1) {
+        jouerTourIndividuel();
+        pioche->retirerTuileJetonDebut();
+    }
+}
+
+// TODO
+void Partie::jouerTourCollectif() {
+    std::cout << "> Début du tour " << compteurTour + 1 << std::endl;
+
+    for (joueurCourant = 0; joueurCourant < nbJoueurs; joueurCourant++) {
+        jouerTourIndividuel();
+    }
+
 
 }
 
-// Controle le deroulement d'une partie.
+// Controle le deroulement d'une partie entiere.
 // Suppose d'avoir defini les joueurs et instancier la pioche pour pouvoir commencer à jouer sereinement.
 void Partie::lancer() {
-    
+
+    /// 1. Verifications des conditions preliminaires pour que le jeu puisse etre demarre.
     // Verifier si des joueurs existent
     if (joueurs.empty()) {
         throw std::runtime_error("Impossible de démarrer : aucun joueur encore.");
@@ -58,48 +75,44 @@ void Partie::lancer() {
     if (joueurCourant != 0) joueurCourant = 0;
     if (compteurTour != 0) compteurTour = 0;
 
-    // Vérifier si la pioche est initialisée
-    if (!pioche) {
-        throw std::runtime_error("Impossible de démarrer : la pioche n'est pas initialisée !");
-    }
+    // Vérifier si la pioche est initialisée: si non, on l'initialise alors
+    if (!pioche) { initialiserPioche(nbJoueurs); }
 
-    // recuperer les tuiles en donnees json
-    using namespace GestionPieces; // pour acceder directement à ses fonctions
-    std::vector<Tuile> tuilesNonReperes = instancierTuiles("json/tuiles_non_reperes.json");
-    std::vector<Tuile> tuilesReperes = instancierTuiles("json/tuiles_reperes.json");
-    std::vector<Tuile> tuiles = fusionnerVecteursTuiles(tuilesNonReperes, tuilesReperes);
-    melangerTuiles(tuiles);
-    std::vector<std::vector<Tuile>> tuilesDepart = instancierTuilesDepart("json/tuiles_depart.json");
-    //melangerTuiles(tuilesDepart); // WARNING: surcharge a definir dans GestionPieces
+    // distribuer une tuile de depart à chaque joueur : celle-ci proviennent de la Pioche, instancié à partir de donnees JSON
+    if (nbJoueurs > pioche->getTuilesDepartDispo().size()) // pas assez de tuiles de depart pour le nombre total de joueurs
+        throw std::runtime_error(std::to_string(pioche->getTuilesDepartDispo().size()) +
+            "tuile de depart pour " + std::to_string(nbJoueurs) + "joueurs : il en manque ! \n" +
+            "Veuillez ajouter de nouvelles tuiles de depart ou bien diminuer le nombre de joueurs.");
 
-    // creer la pile de Tuiles dispo au sein de la Pioche, en fonction du nbJoueurs
-    pioche->setTuilesDispo(tuiles, nbJoueurs);
-
-    // distribuer tuiles de depart à ses joueurs?
     for (int i = 0; i < nbJoueurs; i++) {
-        joueurs.at(i).setTuileDepart(tuilesDepart.at(i));
+        //joueurs.at(i).setTuilesDepart(pioche->getTuilesDepartDispo().at(i));
+        std::vector<std::vector<Tuile>> tuilesDepart = pioche->getTuilesDepartDispo();
+        joueurs.at(i).setTuilesDepart(GestionPieces::piocherTuileDepart(tuilesDepart));
     }
 
-    std::cout << "La partie commence !" << std::endl;
+    std::cout << "[JEU CASCADIA]\n";
+    std::cout << "La pioche est prete et les tuiles de depart ont ete distribuees a chacun des joueurs.\n";
+    std::cout << "La partie peut commencer !\n" << std::endl;
 
-    // Boucle principale du jeu
-    while (!verifierFinPartie()) {
-        std::cout << "Tour " << (compteurTour + 1) << " / " << MAX_NB_TOURS << std::endl;
-        jouerTour();
+    /// 2. Boucle principale du jeu
+    while (!verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
+        std::cout << "> TOUR " << (compteurTour + 1) << " / " << MAX_NB_TOURS << std::endl;
+        jouerTourCollectif();
         compteurTour++;
     }
 
-    // Afficher le résultat final
+    /// 3. Afficher le résultat final
     calculerScores();
     afficherScores();
     calculerGagnant();
     afficherGagnant();
+    std::cout << "[FIN DU JEU CASCADIA]" << std::endl;
 }
 
 void Partie::reset() {
     joueurs.clear();
     scores = std::nullopt;
-    pioche = std::make_unique<Pioche>();
+    pioche = nullptr;
     nbJoueurs = 0;
     compteurTour = 0;
     gagnant = std::nullopt;
@@ -109,27 +122,28 @@ void Partie::reset() {
     std::cout << "La partie a été réinitialisée." << std::endl;
 }
 
+// exemple : avec 20 tours, dès que le compteur fini son 20e tour, le jeu s'arrete
 bool Partie::verifierFinPartie() const {
-    return pioche->nbTuilesDispo() == 0;
+    return compteurTour == MAX_NB_TOURS + 1;
 }
 
 // TODO: verifier que les methodes sont bien implementees dans EnvJoueur.
-void Partie::calculerScores() {
-    if (scores.has_value()) throw std::runtime_error("Des scores existent déjà.");
-
-    scores = std::vector<int>{};
-    for (auto& j : joueurs) {
-        j.calculScore();
-        scores->push_back(j.getScore());
-    }
-}
+//void Partie::calculerScores() {
+//    if (scores.has_value()) throw std::runtime_error("Des scores existent déjà.");
+//
+//    scores = std::vector<int>{};
+//    for (auto& j : joueurs) {
+//        j.calculScore();
+//        scores->push_back(j.getScore());
+//    }
+//}
 
 // Affiche le score de chaque joueur.
 void Partie::afficherScores() const {
     if (!scores.has_value()) 
-        std::cout << "Aucun score à afficher" << std::endl;
+        std::cout << "Aucun score à afficher !" << std::endl;
     else {
-        std::cout << "* SCORES *" << std::endl;
+        std::cout << "[SCORES]" << std::endl;
         for (int i = 0; i < nbJoueurs; i++) {
             std::cout << joueurs.at(i).getPseudo() << " : " << scores->at(i) << std::endl;
         }

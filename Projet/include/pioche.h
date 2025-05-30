@@ -99,7 +99,7 @@ public:
 	}
 
 	// methode qui sera appelée par Partie, pour distribuer ces TuilesDepart a chaque EnvJoueur
-	const std::vector<std::vector<Tuile>>& getTuilesDepartDispo() { return tuilesDepartDispo; }
+	std::vector<std::vector<Tuile>>& getTuilesDepartDispo() { return tuilesDepartDispo; }
 
 
 

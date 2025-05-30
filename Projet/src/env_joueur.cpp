@@ -164,7 +164,7 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 
 
 //reset l'envJoueur et y ajoute les tuiles de départ
-void EnvJoueur::setTuilesDepart(std::vector<Tuile>& tuilesDepart) {
+void EnvJoueur::setTuilesDepart(const std::vector<Tuile>& tuilesDepart) {
 	if (tuilesDepart.empty()) {
 		throw std::invalid_argument("Le vecteur de tuiles de départ possibles est vide.");
 	}

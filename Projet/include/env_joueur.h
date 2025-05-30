@@ -76,7 +76,7 @@ public:
 	//pour placer un jeton faune, on ne peut pas undo cette opération
 	int placerJetonFaune(const Position& coord, const JetonFaune& jeton);
 
-	void setTuilesDepart(std::vector<Tuile>& tuilesDepart);
+	void setTuilesDepart(const std::vector<Tuile>& tuilesDepart);
 	
 	//GETTERS & SETTERS
 	std::string getPseudo() const { return pseudo; };
@@ -95,3 +95,5 @@ public:
 	bool getPlacementEnAttente() const { return placementEnAttente; }
 
 };
+
+std::ostream& operator<<(std::ostream& os, const EnvJoueur& e);
