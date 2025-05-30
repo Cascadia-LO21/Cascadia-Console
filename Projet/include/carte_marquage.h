@@ -35,7 +35,7 @@ class CarteSaumon : public CarteMarquage {
 public:
 	CarteSaumon() : CarteMarquage(Faune::saumon) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int explorerChaineA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& positionsVisitees, const Position* pere) const; //fct recursive qui sera appelée dans methodeCalculA, retourn la taille d'une chaine
+	int explorerChaineSaumonA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& positionsVisitees, const Position* pere) const; //fct recursive qui sera appelée dans methodeCalculA, retourn la taille d'une chaine
 };
 
 class CarteOurs : public CarteMarquage {
@@ -61,6 +61,7 @@ class CarteWapiti : public CarteMarquage {
 public:
 	CarteWapiti() : CarteMarquage(Faune::wapiti) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
+	int explorerChaineWapitiA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, std::optional<Direction> direction) const;
 };
 
 /* A GARDER JUSQU'À AVOIR FINI TOUTES LES FONCTIONS :
