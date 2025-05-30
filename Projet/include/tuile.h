@@ -14,26 +14,58 @@ class Tuile {
 	std::vector<Faune> faunes; //un vector est adapté étant donné que le nombre de faunes varient entre 1 et 3
 	bool donneJetonNature;
 	std::optional<Faune> faunePlace;
-	std::unique_ptr<Position> position; //composition
+	std::unique_ptr<Position> position; // relation de composition
 	bool placementConfirme;
 
 public:
-
-	//constructeur principal
-	Tuile(const std::array<Habitat, 6>& habitats,
-		const std::vector<Faune>& faunes,
+	// Constructeur principal
+	Tuile(
+		const std::array<Habitat, 6>& habitats,
+		std::vector<Faune> faunes, // prend par valeur
 		bool nature = false,
-		bool jetonPresent = false,
-		Position* p = nullptr,
+		std::unique_ptr<Position> position = nullptr,
 		bool place = false)
-		: habitats(habitats), faunes(faunes),
-		donneJetonNature(nature), faunePlace(std::nullopt),
-		position(p), placementConfirme(place) {
-		if (faunes.size() < 1 && faunes.size() > 3)
-			throw std::invalid_argument("Une tuile doit avoir entre 1 et 3 faunes.");
+		: habitats(habitats),
+		faunes(std::move(faunes)), // deplace pour eviter de copier, on "vide" le parametre passé
+		donneJetonNature(nature),
+		faunePlace(std::nullopt),
+		position(std::move(position)),
+		placementConfirme(place) {
+		if (this->faunes.size() < 1 || this->faunes.size() > 3)
+			throw std::invalid_argument("Nombre de faunes invalide.");
 	}
 
-	///TODO ? un constructeur specifique pour extraire JSON?
+
+	// constructeur par copie
+	Tuile(const Tuile& other)
+		: habitats(other.habitats),
+		faunes(other.faunes),
+		donneJetonNature(other.donneJetonNature),
+		faunePlace(other.faunePlace),
+		position(other.position ? std::make_unique<Position>(*other.position) : nullptr),
+		placementConfirme(other.placementConfirme) {
+	}
+
+	// affectation par la surcharge de l'operateur
+	Tuile& operator=(const Tuile& other) {
+		if (this != &other) { 
+			habitats = other.habitats;
+			faunes = other.faunes;
+			donneJetonNature = other.donneJetonNature;
+			faunePlace = other.faunePlace;
+			position = other.position ? std::make_unique<Position>(*other.position) : nullptr;
+			placementConfirme = other.placementConfirme;
+		}
+		return *this;
+	}
+
+	// Debug only: permet de creer des Tuiles "vides" si on veut reserver x places dans un conteneur, comme vector<Tuile> tab(3)
+	Tuile()
+		: habitats{}, faunes{}, donneJetonNature(false),
+		faunePlace(std::nullopt), position(nullptr),
+		placementConfirme(false) {
+	}
+
 
 	const std::array<Habitat, 6>& getHabitats() const { return habitats; }
 	const std::vector<Faune>& getFaunes() const { return faunes; }
@@ -60,5 +92,7 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& flux, const Tuile& tuile);
+std::ostream& operator<<(std::ostream& flux, const std::vector<Tuile>& tuileDepart);
+
 
 void testClasseTuile();

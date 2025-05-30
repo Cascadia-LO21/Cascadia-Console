@@ -4,7 +4,7 @@
 #include <ostream>
 
 enum class Habitat { marais, fleuve, montagne, prairie, foret };
-enum class Faune { saumon, ours, buse, renard, wapiti, rien };
+enum class Faune { saumon = 0, ours = 1, buse = 2, renard = 3, wapiti = 4, rien = -1};
 enum class Direction { NordEst = 0, Est = 1, SudEst = 2, SudOuest = 3, Ouest = 4, NordOuest = 5, Inconnue = -1 };
 enum class Marquage { A, B, C, D, famille, intermediaire };
 enum class Variante { standard, famille, intermediaire };
