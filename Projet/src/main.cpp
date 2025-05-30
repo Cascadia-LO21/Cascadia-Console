@@ -15,20 +15,18 @@
 #include "gestion_pieces.h"
 
 int main() {
-	//std::cout << "hello world\n" << std::endl;
-	
-	//testClassePosition();
-
-	//testClasseTuile();
-
-	//testGestionPieces();
-	
+	std::cout << "hello world\n" << std::endl;
+		
 	//JetonFaune j(Faune::saumon);
-	//cout << j;
+	//std::cout << j;
 
-	/// TEST PIOCHE
-	//testPioche(1);
-	//testPioche1joueur();
-	testPiocheBcpJoeurs(2);
-	//testPiocheJoueurUndo(1);
+	try {
+		testHexagonalDisplay();
+		std::cout << "Tests completed successfully!\n";
+	}
+	catch (const std::exception& e) {
+		std::cerr << "Error during testing: " << e.what() << std::endl;
+		return 1;
+	}
+	
 }

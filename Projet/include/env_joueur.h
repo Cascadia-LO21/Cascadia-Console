@@ -14,6 +14,7 @@
 #include "position.h"
 #include "tuile.h"
 #include "jeton_faune.h"
+#include "pioche.h"
 
 
 class EnvJoueur {
@@ -76,11 +77,10 @@ public:
 	int placerJetonFaune(const Position& coord, const JetonFaune& jeton);
 
 	void setTuilesDepart(std::vector<Tuile>& tuilesDepart);
+	void placerTuileDepart(const Position& coord, const Tuile& tuile);
+	void placerTuileDefinitiveDepart(const Position& coord, const Tuile& tuile);
 
-	void choisirPaire(const Position& coord, const JetonFaune& jeton);
-	
-	//pour utiliser un jeton nature, on ne peut pas undo cette opération
-	void utiliserJetonNature(const Position& coord, const JetonFaune& jeton);
+	void incNbJetonsNature(size_t nb) { nbJetonNature++; };
 
 	//GETTERS & SETTERS
 	std::string getPseudo() const { return pseudo; };
@@ -90,7 +90,6 @@ public:
 	size_t getScore() const { return scoreFinal; };
 	void setScore(size_t score) { scoreFinal = score; };
 	size_t getNbJetonsNature() const { return nbJetonNature; };
-	void setNbJetonsNature(size_t nb) { nbJetonNature = nb; };
 	std::optional<Position> getDernierePosition() const { return dernierePosition; };
 	std::optional<Tuile> getDerniereTuile() const { return derniereTuile; };
 
@@ -99,3 +98,6 @@ public:
 	bool getPlacementEnAttente() const { return placementEnAttente; }
 
 };
+
+//tests
+void testHexagonalDisplay();
