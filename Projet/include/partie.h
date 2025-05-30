@@ -29,12 +29,11 @@ private:
 
 public:
 
-    // TODO : reviser le constructeur pour repondre au cosntructeur de Pioche si elle a besoin de param
     // La pioche est initialisée en même temps que Partie.
     // Mais le vecteur de joeur est vide encore.
     Partie(int nombreJoueurs = 1) :
         nbJoueurs(nombreJoueurs), compteurTour(0), joueurs(), joueurCourant(0), pause(false),
-        pioche(std::make_unique<Pioche>()),
+        pioche(std::make_unique<Pioche>(nombreJoueurs)),
         marquage(Marquage::A), variante(Variante::standard) {}
 
  

@@ -19,7 +19,7 @@ void Partie::ajouterJoueur(const EnvJoueur& joueur) {
     joueurs.push_back(joueur); // copie du joueur
 }
 
-// Cette surcharge permet d'écrire par exemple: ajouterJoeur("toto")
+// Cette surcharge permet d'écrire par exemple: ajouterJoueur("toto")
 void Partie::ajouterJoueur(const std::string& nom) {
     if (joueurs.size() >= nbJoueurs) {
         throw std::runtime_error("Impossible d'ajouter un joueur : nombre maximum atteint (" + std::to_string(nbJoueurs) + ")");
@@ -113,7 +113,7 @@ bool Partie::verifierFinPartie() const {
     return pioche->nbTuilesDispo() == 0;
 }
 
-// WARNING: verifier que les methodes sont bien implementees dans EnvJoueur.
+// TODO: verifier que les methodes sont bien implementees dans EnvJoueur.
 void Partie::calculerScores() {
     if (scores.has_value()) throw std::runtime_error("Des scores existent déjà.");
 
