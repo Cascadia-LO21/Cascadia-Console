@@ -316,14 +316,14 @@ void testHexagonalDisplay() {
 
 	std::cout << joueur2 << "\n";
 	std::cout << std::string(50, '-') << "\n\n";
-	
+	/*
 	// Test 3: Environment with pending placement
 	std::cout << "Test 3: Test des coordonnees et placement en attente\n";
 
 	EnvJoueur joueur3("Charlie", 2, 10);
 
 	// Test pending placement
-
+	*/
 	std::array<Habitat, 6> habitats3 = {
 		Habitat::montagne, Habitat::montagne, Habitat::montagne,
 		Habitat::montagne, Habitat::montagne, Habitat::montagne //TEST 3 IS THE PROBLEM
@@ -335,8 +335,9 @@ void testHexagonalDisplay() {
 	// Place without confirming to test pending placement display
 	//std::cout<<"\n\n\n position est valide?"<<joueur2.positionTuileValide(Position(1, 0, -1));
 	//std::cout << "\n\n\n A tuile a 000?"<< joueur2.aTuile(Position(0,0,0));
-	//joueur3.placerTuile(Position(1, 0, -1), tuile3);
-
+	std::cout << "POTATOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n";
+	joueur2.placerTuile(Position(1, 0, -1), tuile3);
+	std::cout << joueur2 << "\n";
 
 	//std::cout << joueur3 << "\n";
 
