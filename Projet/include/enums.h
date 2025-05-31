@@ -23,4 +23,5 @@ std::string varianteToString(Variante v);
 std::ostream& operator<<(std::ostream& flux, Habitat h);
 std::ostream& operator<<(std::ostream& flux, Faune f);
 std::ostream& operator<<(std::ostream& flux, Direction d);
+std::ostream& operator<<(std::ostream& flux, std::vector<Direction> dirs);
 

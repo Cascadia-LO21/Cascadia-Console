@@ -73,7 +73,7 @@ public:
 	void placerTuileDefinitive(const Position& coord, const Tuile& tuile);
 
 	//=============fin systeme placement tuile + undo
-
+	
 	//pour placer un jeton faune, on ne peut pas undo cette opération
 	int placerJetonFaune(const Position& coord, const JetonFaune& jeton);
 
@@ -82,6 +82,12 @@ public:
 	void placerTuileDefinitiveDepart(const Position& coord, const Tuile& tuile);
 
 	void incNbJetonsNature(size_t nb) { nbJetonNature++; };
+	
+	//retourne un vecteur de positions possibles pour placer une tuile
+	std::vector<Tuile> getTuilesAvecVoisinLibre() const;
+
+	std::vector<Direction> getDirLibresAutourTuile(const Tuile& tuile) const;
+	std::vector<Position> getPosLibresAutourTuile(const Tuile& tuile) const;
 
 	//GETTERS & SETTERS
 	std::string getPseudo() const { return pseudo; };
@@ -100,7 +106,7 @@ public:
 
 };
 
-std::ostream& operator<<(std::ostream& os, const EnvJoueur& e);
+std::ostream& operator<<(std::ostream& os, const EnvJoueur& env);
 
 //tests
 void testHexagonalDisplay();

@@ -66,6 +66,19 @@ const Position Position::getPositionAdjacente(Direction direction) const
 	return Position(q + pos.getQ(), r + pos.getR(), s + pos.getS());
 }
 
+const Direction Position::getDirectionAdjacente(Position pos) const {
+	if (!estAdjacente(pos)) {
+		return Direction::Inconnue;
+	}
+	const std::vector<Position> adjs = getVecteurPositionsAdjacentes();
+	for (int i = 0; i < static_cast<int>(adjs.size()); ++i) { //6 voisins pour un hexagone
+		if (adjs[i] == pos) {
+			return static_cast<Direction>(i);
+		}
+	}
+	return Direction::Inconnue;
+}
+
 const std::vector<Position> direction_vecteur = {
 	Position(1, -1, 0), //NordEst, 0
 	Position(1, 0, -1), //Est, 1

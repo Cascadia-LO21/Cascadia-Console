@@ -209,6 +209,51 @@ void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, const Tuile& 
 	confirmerPlacement();
 }
 
+std::vector<Tuile> EnvJoueur::getTuilesAvecVoisinLibre() const{
+	std::vector<Tuile> res;
+
+	for (const auto& [position, tuile] : tuiles) {
+		std::vector<Position> posVoisines = position.getVecteurPositionsAdjacentes();
+		for (const Position& voisin : posVoisines) {
+			if (!aTuile(voisin)) {
+				res.push_back(tuile); //on rajoute les positions des tuiles qui ont au moins un voisin
+				break;
+			}
+		}
+	}
+	return res;
+}
+
+std::vector<Direction> EnvJoueur::getDirLibresAutourTuile(const Tuile& tuile) const {
+	const Position& tuilePos = tuile.getPosition();
+	const std::vector<Position> posVoisines = tuilePos.getVecteurPositionsAdjacentes();
+	
+	std::vector<Direction> res;
+	for (const Position& voisin : posVoisines) {
+		if (!aTuile(voisin)) {
+			Direction dirVersVoisin = tuilePos.getDirectionAdjacente(voisin);
+			if (dirVersVoisin != Direction::Inconnue) { // Par sécurité
+				res.push_back(dirVersVoisin);
+			}
+		}
+	}
+	return res;
+}
+
+std::vector<Position> EnvJoueur::getPosLibresAutourTuile(const Tuile& tuile) const{
+	const Position& tuilePos = tuile.getPosition();
+	const std::vector<Position> posVoisines = tuilePos.getVecteurPositionsAdjacentes();
+
+	std::vector<Position> res;
+	for (const Position& voisin : posVoisines) {
+		if (!aTuile(voisin)) {
+			res.push_back(voisin);
+		}
+	}
+	return res;
+}
+
+
 std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 	os << "======== ENVIRONNEMENT DE " << env.getPseudo() << " ========\n";
 	os << "Jetons Nature: " << env.getNbJetonsNature() << " | Score Final: " << env.getScore() << "\n";

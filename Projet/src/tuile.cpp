@@ -37,13 +37,38 @@ std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
 	return flux;
 }
 
-std::ostream& operator<<(std::ostream& flux, const std::vector<Tuile>& tuileDepart)
-{
-	flux << "TUILE DE DEPART : \n" << std::endl;
-	for (const auto& tuile : tuileDepart) {
-		flux << "\t" << tuile << "\n";
+//ostream pour vecteur de tuile like in envjoueur
+std::ostream& operator<<(std::ostream& os, const std::vector<Tuile>& tuiles) {
+	if (tuiles.empty()) {
+		os << "Aucune tuile à afficher\n";
+		return os;
 	}
-	return flux;
+
+	for (const auto& tuile : tuiles) {
+		os << "  (" << tuile.getPosition().getQ() << "," << tuile.getPosition().getR() << "," << tuile.getPosition().getS() << "): ";
+		if (!tuile.getPlacementConfirme()) {
+			os << " [NON CONFIRME] ";
+		}
+		if (tuile.getDonneJetonNature()) {
+			os << " [REPERE]";
+		}
+		os << "\n";
+		if (tuile.JetonFaunePresent()) {
+			os << "    Jeton Faune Place: " << fauneToString(tuile.getFaunePlace()) << "\n";
+		}
+		else {
+			os << "    Possibilite de placer: ";
+			for (const auto& faune : tuile.getFaunes()) {
+				os << fauneToString(faune) << " ";
+			}
+			os << "\n";
+		}
+		os << "    Habitats: ";
+		for (const auto& habitat : tuile.getHabitats()) {
+			os << habitatToString(habitat) << " ";
+		}
+		os << "\n";
+	}
 }
 
 void Tuile::placerJetonFaune(Faune faune) {
