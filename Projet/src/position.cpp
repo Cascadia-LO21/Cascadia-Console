@@ -9,7 +9,7 @@ std::ostream& operator<<(std::ostream& flux, const Position& p)
 
 std::ostream& operator<<(std::ostream& flux, const std::vector<Position>& vect) {
 	for(const auto& p: vect)
-		flux << p;
+		flux << p << " ";
 	return flux;
 }
 

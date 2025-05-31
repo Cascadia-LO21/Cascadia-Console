@@ -75,8 +75,8 @@ public:
     
     void saisirJoueurs();
     unsigned int saisirNombre(unsigned int max) const;
-    const Position& saisirPositionTuile() const ;
-    const Position& saisirPositionJeton(Faune f) const;
+    const Position saisirPositionTuile() const ;
+    const Position saisirPositionJeton(Faune f) const;
 
 
     void calculerScores();
@@ -86,3 +86,5 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& os, const Partie& partie);
+
+void testPartie();

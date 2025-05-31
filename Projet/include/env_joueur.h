@@ -32,7 +32,7 @@ class EnvJoueur {
 
 public:
 
-	//constructeur principal!!!!!!!!!!!!!!!!TO LOOK AT AGAIN
+	//constructeur principal
 	EnvJoueur(const std::string& pseudo, size_t nbJetonNature = 0, size_t scoreFinal = 0)
 		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
 	};
@@ -61,27 +61,28 @@ public:
 	//=============debut systeme placement tuile + undo
 
 	//étape 1: placer une tuile, peut etre undone
-	void placerTuile(const Position& coord, const Tuile& tuile);
+	void placerTuile(const Position& coord, Tuile& tuile);
 
 	//étape 2: confirmer le placement de la tuile
-	void confirmerPlacement();
+	void confirmerPlacement(const Position& p);
 
 	//annuler le dernier placement
 	bool undoDernierPlacement();
 
 	//alternative combine étapes 1 et 2, placer une tuile et confirmer son placement
-	void placerTuileDefinitive(const Position& coord, const Tuile& tuile);
+	void placerTuileDefinitive(const Position& coord, Tuile& tuile);
 
 	//=============fin systeme placement tuile + undo
 	
 	//pour placer un jeton faune, on ne peut pas undo cette opération
 	int placerJetonFaune(const Position& coord, const JetonFaune& jeton);
 
-	void setTuilesDepart(const std::vector<Tuile>& tuilesDepart);
-	void placerTuileDepart(const Position& coord, const Tuile& tuile);
-	void placerTuileDefinitiveDepart(const Position& coord, const Tuile& tuile);
+	void setTuilesDepart(std::vector<Tuile>& tuilesDepart);
+	void placerTuileDepart(const Position& coord, Tuile& tuile);
+	void placerTuileDefinitiveDepart(const Position& coord, Tuile& tuile);
 
-	void incNbJetonsNature(size_t nb) { nbJetonNature++; };
+	void incNbJetonsNature() { nbJetonNature++; };
+	void decNbJetonsNature() { nbJetonNature--; };
 	
 	//retourne un vecteur de positions possibles pour placer une tuile
 	std::vector<Tuile> getTuilesAvecVoisinLibre() const;
@@ -111,3 +112,4 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env);
 //tests
 void testHexagonalDisplay();
 void testDivers();
+void testEnvJoueur();

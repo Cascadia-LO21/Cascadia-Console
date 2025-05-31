@@ -43,28 +43,30 @@ void Partie::affichePioche() const {
     else std::cout << "La pioche est à créer.";
 }
 
-// TODO: in progress
 // Gere le tour individuel d'un joueur, notamment si utiliser Jeton Nature ou pas
 void Partie::jouerTourIndividuel() {
     // 0.1 Afficher le plateau du joueur ET la pioche
-    EnvJoueur player = joueurs.at(joueurCourant);
+    EnvJoueur& player = joueurs.at(joueurCourant);
     std::cout << player << std::endl;
-    affichePioche();
+    //affichePioche();
 
     // 0.2 Detecter si Jetons Identiques dans Pioche : si oui, on les enleve, sans les remettre dans le sac de Jetons
     while (pioche->quatreJetonsIdentiques()) {
+        affichePioche();
         pioche->resetAllJetonFaune();
-        std::cout << "\n>>> Oh non ! Tous les jetons sont identiques ! Reglons cela !\n" << pioche;
+        std::cout << "\n>>> Oh non ! Tous les jetons sont identiques dans la pioche ! Reglons cela !\n" << pioche;
     }
 
     // 0.3 Trois jetons identiques : option de reset (une seule fois)
     char tmp;
     if (pioche->troisJetonsIdentiques()) {
+        affichePioche();
         std::cout << "\n>>> 3 Jetons identiques dans la pioche ! Les retire-t-on ? (o/n) : ";
         std::cin >> tmp;
         if (tmp == 'o') pioche->resetTroisJetonsIdentiques();
     }
 
+    //std::cout << "\n>> Voici la pioche : \n";
     affichePioche();
 
     // 1. Demander si usage Jeton Nature
@@ -79,12 +81,15 @@ void Partie::jouerTourIndividuel() {
         std::cout << ">>> Saisis ton choix (1-3) : ";
         rep = saisirNombre(3); 
 
-        if (rep != 1) jetonNatureUsed = true;
+        if (rep != 1) {
+            jetonNatureUsed = true;
+            player.decNbJetonsNature();
+        }
 
         // 1.bis. Si Jeton Nature recouru pour remplacer les Jetons indesirables
         if (rep == 3) {
-            std::vector<unsigned int> jetonsIndesirables;
-            while (jetonsIndesirables.size() < pioche->getMax()) {
+            std::vector<unsigned int> jetonsIndesirables{};
+            while (tmp == 'o' && jetonsIndesirables.size() < pioche->getMax()) {
                 std::cout << "\n>>> Quel jeton enlever ? ";
                 jetonsIndesirables.push_back(saisirNombre(pioche->getMax()));
                 std::cout << "\n>>> Encore ? (o/n) : ";
@@ -100,17 +105,19 @@ void Partie::jouerTourIndividuel() {
     unsigned int tuile = 0, jeton = 0;
     Position posTuile, posJeton;
     bool placementReussi = false;
+    Tuile tuileTmp;
 
     // 2. Boucle principale pour gérer le choix de tuile et de jeton, et la possibilité de recommencer
     while (!placementReussi) {
         // 2.1 Choix d'une Tuile
-        std::cout << "\n>>> Quelle tuile veux-tu ?\n ";
+        std::cout << "\n>>> Quelle tuile veux-tu " << player.getPseudo() << " ? \n";
         tuile = saisirNombre(pioche->getMax());
         pioche->retirerTuileVisible(tuile);
         affichePioche(); // la pioche presente une Tuile absente
 
         posTuile = saisirPositionTuile();
-        player.placerTuile(posTuile, pioche->getPiocheVisible().at(tuile).first);
+        tuileTmp = pioche->getPiocheVisible().at(tuile).first; //creer une copie
+        //player.placerTuile(posTuile, tuileTmp);
 
         // 2.1.1 Demander s'il regrette son placement de Tuile
         std::cout << "\n>>> Veux-tu revenir en arriere pour choisir une autre tuile ? (o/n)";
@@ -177,11 +184,13 @@ void Partie::jouerTourIndividuel() {
 
         else if (succesJetonPlace == 1) {
             placementReussi = true;
+            if (tuileTmp.getDonneJetonNature()) player.incNbJetonsNature();
         }
     }
 
     // 3. Jeton Place, alors la position de la Tuile est definitive
-    player.confirmerPlacement();
+    //player.confirmerPlacement(posTuile);
+    player.placerTuileDefinitive(posTuile, tuileTmp);
     std::cout << "\n>>> Les pieces sont placees dans ton plateau avec succes !";
     std::cout << player;
     pioche->slide(0, true); // slide tuiles
@@ -190,7 +199,8 @@ void Partie::jouerTourIndividuel() {
     // 4. Si joueur solitaire, alors son tour est toujours suivi de l'extraction artificielle d'une paire de la pioche
     if (nbJoueurs == 1) {
         pioche->retirerTuileJetonDebut();
-        std::cout << pioche;
+        std::cout << "\n>>> L'ordinateur a extrait une paire.\n";
+        affichePioche();
         pioche->slide(0, true); // slide tuiles
         pioche->slide(0, false); // slide jetons
     }
@@ -213,6 +223,8 @@ void Partie::jouerTourCollectif() {
 // Controle le deroulement d'une partie entiere.
 // Suppose d'avoir defini les joueurs et instancier la pioche pour pouvoir commencer à jouer sereinement.
 void Partie::lancer() {
+    std::cout << "[JEU CASCADIA]\n";
+    std::cout << ">> Saisie des joueurs : " << std::endl;
     saisirJoueurs();
 
     /// 1. Verifications des conditions preliminaires pour que le jeu puisse etre demarre.
@@ -235,10 +247,10 @@ void Partie::lancer() {
             "Veuillez ajouter de nouvelles tuiles de depart ou bien diminuer le nombre de joueurs.");
 
     for (unsigned int i = 0; i < nbJoueurs; i++) {
-        joueurs.at(i).setTuilesDepart(GestionPieces::piocherTuileDepart(pioche->getTuilesDepartDispo()));
+        std::vector<Tuile> t = GestionPieces::piocherTuileDepart(pioche->getTuilesDepartDispo()); 
+        joueurs.at(i).setTuilesDepart(t);
     }
 
-    std::cout << "\n[JEU CASCADIA]\n";
     std::cout << "> Tout est pret : joueurs, pioche, tuiles de depart distribuees.\n";
     std::cout << "> La partie peut commencer !\n" << std::endl;
 
@@ -262,7 +274,7 @@ void Partie::lancer() {
 
     }
 
-    // TODO
+    // TODO: recuperer les fonctions du namespace EvalScore pour calculer les scores
     /// 3. Afficher le résultat final
     //calculerScores();
     //afficherScores();
@@ -385,7 +397,7 @@ unsigned int Partie::saisirNombre(unsigned int max) const {
 
 
 // Pour placer une tuile ou un jeton, on doit demander au joueur la position où placer
-const Position& Partie::saisirPositionTuile() const {
+const Position Partie::saisirPositionTuile() const {
     EnvJoueur player = joueurs.at(joueurCourant);
     bool posValide = false;
     Tuile tuile;
@@ -397,14 +409,14 @@ const Position& Partie::saisirPositionTuile() const {
 
     // 1. On affiche toutes les positions des tuiles qui ont des places libres valides autour
     // 2. On lui demande de choisir la Tuile (la Position plus precisement) a cote de laquelle placer sa nouvelle Tuile
-    std::cout << "\n>> Voici toutes les Tuiles a cote desquelles tu peux encore placer ta nouvelle tuile :" << std::endl;
+    std::cout << "\n>> Voici toutes les Tuiles a cote desquelles tu peux placer ta nouvelle tuile :" << std::endl;
     while (!posValide) {
         std::cout << player.getTuilesAvecVoisinLibre();
         std::cout << "\n>> Rentre les 3 coordonnées de la Tuile à côté de laquelle tu veux placer.\n"
-                  << "Repète les étapes suivantes 3 fois : saisis un nombre puis appuie sur ENTRER.\n";
+                  << ">> Repète les étapes suivantes 3 fois : saisis un nombre puis appuie sur ENTRER.\n";
         std::cout << "\n>> Coordonnée 1 : "; std::cin >> q;
-        std::cout << "\n>> Coordonnée 2 : "; std::cin >> r;
-        std::cout << "\n>> Coordonnée 3 : "; std::cin >> s;
+        std::cout << ">> Coordonnée 2 : "; std::cin >> r;
+        std::cout << ">> Coordonnée 3 : "; std::cin >> s;
 
         if (!player.aTuile(Position(q, r, s))) {
             std::cout << "\n>> Attention: tu n'as pas de tuile placee a cette position! Veille a bien choisir parmi celles proposees !" << std::endl;
@@ -418,7 +430,7 @@ const Position& Partie::saisirPositionTuile() const {
 
     // 3. On lui affiche les directions disponibles autour de la Tuile qu'il a choisit
     std::cout << "\n>> Voici les directions libres à partir de la tuile que tu viens de choisir :\n";
-    std::cout << player.getDirLibresAutourTuile(tuile);
+    std::cout << ">> CHOISIR PARMI : " << player.getDirLibresAutourTuile(tuile);
 
     // 4. On lui demande la direction qu'il veut
     std::cout << "\n>> Saisis la direction que tu veux parmi celles valides : NE, E, SE, SO, O, NO :\n";
@@ -431,7 +443,7 @@ const Position& Partie::saisirPositionTuile() const {
 }
 
 // retourne une position où il y a une tuile qui peut accueillir la faune f
-const Position& Partie::saisirPositionJeton(Faune f) const {
+const Position Partie::saisirPositionJeton(Faune f) const {
     EnvJoueur player = joueurs.at(joueurCourant);
     bool posValide = false;
     int q, r, s;
@@ -441,13 +453,13 @@ const Position& Partie::saisirPositionJeton(Faune f) const {
     // 1. Lister toutes les positions des tuiles qui peuvent accueillir la faune en question : tuile libre + vecteur de Faunes contient la faune
     // 2. Saisir les coordonnes de la position
     while (!posValide) {
-        std::cout << "\nVoici les positions qui peuvent accueillir la faune :\n";
+        std::cout << "\nVoici les positions qui peuvent accueillir la faune " << fauneToString(f) << "\n";
         std::cout << player.getPosLibresPourJeton(f);
         std::cout << "\n>> Rentre les 3 coordonnées de la Tuile à côté de laquelle tu veux placer.\n"
                   << "Repète les étapes suivantes 3 fois : saisis un nombre puis appuie sur ENTRER.\n";
         std::cout << "\n>> Coordonnée 1 : "; std::cin >> q;
-        std::cout << "\n>> Coordonnée 2 : "; std::cin >> r;
-        std::cout << "\n>> Coordonnée 3 : "; std::cin >> s;
+        std::cout << ">> Coordonnée 2 : "; std::cin >> r;
+        std::cout << ">> Coordonnée 3 : "; std::cin >> s;
 
         if (!player.aTuile(Position(q, r, s))) {
             std::cout << "\n>> Attention: tu n'as pas de tuile placee a cette position! Veille a bien choisir parmi celles proposees !" << std::endl;
@@ -460,4 +472,10 @@ const Position& Partie::saisirPositionJeton(Faune f) const {
 
     return Position(q, r, s);
 
+}
+
+
+void testPartie() {
+    Partie p;
+    p.lancer();
 }

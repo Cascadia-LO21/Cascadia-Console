@@ -74,11 +74,17 @@ public:
 	Faune getFaunePlace() const { return faunePlace.value_or(Faune::rien); }
 	const Position& getPosition() const { return *(position.get()); }
 	bool getPlacementConfirme() const { return placementConfirme; }
+	bool positionDefinie() const { return position != nullptr; }
 
 
 	void setPosition(int q, int r, int s) {
 		if (!placementConfirme)
 			position = std::make_unique<Position>(q, r, s);
+	}
+
+	void setPosition(const Position& pos) {
+		if (!placementConfirme)
+			position = std::make_unique<Position>(pos.getQ(), pos.getR(), pos.getS());
 	}
 
 	void placerJetonFaune(Faune faune);
@@ -88,6 +94,8 @@ public:
 	void pivoterHoraire();
 
 	void pivoterAntiHoraire();
+
+	bool operator==(const Tuile& autre) const;
 
 };
 

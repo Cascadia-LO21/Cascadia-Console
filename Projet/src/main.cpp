@@ -15,18 +15,11 @@
 #include "gestion_pieces.h"
 
 int main() {
-	std::cout << "hello world\n" << std::endl;
-		
-	//JetonFaune j(Faune::saumon);
-	//std::cout << j;
-
-	try {
-		testHexagonalDisplay();
-		std::cout << "Tests completed successfully!\n";
-	}
-	catch (const std::exception& e) {
-		std::cerr << "Error during testing: " << e.what() << std::endl;
-		return 1;
-	}
+	//std::cout << "hello world\n" << std::endl;
 	
+	testPartie();
+
+	//testEnvJoueur();
+
+	return 0;
 }

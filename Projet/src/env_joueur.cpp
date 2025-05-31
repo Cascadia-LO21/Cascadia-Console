@@ -9,6 +9,7 @@
 #include "position.h"
 #include "tuile.h"
 #include "env_joueur.h"
+#include "gestion_pieces.h" //debug only
 
 bool EnvJoueur::aTuile(const Position& coord) const {
 	return tuiles.find(coord) != tuiles.end(); //find trouve la tuile avec la clé coord (renvoie tuiles.end() sinon), end renvoie pointeur vers l'élément après le dernier de tuiles
@@ -59,7 +60,9 @@ bool EnvJoueur::positionTuileValide(const Position& coord) const {
 	return false;
 };
 
-void EnvJoueur::placerTuile(const Position& coord, const Tuile& tuile) {
+// on ne modifie pas encore l'attribut position dans la tuile, on ne le fera que quand cest confirme
+// a ce stade, la tuile : position = nullptr ET placementConfirme = false
+void EnvJoueur::placerTuile(const Position& coord, Tuile& tuile) {
 	if (!positionTuileValide(coord)) {
 		throw std::invalid_argument("Position invalide pour placer la tuile");
 	}
@@ -79,7 +82,7 @@ void EnvJoueur::placerTuile(const Position& coord, const Tuile& tuile) {
 
 };
 
-void EnvJoueur::confirmerPlacement() {
+void EnvJoueur::confirmerPlacement(const Position& p) {
 	if (!placementEnAttente) {
 		throw std::logic_error("Aucun placement en attente à confirmer");
 	}
@@ -88,7 +91,9 @@ void EnvJoueur::confirmerPlacement() {
 	}
 
 	//marquer dans la tuile que sa position est confirmée
+	tuiles[dernierePosition.value()].setPosition(p);
 	tuiles[dernierePosition.value()].confirmerPlacement();
+	// maintenant, la Tuile a bien : une position definitive ET placementConfirme = true
 
 	//vider les variables d'attente
 	placementEnAttente = false;
@@ -102,7 +107,7 @@ bool EnvJoueur::undoDernierPlacement() {
 	}
 
 	//retirer la tuile de la map
-	tuiles.erase(dernierePosition.value());
+	tuiles.erase(dernierePosition.value()); // rien a modifier dans la tuile, qui n'a toujours pas de position definie
 
 	//vider les variables d'attente
 	placementEnAttente = false;
@@ -112,9 +117,9 @@ bool EnvJoueur::undoDernierPlacement() {
 	return true; //annulation réussie
 }
 
-void EnvJoueur::placerTuileDefinitive(const Position& coord, const Tuile& tuile) {
+void EnvJoueur::placerTuileDefinitive(const Position& coord, Tuile& tuile) {
 	placerTuile(coord, tuile);
-	confirmerPlacement();
+	confirmerPlacement(coord);
 }
 
 //retourne -1 si le jeton ne peut être placé nulpart, 0 si le jeton ne peut etre placé à cette position, 1 si le jeton est placé avec succès
@@ -170,7 +175,7 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 
 
 //reset l'envJoueur et y ajoute les tuiles de départ
-void EnvJoueur::setTuilesDepart(const std::vector<Tuile>& tuilesDepart) {
+void EnvJoueur::setTuilesDepart(std::vector<Tuile>& tuilesDepart) {
 	if (tuilesDepart.empty()) {
 		throw std::invalid_argument("Le vecteur de tuiles de départ possibles est vide.");
 	}
@@ -189,36 +194,34 @@ void EnvJoueur::setTuilesDepart(const std::vector<Tuile>& tuilesDepart) {
 	placerTuileDefinitiveDepart(Position(0, 0, 0), tuilesDepart[2]);
 }
 
-void EnvJoueur::placerTuileDepart(const Position& coord, const Tuile& tuile){
-	//si y'avait déjà une tentative de placement pour cette tuile, undo en premier
-	//if (placementEnAttente) {
-	//	undoDernierPlacement();
-	//}
+void EnvJoueur::placerTuileDepart(const Position& coord, Tuile& tuile){
 
-	//placer la tuile
 	tuiles[coord] = tuile;
-
-	//se rappeler de ce placement
 	dernierePosition = coord;
 	derniereTuile = tuile;
-	placementEnAttente = true; //on a un placement en attente de confirmation
+	placementEnAttente = true;
 
 }
 
-void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, const Tuile& tuile){
+void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, Tuile& tuile){
 	placerTuileDepart(coord, tuile);
-	confirmerPlacement();
+	confirmerPlacement(coord);
 }
 
-std::vector<Tuile> EnvJoueur::getTuilesAvecVoisinLibre() const{
+std::vector<Tuile> EnvJoueur::getTuilesAvecVoisinLibre() const {
 	std::vector<Tuile> res;
 
 	for (const auto& [position, tuile] : tuiles) {
 		std::vector<Position> posVoisines = position.getVecteurPositionsAdjacentes();
+		bool aVoisinLibre = false;
 		for (const Position& voisin : posVoisines) {
 			if (!aTuile(voisin)) {
-				res.push_back(tuile); //on rajoute les positions des tuiles qui ont au moins un voisin
+				aVoisinLibre = true;
+				break; // Pas besoin de continuer si un voisin libre est trouvé
 			}
+		}
+		if (aVoisinLibre && std::find(res.begin(), res.end(), tuile) == res.end()) {
+			res.push_back(tuile);
 		}
 	}
 	return res;
@@ -283,38 +286,32 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 
 	// afficher le système d'affichage
 	std::cout << "\n" << std::string(25, '-');
-	os << "\nFormat d'affichage: (q,r,s): ([NON CONFIRME]) ([REPERE]) [Faune(s)] [Habitats] \n";
-	os << "Legende ordre habitats: NordEst, Est, SudEst, SudOuest, Ouest, NordOuest\n";
-	std::cout << std::string(25, '-') << "\n\n";
+	//os << "\nFormat d'affichage: (q,r,s): ([NON CONFIRME]) ([REPERE]) [Faune(s)] [Habitats] \n";
+	os << "\nOrdre Habitats: NordEst, Est, SudEst, SudOuest, Ouest, NordOuest\n";
+	//std::cout << std::string(25, '-') << "\n\n";
 	//os << "Légende faune: s=saumon, o=ours, b=buse, r=renard, w=wapiti\n";
 
 	// afficher informations tuile
 	os << "Detail des tuiles dans l'environnement:\n";
 	for (const auto& [pos, tuile] : tuiles) {
-		os << "  (" << pos.getQ() << "," << pos.getR() << "," << pos.getS() << "): ";
+		//os << "\n  (" << pos.getQ() << "," << pos.getR() << "," << pos.getS() << "): ";
+		os << "\n" << pos;
 
-		if (!tuile.getPlacementConfirme()) {
-			os << " [NON CONFIRME] ";
-		}
-		
-		if (tuile.getDonneJetonNature()) {
-			os << " [REPERE]";
-		}
-
-		os << "\n";
+		if (!tuile.getPlacementConfirme()) { os << " [NON CONFIRME] "; }
+		if (tuile.getDonneJetonNature()) { os << " [REPERE]"; }
 
 		if (tuile.JetonFaunePresent()) {
-			os << "    Jeton Faune Place: " << fauneToString(tuile.getFaunePlace()) << "\n";
+			os << "\tJeton Faune Place: " << fauneToString(tuile.getFaunePlace()) << "\n";
 		}
 		else {
-			os << "    Possibilite de placer: ";
+			os << "\n\tPossibilite de placer: ";
 			for (const auto& faune : tuile.getFaunes()) {
 				os << fauneToString(faune) << " ";
 			}
 			os << "\n";
 		}
 
-		os << "    Habitats: ";
+		os << "\tHabitats: ";
 		for (const auto& habitat : tuile.getHabitats()) {
 			os << habitatToString(habitat) << " ";
 		}
@@ -396,7 +393,6 @@ void testHexagonalDisplay() {
 	// Place without confirming to test pending placement display
 	//std::cout<<"\n\n\n position est valide?"<<joueur2.positionTuileValide(Position(1, 0, -1));
 	//std::cout << "\n\n\n A tuile a 000?"<< joueur2.aTuile(Position(0,0,0));
-	std::cout << "POTATOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n";
 	joueur2.placerTuile(Position(1, 0, -1), tuile3);
 	std::cout << joueur2 << "\n";
 
@@ -443,4 +439,14 @@ void testDivers(){
 	std::cout << joueur2;
 	//std::cout << joueur2 << "\n";
 	std::cout << std::string(50, '-') << "\n\n";
+}
+
+void testEnvJoueur() {
+	using namespace GestionPieces;
+	std::vector <std::vector<Tuile>> td = instancierTuilesDepart();
+	std::vector<Tuile> t = instancierTuiles();
+
+	//std::cout << std::vector{t[0], t[1]};
+	//std::cout << td.at(0);
+	std::cout << t[0];
 }

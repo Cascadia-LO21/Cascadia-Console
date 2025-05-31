@@ -13,26 +13,28 @@ std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
 
 	flux << "TUILE : \n";
 
+	if (tuile.getPlacementConfirme())
+		flux << "\t- Position : " << tuile.getPosition() << "\n";
+
 	flux << "\t- Habitats : ";
 	for (Habitat h : habitats) {
 		flux << habitatToString(h) << ", ";
 	}
 	flux << "\n";
 
-	flux << "\t- Faunes : ";
-	for (Faune f : faunes) {
-		flux << fauneToString(f) << ", ";
-	}
-	flux << "\n";
-
-	if (tuile.getPlacementConfirme())
-		flux << "\t- Position : " << tuile.getPosition() << "\n";
-
-	if (tuile.getDonneJetonNature())
-		flux << "\t- Donne Jeton Nature.\n";
-
-	if (tuile.JetonFaunePresent())
+	if (tuile.JetonFaunePresent()) {
 		flux << "\t- Faune placée : " << fauneToString(tuile.getFaunePlace()) << ".\n";
+	}
+	else {
+		flux << "\t- Faunes possibles : ";
+		for (Faune f : faunes) {
+			flux << fauneToString(f) << ", ";
+		}
+		flux << "\n";
+
+		if (tuile.getDonneJetonNature())
+			flux << "\t- Donne Jeton Nature.\n";
+	}
 
 	return flux;
 }
@@ -43,32 +45,8 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Tuile>& tuiles) {
 		os << "Aucune tuile à afficher\n";
 		return os;
 	}
-
-	for (const auto& tuile : tuiles) {
-		os << "  (" << tuile.getPosition().getQ() << "," << tuile.getPosition().getR() << "," << tuile.getPosition().getS() << "): ";
-		if (!tuile.getPlacementConfirme()) {
-			os << " [NON CONFIRME] ";
-		}
-		if (tuile.getDonneJetonNature()) {
-			os << " [REPERE]";
-		}
-		os << "\n";
-		if (tuile.JetonFaunePresent()) {
-			os << "    Jeton Faune Place: " << fauneToString(tuile.getFaunePlace()) << "\n";
-		}
-		else {
-			os << "    Possibilite de placer: ";
-			for (const auto& faune : tuile.getFaunes()) {
-				os << fauneToString(faune) << " ";
-			}
-			os << "\n";
-		}
-		os << "    Habitats: ";
-		for (const auto& habitat : tuile.getHabitats()) {
-			os << habitatToString(habitat) << " ";
-		}
-		os << "\n";
-	}
+	
+	for (const auto& t : tuiles) os << t;
 
 	return os;
 }
@@ -86,6 +64,12 @@ void Tuile::pivoterHoraire() {
 
 void Tuile::pivoterAntiHoraire() {
 	rotate(habitats.begin(), habitats.begin() + 1, habitats.end());
+}
+
+bool Tuile::operator==(const Tuile& autre) const
+{
+	return habitats == autre.getHabitats() && faunes == autre.getFaunes() && donneJetonNature == autre.getDonneJetonNature()
+		&& faunePlace == autre.getFaunePlace() && *position == autre.getPosition() && placementConfirme == autre.getPlacementConfirme();
 }
 
 
