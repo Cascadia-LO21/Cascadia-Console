@@ -64,7 +64,7 @@ void Pioche::setPiocheVisible() {
 // Cas où la pioche presente 4 mêmes JetonFaune : dans ce cas, il faut automatiqument remplacer TOUS les jetons
 // Rend invisible TOUS les jetons faunes, et les remplace par de nouveaux
 void Pioche::resetAllJetonFaune() {
-	for (int i = 0; i < MAX; ++i) retirerJetonVisible(i, true); // true : remet les jetons dans la pioche
+	for (int i = 0; i < MAX; ++i) retirerJetonVisible(i); // ne remet pas les jetons dans la pioche
 	rafraichirPioche();
 }
 
@@ -74,7 +74,7 @@ void Pioche::resetJetonFaune(const std::vector<unsigned int>& indices) {
 	for (unsigned int i : indices) {
 		if (i >= 0 && i < MAX) {
 			if (visibilite.at(i).second) {
-				retirerJetonVisible(i, true); //remet dans la pioche
+				retirerJetonVisible(i); // ne remet pas dans la pioche
 			}
 		}
 		else {
@@ -86,23 +86,29 @@ void Pioche::resetJetonFaune(const std::vector<unsigned int>& indices) {
 
 void Pioche::resetTroisJetonsIdentiques() {
 	std::vector<unsigned int> indicesJetonsIndentiques;
-	Faune fauneIdentique;
+	Faune fauneIdentique = Faune::rien;
 
+	// recherche de la Faune qui se repete
 	std::array<unsigned int, 5> fauneCount{ 0 }; // initialise les compteurs à 0
 	for (const auto& paire : piocheVisible) {
 		unsigned int indiceFaune = static_cast<unsigned int>(paire.second.getType());
 		fauneCount[indiceFaune]++;
 	}
 
+	// la Faune recherchee doit etre apparue 3 fois
 	for (int i : fauneCount) {
 		if (i == 3) fauneIdentique = static_cast<Faune>(i);
 	}
 
-	for (unsigned int i = 0; i < MAX; i++) {
-		if (piocheVisible.at(i).second.getType() == fauneIdentique)
-			indicesJetonsIndentiques.push_back(i);
+	// recherche des indices de ces 3 Faunes identiques
+	if (fauneIdentique != Faune::rien) {
+		for (unsigned int i = 0; i < MAX; i++) {
+			if (piocheVisible.at(i).second.getType() == fauneIdentique) 
+				indicesJetonsIndentiques.push_back(i);
+		}
 	}
 
+	// remplacer ces 3 faunes identiques
 	resetJetonFaune(indicesJetonsIndentiques);
 }
 

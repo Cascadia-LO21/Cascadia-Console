@@ -12,12 +12,12 @@
 
 class Partie {
 private:
-    static constexpr int MAX_NB_TOURS = 20; // valeur par défaut officielle
-    static constexpr int MAX_NB_JOUEURS = 4;
-    int nbJoueurs;
-    int compteurTour;
+    static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
+    static constexpr unsigned int MAX_NB_JOUEURS = 4;
+    unsigned int nbJoueurs;
+    unsigned int compteurTour;
     std::vector<EnvJoueur> joueurs;
-    int joueurCourant;
+    unsigned int joueurCourant;
     bool pause;
     std::unique_ptr<Pioche> pioche;
     Marquage marquage;
@@ -64,7 +64,7 @@ public:
 
     void lancer();
     void prochainJoueur() { joueurCourant = (joueurCourant + 1) % nbJoueurs; }
-    void pause() { if (!pause) pause = true; }
+    void pauser() { if (!pause) pause = true; }
     void reprendre() { if (pause) pause = false; }
     void reset(); 
 
@@ -72,9 +72,12 @@ public:
     void jouerTourIndividuel();
     void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
-    unsigned int saisirNombre() const;
+    
+    void saisirJoueurs();
+    unsigned int saisirNombre(unsigned int max) const;
     const Position& saisirPositionTuile() const ;
     const Position& saisirPositionJeton() const;
+
 
     void calculerScores();
     void afficherScores() const;

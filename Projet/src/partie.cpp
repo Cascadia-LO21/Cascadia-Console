@@ -18,6 +18,7 @@ void Partie::ajouterJoueur(const EnvJoueur& joueur) {
         throw std::runtime_error("Impossible d'ajouter un joueur : nombre maximum atteint (" + std::to_string(nbJoueurs) + ")");
     }
     joueurs.push_back(joueur); // copie du joueur
+    nbJoueurs++;
 }
 
 // Cette surcharge permet d'écrire par exemple: ajouterJoueur("toto")
@@ -26,6 +27,7 @@ void Partie::ajouterJoueur(const std::string& nom) {
         throw std::runtime_error("Impossible d'ajouter un joueur : nombre maximum atteint (" + std::to_string(nbJoueurs) + ")");
     }
     joueurs.emplace_back(nom); // creation et ajout d'un EnvJoueur
+    nbJoueurs++;
 }
 
 // Affiche les pseudos de tous les joeurs.
@@ -42,126 +44,183 @@ void Partie::affichePioche() const {
 }
 
 // TODO: in progress
-// Gere le tour individuel pour le tour d'un joueur : gestion de Jeton Nature ou pas
+// Gere le tour individuel d'un joueur, notamment si utiliser Jeton Nature ou pas
 void Partie::jouerTourIndividuel() {
-    EnvJoueur player = joueurs.at(joueurCourant); 
-    char tmp;
-
-    /// 0.1 Afficher le plateau du joueur ET la pioche
+    // 0.1 Afficher le plateau du joueur ET la pioche
+    EnvJoueur player = joueurs.at(joueurCourant);
     std::cout << player << std::endl;
-    std::cout << pioche << std::endl;
+    affichePioche();
 
-    /// 0.2 Detecter si Jetons Identiques dans Pioche : si oui, on les enleve, sans les remettre dans le sac de Jetons
+    // 0.2 Detecter si Jetons Identiques dans Pioche : si oui, on les enleve, sans les remettre dans le sac de Jetons
     while (pioche->quatreJetonsIdentiques()) {
         pioche->resetAllJetonFaune();
-        std::cout << ">>> Oh non ! Tous les jetons sont identiques ! Reglons cela !\n" << pioche;
+        std::cout << "\n>>> Oh non ! Tous les jetons sont identiques ! Reglons cela !\n" << pioche;
     }
 
+    // 0.3 Trois jetons identiques : option de reset (une seule fois)
+    char tmp;
     if (pioche->troisJetonsIdentiques()) {
-        std::cout << ">>> 3 Jetons identiques dans la piche ! Veux-tu qu'on les retire ? (o/n) : ";
-        (tmp == 'o') pioche->resetTroisJetonsIdentiques();
+        std::cout << "\n>>> 3 Jetons identiques dans la pioche ! Les retire-t-on ? (o/n) : ";
+        std::cin >> tmp;
+        if (tmp == 'o') pioche->resetTroisJetonsIdentiques();
     }
 
-    /// 1. Demander si usage Jeton Nature
-    unsigned int rep;
+    affichePioche();
+
+    // 1. Demander si usage Jeton Nature
+    unsigned int rep = 0;
+    bool jetonNatureUsed = false;
     if (player.getNbJetonsNature() > 0) {
-        std::cout << ">>> Veux-tu utiliser un Jeton Nature ?\n";
-        std::cout << ">>> Tu peux :\
-                      \n\t0. Choisir de ne pas utiliser. \
-                      \n\t1. Choisir une paire (Tuile,Jeton) libre. \
-                      \n\t2. Remplacer les Jetons que tu n'aimes pas.\n";
-        std::cout << ">>> Saisis ton choix (0, 1 ou 2) : ";
-        std::cin >> rep;
-    }
+        std::cout << "\n>>> Veux-tu utiliser un Jeton Nature ?\n";
+        std::cout << "\n>>> Tu peux :\
+                      \n\t1. Choisir de ne pas utiliser. \
+                      \n\t2. Choisir une paire (Tuile,Jeton) libre. \
+                      \n\t3. Remplacer les Jetons que tu n'aimes pas.\n";
+        std::cout << ">>> Saisis ton choix (1-3) : ";
+        rep = saisirNombre(3); 
 
-    /// 1.a Si Jeton Nature -> remplacer les Jetons indesirables
-    if (rep == 2) {
-        std::vector<unsigned int> jetonsIndesirables;
-        while (jetonsIndesirables.size() < pioche->getMax()) {
-            std::cout << ">>> Quel jeton enlever ? ";
-            jetonsIndesirables.push_back(saisirNombre());
-            std::cout << ">>> Encore ? (o/n) : ";
-            std::cin >> tmp;
-            if (tmp == 'n') break;
+        if (rep != 1) jetonNatureUsed = true;
 
+        // 1.bis. Si Jeton Nature recouru pour remplacer les Jetons indesirables
+        if (rep == 3) {
+            std::vector<unsigned int> jetonsIndesirables;
+            while (jetonsIndesirables.size() < pioche->getMax()) {
+                std::cout << "\n>>> Quel jeton enlever ? ";
+                jetonsIndesirables.push_back(saisirNombre(pioche->getMax()));
+                std::cout << "\n>>> Encore ? (o/n) : ";
+                std::cin >> tmp;
+                if (tmp == 'n') break;
+            }
+            pioche->resetJetonFaune(jetonsIndesirables);
+            affichePioche();
         }
     }
 
-    /// 1.1 Si Jeton Nature -> choix paire libre
-    if (rep == 1) {
-        unsigned int tuile = 0, jeton = 0;
+    // Variable pour stocker le choix de tuile et de jeton
+    unsigned int tuile = 0, jeton = 0;
+    Position posTuile, posJeton;
+    bool placementReussi = false;
 
+    // 2. Boucle principale pour gérer le choix de tuile et de jeton, et la possibilité de recommencer
+    while (!placementReussi) {
+        // 2.1 Choix d'une Tuile
+        std::cout << "\n>>> Quelle tuile veux-tu ?\n ";
+        tuile = saisirNombre(pioche->getMax());
+        pioche->retirerTuileVisible(tuile);
+        affichePioche(); // la pioche presente une Tuile absente
 
-        /// 1. choix de n'importe quelle Tuile
-        while (true) {
-            std::cout << ">>> Quelle tuile veux-tu ?\n ";
-            tuile = saisirNombre();
-            pioche->retirerTuileVisible(tuile);
-            std::cout << pioche;
-            player.placerTuile(saisirPositionTuile(), pioche->getPiocheVisible().at(tuile).first);
+        posTuile = saisirPositionTuile();
+        player.placerTuile(posTuile, pioche->getPiocheVisible().at(tuile).first);
 
-            /// 1.1 Demander s'il regrette son placement de Tuile
-            std::cout << ">>>> Veux-tu revenir en arriere pour choisir autre chose? (o/n)";
+        // 2.1.1 Demander s'il regrette son placement de Tuile
+        std::cout << "\n>>> Veux-tu revenir en arriere pour choisir une autre tuile ? (o/n)";
+        std::cin >> tmp;
+        if (tmp == 'o') {
+            pioche->setVisibilite(tuile, true); // la tuile redevient visible
+            player.undoDernierPlacement(); // attention: retour de la fonction non recupere
+            affichePioche(); // la pioche affiche l'etat precedent avec toutes les pieces
+            continue; // On recommence le choix de la tuile
+        }
+
+        // 2.2 Choix d'un Jeton Faune
+        if (jetonNatureUsed && rep == 2) { // le joueur peut choisir librement le Jeton qu'il veut
+            std::cout << "\n>>> Quel jeton faune veux-tu ?\n ";
+            jeton = saisirNombre(pioche->getMax());
+        }
+        else { // sans jeton nature, le jeton est automatiquement celui associé a la tuile
+            jeton = tuile; // meme indice
+        }
+        pioche->retirerJetonVisible({ jeton });
+        affichePioche(); // la pioche doit presenter une Tuile absente et un Jeton absent
+
+        // Tentative de placement du jeton
+        posJeton = saisirPositionJeton();
+        int succesJetonPlace = player.placerJetonFaune(posJeton, pioche->getPiocheVisible().at(jeton).second);
+
+        // 2.2.1 Gestion des cas d'erreur de placement
+        if (succesJetonPlace == -1) {
+            std::cout << "\n>>> Aucune tuile ne peut accueillir ce jeton. Veux-tu recommencer ? (o/n)";
             std::cin >> tmp;
-            if (tmp == 'n') break;
-            else {
-                pioche->setVisibilite(tuile, true); // la tuile redevient visible
-                player.undoDernierPlacement(); // attention: retour de la fonction non recupere
-                std::cout << pioche;
+            if (tmp == 'o') {
+                pioche->setVisibilite(tuile, true);
+                player.undoDernierPlacement();
+                affichePioche();
+                continue; // On recommence le choix de la tuile
             }
         }
-       
-        /// 2. choix de n'importe quelle Jeton Faune
-        std::cout << ">>> Quel jeton faune veux-tu ?\n ";
-        jeton = saisirNombre();
-        pioche->retirerJetonVisible({ jeton });
-        std::cout << pioche;
-        int succesJetonPlace = player.placerJetonFaune(saisirPositionJeton(), pioche->getPiocheVisible().at(tuile).second);
+        else if (succesJetonPlace == 0) {
+            do {
+                std::cout << "\n>>> Impossible de placer le Jeton sur la Tuile choisie !";
+                std::cout << "\n>>> Veux-tu :\n\t1. Saisir une nouvelle position\n\t2. Recommencer depuis le choix de la tuile\n";
+                std::cout << ">>> Saisis ton choix (1 ou 2) : ";
+                unsigned int choix = saisirNombre(2);
+                if (choix == 2) {
+                    pioche->setVisibilite(tuile, true);
+                    player.undoDernierPlacement();
+                    affichePioche();
+                    break; // on sort de la boucle do...while, puis continue dans la boucle principale
+                }
 
-        if(succesJetonPlace == -1)
+                // si choix = 1
+                posJeton = saisirPositionJeton();
+                succesJetonPlace = player.placerJetonFaune(posJeton, pioche->getPiocheVisible().at(jeton).second);
+            } while (succesJetonPlace == 0);
 
-        /// 3. Jeton Place, alors la position de la Tuile est definitive
-        player.confirmerPlacement();
+            if (succesJetonPlace == 1) {
+                placementReussi = true;
+            }
+            // Si le joueur a choisi de recommencer, on continue dans la boucle principale
+            // (donc pas besoin de faire placementReussi = true ici)
+            continue;
+        }
 
-
+        else if (succesJetonPlace == 1) {
+            placementReussi = true;
+        }
     }
 
+    // 3. Jeton Place, alors la position de la Tuile est definitive
+    player.confirmerPlacement();
+    std::cout << "\n>>> Les pieces sont placees dans ton plateau avec succes !";
+    std::cout << player;
+    pioche->slide(0, true); // slide tuiles
+    pioche->slide(0, false); // slide jetons
 
-
-
-    /// 1.3 Coup normal : pas de Jeton Nature OU apres JetonNature-remplacer-Jetons
-
-    
-
-    /// Si joueur solitaire, alors son tour est toujours suivi de l'extraction artififcielle d'une paire de la pioche
+    // 4. Si joueur solitaire, alors son tour est toujours suivi de l'extraction artificielle d'une paire de la pioche
     if (nbJoueurs == 1) {
-        jouerTourIndividuel();
         pioche->retirerTuileJetonDebut();
+        std::cout << pioche;
+        pioche->slide(0, true); // slide tuiles
+        pioche->slide(0, false); // slide jetons
     }
+
+    // 5. remplissage de la pioche visible en piochant des pieces de la pioche cachee
+    pioche->rafraichirPioche();
 }
 
-// TODO
+
+// Gere les tours de chaque joueur dans le tour courant. Fonctionne bien aussi avec 1 joueur
 void Partie::jouerTourCollectif() {
     std::cout << ">> " << joueurs.at(joueurCourant).getPseudo() << 
         " joue (tour " << compteurTour +1 << ")" << std::endl;
 
     jouerTourIndividuel();
-    prochainJoueur();
+    prochainJoueur(); // si jeu solitaire, alors le prochain joueur sera toujours lui-meme
 
 }
 
 // Controle le deroulement d'une partie entiere.
 // Suppose d'avoir defini les joueurs et instancier la pioche pour pouvoir commencer à jouer sereinement.
 void Partie::lancer() {
+    saisirJoueurs();
 
     /// 1. Verifications des conditions preliminaires pour que le jeu puisse etre demarre.
-    // Verifier si des joueurs existent
     if (joueurs.empty()) {
         throw std::runtime_error("Impossible de démarrer : aucun joueur encore.");
     }
 
     // S'assurer que les attributs sont dans des états primitifs
-    if (nbJoueurs != joueurs.size()) nbJoueurs = joueurs.size();
+    if (nbJoueurs != joueurs.size()) nbJoueurs = static_cast<int>(joueurs.size());
     if (joueurCourant != 0) joueurCourant = 0;
     if (compteurTour != 0) compteurTour = 0;
 
@@ -174,15 +233,13 @@ void Partie::lancer() {
             "tuile de depart pour " + std::to_string(nbJoueurs) + "joueurs : il en manque ! \n" +
             "Veuillez ajouter de nouvelles tuiles de depart ou bien diminuer le nombre de joueurs.");
 
-    for (int i = 0; i < nbJoueurs; i++) {
-        //joueurs.at(i).setTuilesDepart(pioche->getTuilesDepartDispo().at(i));
-        std::vector<std::vector<Tuile>> tuilesDepart = pioche->getTuilesDepartDispo();
-        joueurs.at(i).setTuilesDepart(GestionPieces::piocherTuileDepart(tuilesDepart));
+    for (unsigned int i = 0; i < nbJoueurs; i++) {
+        joueurs.at(i).setTuilesDepart(GestionPieces::piocherTuileDepart(pioche->getTuilesDepartDispo()));
     }
 
-    std::cout << "[JEU CASCADIA]\n";
-    std::cout << "La pioche est prete et les tuiles de depart ont ete distribuees a chacun des joueurs.\n";
-    std::cout << "La partie peut commencer !\n" << std::endl;
+    std::cout << "\n[JEU CASCADIA]\n";
+    std::cout << "> Tout est pret : joueurs, pioche, tuiles de depart distribuees.\n";
+    std::cout << "> La partie peut commencer !\n" << std::endl;
 
     /// 2. Boucle principale du jeu
     while (!verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
@@ -191,24 +248,26 @@ void Partie::lancer() {
         compteurTour++;
 
         // Systeme de pause/reprise de la partie (a mieux implementer dans la version graphique du jeu)
-        char p = 'o', r = 'n';
+        char tmp;
         std::cout << ">> Souhaitez-vous faire une pause ? (o/n)" << std::endl;
-        std::cin >> p;
-        while (p == 'o' && r == 'n') {
-            pause();
+        std::cin >> tmp;
+        if (tmp == 'o') pauser();
+        while (pause) {
             std::cout << ">>> Reposez-vous..." << std::endl;
             std::cout << ">> Souhaitez-vous reprendre la partie ? (o/n)" << std::endl;
-            std::cin >> r;
-        }
-            
+            std::cin >> tmp;
+            if (tmp == 'o') reprendre();
+        }     
 
     }
 
+    // TODO
     /// 3. Afficher le résultat final
-    calculerScores();
-    afficherScores();
-    calculerGagnant();
-    afficherGagnant();
+    //calculerScores();
+    //afficherScores();
+    //calculerGagnant();
+    //afficherGagnant();
+
     std::cout << "[FIN DU JEU CASCADIA]" << std::endl;
 }
 
@@ -247,7 +306,7 @@ void Partie::afficherScores() const {
         std::cout << "Aucun score à afficher !" << std::endl;
     else {
         std::cout << "[SCORES]" << std::endl;
-        for (int i = 0; i < nbJoueurs; i++) {
+        for (unsigned int i = 0; i < nbJoueurs; i++) {
             std::cout << joueurs.at(i).getPseudo() << " : " << scores->at(i) << std::endl;
         }
     }
@@ -263,7 +322,7 @@ void Partie::calculerGagnant(){
         gagnant = std::nullopt; // s'assurer que aucun gagnant existe encore
         gagnant = std::vector<int>{}; // initialiser l'attribut optionnel
         int maxScore = *std::max_element(scores->begin(), scores->end());
-        for (int i = 0; i < nbJoueurs; i++) {
+        for (unsigned int i = 0; i < nbJoueurs; i++) {
             if (scores->at(i) == maxScore)
                 gagnant->push_back(i);
         }
@@ -276,7 +335,7 @@ void Partie::calculerGagnant(){
 // Suppose d'avoir calculerGagnant() au prealable.
 void Partie::afficherGagnant() const {
     if (!gagnant)
-        throw std::runtime_error("Veuillez calculer les gagnants d'abord, avant d'afficher les gagnants.");
+        throw std::runtime_error("\nVeuillez calculer les gagnants d'abord, avant d'afficher les gagnants.");
     
     gagnant->size() == 1 ? std::cout << "* GAGNANT * \n" : std::cout << "* GAGNANTS * \n";
     for (auto i : *gagnant) {
@@ -284,16 +343,31 @@ void Partie::afficherGagnant() const {
     }
 }
 
+
+void Partie::saisirJoueurs() {
+    std::string nom;
+    char tmp;
+    while (nbJoueurs < MAX_NB_JOUEURS) {
+        std::cout << "\n>>> Saisis le nom d'un joueur a ajouter : ";
+        std::cin >> nom;
+        ajouterJoueur(nom);
+        std::cout << "\n>>> Encore? (o/n) : ";
+        std::cin >> tmp;
+        if (tmp == 'n') break;
+    }
+}
+
+
 // Verifie si le nombre saisi par le user est correct en terme de bornes et de caractere numerique
-unsigned int Partie::saisirNombre() const {
+unsigned int Partie::saisirNombre(unsigned int max) const {
     int tmp;
 
     while (true) {
-        std::cout << ">>> Entre un nombre (entre 0 et " << pioche->getMax() << ") : ";
+        std::cout << ">>> Entre un nombre (entre 1 et " << max << ") : ";
         if (std::cin >> tmp) {
             tmp--; // car du cote users, les indices commencent a 1
 
-            if (tmp >= 0 || tmp < n) {
+            if (tmp >= 0 || tmp < max) {
                 break; // saisie valide
             }
            
@@ -315,15 +389,15 @@ unsigned int Partie::saisirNombre() const {
 // 2. Afficher les Positions disponibles autour de celle-ci
 // 3. Demander quelle direction (NordOuest, etc)
 // 4. Retourner la position finale choisie
-const Position& Partie::saisirPositionTuile() const {
-    EnvJoueur player = joueurs.at(joueurCourant);
-    std::cout << player; // affiche le plateau du joueur
-    int q, r, s;
-
-    //TODO : utiliser des methodes de EnvJoueur
-
-}
-
-// TODO
-const Position& Partie::saisirPositionJeton() const {
-}
+//const Position& Partie::saisirPositionTuile() const {
+//    EnvJoueur player = joueurs.at(joueurCourant);
+//    std::cout << player; // affiche le plateau du joueur
+//    int q, r, s;
+//
+//    //TODO : utiliser des methodes de EnvJoueur
+//
+//}
+//
+//// TODO
+//const Position& Partie::saisirPositionJeton() const {
+//}
