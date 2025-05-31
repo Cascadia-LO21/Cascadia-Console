@@ -85,9 +85,9 @@ public:
 	
 	//retourne un vecteur de positions possibles pour placer une tuile
 	std::vector<Tuile> getTuilesAvecVoisinLibre() const;
-
 	std::vector<Direction> getDirLibresAutourTuile(const Tuile& tuile) const;
 	std::vector<Position> getPosLibresAutourTuile(const Tuile& tuile) const;
+	std::vector<Position> getPosLibresPourJeton(Faune f) const;
 
 	//GETTERS & SETTERS
 	std::string getPseudo() const { return pseudo; };

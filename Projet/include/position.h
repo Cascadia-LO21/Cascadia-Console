@@ -34,14 +34,15 @@ public:
 
 	const Position operator-(const Position& position) const;
 
-	//donne la position de la tuile trouvé dans cette direction
+	//donne la position de la tuile trouvï¿½ dans cette direction
 	const Position getPositionAdjacente(Direction direction) const;
-	//donne la direction de la tuile trouvé à cette position
+	//donne la direction de la tuile trouvï¿½ ï¿½ cette position
 	const Direction getDirectionAdjacente(Position pos) const;
 
 };
 
 std::ostream& operator<<(std::ostream& flux, const Position& p);
+std::ostream& operator<<(std::ostream& flux, const std::vector<Position>& v);
 
 std::string directionToString(Direction dir);
 

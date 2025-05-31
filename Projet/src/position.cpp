@@ -7,6 +7,12 @@ std::ostream& operator<<(std::ostream& flux, const Position& p)
 	return flux;
 }
 
+std::ostream& operator<<(std::ostream& flux, const std::vector<Position>& vect) {
+	for(const auto& p: vect)
+		flux << p;
+	return flux;
+}
+
 Direction getDirectionOpposee(Direction dir) {
 	return static_cast<Direction>((static_cast<int>(dir) + 3) % 6);
 }

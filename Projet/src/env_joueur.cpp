@@ -5,6 +5,7 @@
 #include <optional>
 #include <stdexcept>
 #include <random>
+#include <algorithm>
 #include "position.h"
 #include "tuile.h"
 #include "env_joueur.h"
@@ -217,7 +218,6 @@ std::vector<Tuile> EnvJoueur::getTuilesAvecVoisinLibre() const{
 		for (const Position& voisin : posVoisines) {
 			if (!aTuile(voisin)) {
 				res.push_back(tuile); //on rajoute les positions des tuiles qui ont au moins un voisin
-				break;
 			}
 		}
 	}
@@ -251,6 +251,22 @@ std::vector<Position> EnvJoueur::getPosLibresAutourTuile(const Tuile& tuile) con
 		}
 	}
 	return res;
+}
+
+// retourne toutes les positions de tuiles, telles qu'une tuile n'ait pas encore de Faune placee ET son vecteur de Faunes contient la faune
+std::vector<Position> EnvJoueur::getPosLibresPourJeton(Faune f) const {
+	std::vector<Position> posLibres;
+	for (const auto& [position, tuile] : tuiles) {
+		// Vérifie qu'il n'y a pas déjà de jeton faune sur la tuile
+		if (!tuile.JetonFaunePresent()) {
+			// Vérifie que la faune f est bien présente dans les faunes de la tuile
+			const auto& faunes = tuile.getFaunes();
+			if (std::find(faunes.begin(), faunes.end(), f) != faunes.end()) {
+				posLibres.push_back(position);
+			}
+		}
+	}
+	return posLibres;
 }
 
 

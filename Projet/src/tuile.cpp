@@ -69,6 +69,8 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Tuile>& tuiles) {
 		}
 		os << "\n";
 	}
+
+	return os;
 }
 
 void Tuile::placerJetonFaune(Faune faune) {

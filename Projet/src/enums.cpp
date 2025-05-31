@@ -102,6 +102,18 @@ std::string directionToString(Direction dir) {
 	}
 }
 
+// = 0, Est = 1, SudEst = 2, SudOuest = 3, Ouest = 4, NordOuest = 5
+Direction stringToDirection(const std::string s)
+{
+	if (s == "NE" || s == "ne")	return Direction::NordEst;
+	if (s == "E" || s == "e")	return Direction::Est;
+	if (s == "SE" || s == "se")	return Direction::SudEst;
+	if (s == "SO" || s == "so")	return Direction::SudOuest;
+	if (s == "O" || s == "o")	return Direction::Ouest;
+	if (s == "NO" || s == "no")	return Direction::NordOuest;
+	throw std::invalid_argument("Direction inconnue : " + s);
+}
+
 std::ostream& operator<<(std::ostream& flux, Habitat h) {
 	flux << habitatToString(h);
 	return flux;

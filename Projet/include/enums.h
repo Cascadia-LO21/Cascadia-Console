@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <ostream>
 
 enum class Habitat { marais, fleuve, montagne, prairie, foret };
@@ -12,6 +13,7 @@ enum class Variante { standard, famille, intermediaire };
 std::string habitatToString(Habitat habitat);
 std::string fauneToString(Faune faune);
 std::string directionToString(Direction dir);
+Direction stringToDirection(const std::string s);
 Faune stringToFaune(const std::string& s);
 Habitat stringToHabitat(const std::string& s);
 bool stringToBool(const std::string& str);
