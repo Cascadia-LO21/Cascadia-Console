@@ -101,13 +101,15 @@ public:
 	// methode qui sera appelée par Partie, pour distribuer ces TuilesDepart a chaque EnvJoueur
 	std::vector<std::vector<Tuile>>& getTuilesDepartDispo() { return tuilesDepartDispo; }
 
+	int getMax() const { return MAX; }
+
 
 
 	/// AUTRES METHODES ///
 
 	void resetAllJetonFaune();
-	void resetJetonFaune(const std::vector<int>& indices);
-
+	void resetJetonFaune(const std::vector<unsigned int>& indices);
+	void resetTroisJetonsIdentiques();
 
 	void retirerTuileVisible(unsigned int indexTuile);
 	void retirerJetonVisible(unsigned int indexJeton, bool remettre = false);

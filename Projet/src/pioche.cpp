@@ -70,8 +70,8 @@ void Pioche::resetAllJetonFaune() {
 
 // Cas où la pioche presente 3 mêmes JetonFaune : dans ce cas, il est tolerer de les remplacer UNE FOIS
 // Cas où coup Jeton Nature : le joeur selectionne les jetons faunes qu'ils veut remplacer
-void Pioche::resetJetonFaune(const std::vector<int>& indices) {
-	for (int i : indices) {
+void Pioche::resetJetonFaune(const std::vector<unsigned int>& indices) {
+	for (unsigned int i : indices) {
 		if (i >= 0 && i < MAX) {
 			if (visibilite.at(i).second) {
 				retirerJetonVisible(i, true); //remet dans la pioche
@@ -82,6 +82,28 @@ void Pioche::resetJetonFaune(const std::vector<int>& indices) {
 		}
 	}
 	rafraichirPioche();
+}
+
+void Pioche::resetTroisJetonsIdentiques() {
+	std::vector<unsigned int> indicesJetonsIndentiques;
+	Faune fauneIdentique;
+
+	std::array<unsigned int, 5> fauneCount{ 0 }; // initialise les compteurs à 0
+	for (const auto& paire : piocheVisible) {
+		unsigned int indiceFaune = static_cast<unsigned int>(paire.second.getType());
+		fauneCount[indiceFaune]++;
+	}
+
+	for (int i : fauneCount) {
+		if (i == 3) fauneIdentique = static_cast<Faune>(i);
+	}
+
+	for (unsigned int i = 0; i < MAX; i++) {
+		if (piocheVisible.at(i).second.getType() == fauneIdentique)
+			indicesJetonsIndentiques.push_back(i);
+	}
+
+	resetJetonFaune(indicesJetonsIndentiques);
 }
 
 // retire une paire fixe : coup "normal"

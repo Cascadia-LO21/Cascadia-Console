@@ -72,6 +72,10 @@ public:
     void jouerTourIndividuel();
     void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
+    unsigned int saisirNombre() const;
+    const Position& saisirPositionTuile() const ;
+    const Position& saisirPositionJeton() const;
+
     void calculerScores();
     void afficherScores() const;
     void calculerGagnant();
