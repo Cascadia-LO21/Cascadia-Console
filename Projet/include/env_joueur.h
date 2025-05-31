@@ -47,11 +47,6 @@ public:
 		return placementEnAttente;
 	};
 
-	// get carte
-	const std::unordered_map<Position, Tuile>& getTuiles() const {
-		return tuiles;
-	}
-
 	//get pointeur de la tuile à cette coordonnée
 	const Tuile* getTuile(const Position& coord) const;
 
