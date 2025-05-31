@@ -34,7 +34,10 @@ public:
 
 	const Position operator-(const Position& position) const;
 
+	//donne la position de la tuile trouvé dans cette direction
 	const Position getPositionAdjacente(Direction direction) const;
+	//donne la direction de la tuile trouvé à cette position
+	const Direction getDirectionAdjacente(Position pos) const;
 
 };
 

@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <vector>
 #include "enums.h"
 
 std::string habitatToString(Habitat habitat) {
@@ -72,5 +73,12 @@ std::ostream& operator<<(std::ostream& flux, Faune f) {
 std::ostream& operator<<(std::ostream& flux, Direction d) {
 
 	flux << directionToString(d);
+	return flux;
+}
+
+std::ostream& operator<<(std::ostream& flux, std::vector<Direction> dirs) {
+	for (const Direction& d : dirs) {
+		flux << directionToString(d) << "  ";
+	}
 	return flux;
 }
