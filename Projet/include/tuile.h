@@ -99,8 +99,5 @@ public:
 
 };
 
-std::ostream& operator<<(std::ostream& flux, const Tuile& tuile);
-std::ostream& operator<<(std::ostream& flux, const std::vector<Tuile>& tuileDepart);
-
 
 void testClasseTuile();

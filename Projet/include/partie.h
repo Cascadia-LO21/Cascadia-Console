@@ -85,6 +85,5 @@ public:
     void afficherGagnant() const;
 };
 
-std::ostream& operator<<(std::ostream& os, const Partie& partie);
 
 void testPartie();

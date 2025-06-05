@@ -273,53 +273,6 @@ std::vector<Position> EnvJoueur::getPosLibresPourJeton(Faune f) const {
 }
 
 
-std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
-	os << "======== ENVIRONNEMENT DE " << env.getPseudo() << " ========\n";
-	os << "Jetons Nature: " << env.getNbJetonsNature() << " | Score Final: " << env.getScore() << "\n";
-
-	const auto& tuiles = env.getTuiles();
-	if (tuiles.empty()) {
-		os << "Aucune tuile placee\n";
-		os << "\n======= FIN DE L'ENVIRONNEMENT DE " << env.getPseudo() << " =======\n";
-		return os;
-	}
-
-	// afficher le système d'affichage
-	std::cout << "\n" << std::string(25, '-');
-	//os << "\nFormat d'affichage: (q,r,s): ([NON CONFIRME]) ([REPERE]) [Faune(s)] [Habitats] \n";
-	os << "\nOrdre Habitats: NordEst, Est, SudEst, SudOuest, Ouest, NordOuest\n";
-	//std::cout << std::string(25, '-') << "\n\n";
-	//os << "Légende faune: s=saumon, o=ours, b=buse, r=renard, w=wapiti\n";
-
-	// afficher informations tuile
-	os << "Detail des tuiles dans l'environnement:\n";
-	for (const auto& [pos, tuile] : tuiles) {
-		//os << "\n  (" << pos.getQ() << "," << pos.getR() << "," << pos.getS() << "): ";
-		os << "\n" << pos;
-
-		if (!tuile.getPlacementConfirme()) { os << " [NON CONFIRME] "; }
-		if (tuile.getDonneJetonNature()) { os << " [REPERE]"; }
-
-		if (tuile.JetonFaunePresent()) {
-			os << "\tJeton Faune Place: " << fauneToString(tuile.getFaunePlace()) << "\n";
-		}
-		else {
-			os << "\n\tPossibilite de placer: ";
-			for (const auto& faune : tuile.getFaunes()) {
-				os << fauneToString(faune) << " ";
-			}
-			os << "\n";
-		}
-
-		os << "\tHabitats: ";
-		for (const auto& habitat : tuile.getHabitats()) {
-			os << habitatToString(habitat) << " ";
-		}
-		os << "\n";
-	}
-	os << "\n======= FIN DE L'ENVIRONNEMENT DE " << env.getPseudo() << " =======\n";
-	return os;
-}
 
 void testHexagonalDisplay() {
 	std::cout << "=== Test Affichage Hexagonal ===\n\n";

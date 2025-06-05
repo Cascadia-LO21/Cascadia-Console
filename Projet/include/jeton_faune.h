@@ -12,5 +12,3 @@ public:
 	JetonFaune() : type(Faune::rien) {}
 };
 
-std::ostream& operator<<(std::ostream& os, const JetonFaune& j);
-

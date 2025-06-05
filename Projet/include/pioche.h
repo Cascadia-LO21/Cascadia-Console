@@ -132,7 +132,6 @@ public:
 	void rafraichirPioche();
 };
 
-std::ostream& operator<<(std::ostream& os, const Pioche& p);
 
 void testPioche(int nbJoueur);
 void testPioche1joueur();

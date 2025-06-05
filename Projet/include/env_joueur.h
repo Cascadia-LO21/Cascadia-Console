@@ -107,7 +107,6 @@ public:
 
 };
 
-std::ostream& operator<<(std::ostream& os, const EnvJoueur& env);
 
 //tests
 void testHexagonalDisplay();

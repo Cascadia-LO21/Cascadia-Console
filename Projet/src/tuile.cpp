@@ -5,51 +5,8 @@
 #include <stdexcept>
 #include <memory>
 #include "tuile.h"
+#include "affichage.h"
 
-
-std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
-	const auto& habitats = tuile.getHabitats();
-	const auto& faunes = tuile.getFaunes();
-
-	flux << "TUILE : \n";
-
-	if (tuile.getPlacementConfirme())
-		flux << "\t- Position : " << tuile.getPosition() << "\n";
-
-	flux << "\t- Habitats : ";
-	for (Habitat h : habitats) {
-		flux << habitatToString(h) << ", ";
-	}
-	flux << "\n";
-
-	if (tuile.JetonFaunePresent()) {
-		flux << "\t- Faune placée : " << fauneToString(tuile.getFaunePlace()) << ".\n";
-	}
-	else {
-		flux << "\t- Faunes possibles : ";
-		for (Faune f : faunes) {
-			flux << fauneToString(f) << ", ";
-		}
-		flux << "\n";
-
-		if (tuile.getDonneJetonNature())
-			flux << "\t- Donne Jeton Nature.\n";
-	}
-
-	return flux;
-}
-
-//ostream pour vecteur de tuile like in envjoueur
-std::ostream& operator<<(std::ostream& os, const std::vector<Tuile>& tuiles) {
-	if (tuiles.empty()) {
-		os << "Aucune tuile à afficher\n";
-		return os;
-	}
-	
-	for (const auto& t : tuiles) os << t;
-
-	return os;
-}
 
 void Tuile::placerJetonFaune(Faune faune) {
 	if (!JetonFaunePresent() && find(faunes.begin(), faunes.end(), faune) != faunes.end())

@@ -7,6 +7,7 @@
 #include "pioche.h"
 #include "enums.h"
 #include "gestion_pieces.h"
+#include "affichage.h"
 using namespace GestionPieces;
 
 
@@ -248,75 +249,6 @@ void Pioche::rafraichirPioche() {
 
 }
 
-
-// Affiche la pioche visible, où la visibilite de chaque elemennt est controlé par visibilite
-// PIOCHE :
-// T1  T2  X   T3
-// J1  J2  J3  J4
-//
-// T1 :
-// <description de la tuile 1>
-// etc...
-// J4:
-// <description du jeton 4>
-std::ostream& operator<<(std::ostream& os, const Pioche& p) {
-	os << "========= PIOCHE ========= \n";
-	
-	const auto& visibilite = p.getVisibilite();
-	size_t n = p.getPiocheVisible().size();
-
-	// Affichage des Tuiles visibles (T1, T2, X, T3)
-	for (unsigned int i = 0; i < n; ++i) {
-		if (visibilite[i].first) {
-			os << "T" << (i + 1) << "\t";
-		}
-		else {
-			os << "X\t";
-		}
-	}
-	os << "\n";
-
-	// Affichage des Jetons visibles (J1, J2, J3, J4)
-	for (unsigned int i = 0; i < n; ++i) {
-		if (visibilite[i].second) {
-			os << "J" << (i + 1) << "\t";
-		}
-		else {
-			os << "X\t";
-		}
-	}
-	os << "\n\n";
-	os << "--- Infos Tuiles --- \n";
-
-	// Détail des Tuiles Visibles
-	for (unsigned int i = 0; i < n; ++i) {
-		if (visibilite[i].first) { 
-			os << "T" << (i + 1) << ": ";
-			try { os << p.getPaire(i).first << "\n";
-			}
-			catch (const std::exception& e) {
-				os << "Erreur : " << e.what() << "\n";
-			}
-		}
-	}
-
-	os << "--- Infos Jetons Faunes --- \n";
-	// Détail des Jetons
-	for (unsigned int i = 0; i < n; ++i) {
-		if (visibilite[i].second) {
-			os << "J" << (i + 1) << ": ";
-			try { os << p.getPaire(i).second << "\n";
-			}
-			catch (const std::exception& e) {
-				os << "Erreur : " << e.what() << "\n";
-			}
-		}
-	}
-
-	os << "\n======= FIN PIOCHE ======= \n\n" << std::endl;
-
-	return os;
-}
 
 
 void testPioche(int n) {

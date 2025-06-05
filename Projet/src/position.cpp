@@ -1,17 +1,7 @@
 #include <iostream>
 #include "position.h"
+#include "affichage.h"
 
-std::ostream& operator<<(std::ostream& flux, const Position& p)
-{
-	flux << "(" << p.getQ() << "," << p.getR() << "," << p.getS() << ")";
-	return flux;
-}
-
-std::ostream& operator<<(std::ostream& flux, const std::vector<Position>& vect) {
-	for(const auto& p: vect)
-		flux << p << " ";
-	return flux;
-}
 
 Direction getDirectionOpposee(Direction dir) {
 	return static_cast<Direction>((static_cast<int>(dir) + 3) % 6);

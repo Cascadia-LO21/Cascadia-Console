@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "partie.h"
 #include "gestion_pieces.h"
+#include "affichage.h"
 
 // Avant le démarrage d'une partie, la pioche doit être initialiser.
 void Partie::initialiserPioche(int nbJoueur) {
@@ -35,7 +36,7 @@ void Partie::afficheJoueurs() const {
     if (joueurs.empty())
         throw std::runtime_error("Aucun joueur encore.");
     for (const auto& j : joueurs)
-        std::cout << j << std::endl;
+        std::cout << j << std::endl; 
 }
 
 void Partie::affichePioche() const {

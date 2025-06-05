@@ -41,10 +41,6 @@ public:
 
 };
 
-std::ostream& operator<<(std::ostream& flux, const Position& p);
-std::ostream& operator<<(std::ostream& flux, const std::vector<Position>& v);
-
-std::string directionToString(Direction dir);
 
 extern const std::vector <Position> direction_vecteur;
 
