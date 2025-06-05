@@ -129,18 +129,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="console\affichage.cpp" />
+    <ClCompile Include="console\main_console.cpp" />
+    <ClCompile Include="console\saisie.cpp" />
     <ClCompile Include="src\carte_marquage.cpp" />
     <ClCompile Include="src\enums.cpp" />
     <ClCompile Include="src\env_joueur.cpp" />
     <ClCompile Include="src\gestion_pieces.cpp" />
     <ClCompile Include="src\jeton_faune.cpp" />
-    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\partie.cpp" />
     <ClCompile Include="src\pioche.cpp" />
     <ClCompile Include="src\position.cpp" />
+    <ClCompile Include="src\score.cpp" />
     <ClCompile Include="src\tuile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="console\affichage.h" />
+    <ClInclude Include="console\saisie.h" />
     <ClInclude Include="include\carte_marquage.h" />
     <ClInclude Include="include\enums.h" />
     <ClInclude Include="include\env_joueur.h" />
@@ -150,6 +155,7 @@
     <ClInclude Include="include\partie.h" />
     <ClInclude Include="include\pioche.h" />
     <ClInclude Include="include\position.h" />
+    <ClInclude Include="include\score.h" />
     <ClInclude Include="include\tuile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

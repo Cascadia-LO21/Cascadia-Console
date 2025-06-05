@@ -13,11 +13,13 @@
 #include "partie.h"
 #include "carte_marquage.h"
 #include "gestion_pieces.h"
+#include "score.h"
+#include "saisie.h"
 
 int main() {
-	//std::cout << "hello world\n" << std::endl;
-	
-	testPartie();
+	std::cout << "hello world\n" << std::endl;
+
+	//testPartie();
 
 	//testEnvJoueur();
 
