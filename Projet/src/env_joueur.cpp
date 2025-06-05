@@ -10,6 +10,7 @@
 #include "tuile.h"
 #include "env_joueur.h"
 #include "gestion_pieces.h" //debug only
+#include "affichage.h"
 
 bool EnvJoueur::aTuile(const Position& coord) const {
 	return tuiles.find(coord) != tuiles.end(); //find trouve la tuile avec la clé coord (renvoie tuiles.end() sinon), end renvoie pointeur vers l'élément après le dernier de tuiles
@@ -394,12 +395,12 @@ void testDivers(){
 	std::cout << std::string(50, '-') << "\n\n";
 }
 
-void testEnvJoueur() {
-	using namespace GestionPieces;
-	std::vector <std::vector<Tuile>> td = instancierTuilesDepart();
-	std::vector<Tuile> t = instancierTuiles();
-
-	//std::cout << std::vector{t[0], t[1]};
-	//std::cout << td.at(0);
-	std::cout << t[0];
-}
+//void testEnvJoueur() {
+//	using namespace GestionPieces;
+//	std::vector <std::vector<Tuile>> td = instancierTuilesDepart();
+//	std::vector<Tuile> t = instancierTuiles();
+//
+//	//std::cout << std::vector{t[0], t[1]};
+//	//std::cout << td.at(0);
+//	std::cout << t[0];
+//}

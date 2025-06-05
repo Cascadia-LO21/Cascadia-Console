@@ -22,7 +22,9 @@ namespace EvalScore {
 		void updateTailleMaxTous(int indice, std::array<std::vector<std::vector<Position>>, 5> carteIndexee);
 		void updateBonusTous(int nbJoueurs);
 		void updateScore(int indice, EnvJoueur& joueur);
-		void parcourHabitat(Position position, Habitat currentHabitat, const std::unordered_map<Position, Tuile>& carte, std::vector<Position> positionDirectionVisitees, std::unordered_map<Position, std::array<bool, 6>> carteAParcourir, std::vector<Position> zone);
+		void parcourHabitat(Position position, Habitat currentHabitat, const std::unordered_map<Position, Tuile>& carte, 
+			std::vector<Position> positionDirectionVisitees, std::unordered_map<Position, 
+			std::array<bool, 6>> carteAParcourir, std::vector<Position> zone);
 
 		// prendre la liste des joueurs et attribut respectivement leur score habitat
 		std::array<std::vector<std::vector<Position>>, 5> repartitionZone(const EnvJoueur& joueur);
@@ -50,7 +52,9 @@ namespace EvalScore {
 
 	void calculScoreFaune(std::array<int, 5> cartesMarquageChoisies, Partie& partie);
 
-	/// Classe abstraite avec m thode virtuelle pure methode calcul
+
+
+	/// Classe abstraite avec methode virtuelle pure methode calcul
 	class CarteMarquage {
 		Faune faune;
 	public:

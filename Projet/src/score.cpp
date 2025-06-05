@@ -7,6 +7,264 @@
 #include "position.h"
 
 
+std::array<std::vector<std::vector<Position>>, 5> EvalScore::ScoreHabitat::repartitionZone(const EnvJoueur& joueur)
+{
+	const std::unordered_map<Position, Tuile>& carte = joueur.getTuiles();
+	std::unordered_map<Position, std::array<bool, 6>> carteAParcourir = parcourirCarte(carte);
+	std::array<std::vector<std::vector<Position>>, 5> carteIndexee;
+	std::vector<Position> positionsVisitees;
+	for (const auto& [position, directions] : carteAParcourir) {
+		if (std::find(positionsVisitees.begin(), positionsVisitees.end(), position) != positionsVisitees.end()) {
+			// appartenance, alors skip iteration
+		}
+		else {
+			// cas ou on n'a pas parcouru les 6 directions de la Tuile
+			int currentIndice = getFirstFalseIndex(directions);
+			while (currentIndice != -1) {
+				const Tuile& currentTuile = carte.at(position);
+				Habitat currentHabitat = currentTuile.getHabitats()[currentIndice];
+				// MAJ carteIndexee du currentTuile
+				size_t currentIndice = carteIndexee[static_cast<int>(currentHabitat)].size() + 1;
+				carteIndexee[static_cast<int>(currentHabitat)].resize(currentIndice);
+				parcourHabitat(position, currentHabitat, carte, positionsVisitees, carteAParcourir, carteIndexee[static_cast<int>(currentHabitat)][currentIndice]);
+			}
+			// fini de parcourir une tuile
+			positionsVisitees.push_back(position);
+		}
+	}
+}
+
+void EvalScore::ScoreHabitat::updateTailleMaxTous(int indice, std::array<std::vector<std::vector<Position>>, 5> carteIndexee)
+{
+	auto maxRetenu = getTailleMaxTous();
+	auto maxJoueur = maxRetenu[indice];
+	int courantIndice = 0;
+	for (auto valeurMax : maxJoueur) {
+		valeurMax = retournerMax(carteIndexee, courantIndice);
+		courantIndice++;
+	}
+}
+
+void EvalScore::ScoreHabitat::updateBonusTous(int nbJoueurs)
+{
+	// ref tableau du Rapport 1
+	auto bonus = getBonusTous();
+	auto maxRetenu = getTailleMaxTous();
+
+	if (nbJoueurs == 1) {
+		for (int i = 0; i < 5; i++) {
+			if (maxRetenu[0][i] >= 7) {
+				bonus[0][i] = 2;
+			}
+		}
+	}
+	else if (nbJoueurs == 2) {
+		// chaque type faune
+		for (int i = 0; i < 5; i++) {
+			// V rifier le joueur 1
+			if (maxRetenu[0][i] > maxRetenu[1][i]) {
+				bonus[0][i] = 2; // 1er joueur
+			}
+			else if (maxRetenu[0][i] < maxRetenu[1][i]) {
+				bonus[1][i] = 2; // 1er joueur
+			}
+			else {
+				bonus[0][i] = 1; //  galit 
+				bonus[1][i] = 1;
+			}
+		}
+	}
+	else {
+		// 3 et 4 joueurs
+		int valPremier = 0;
+		int valDeuxieme = 0;
+		std::vector<int> ensemblePremiers;
+		std::vector<int> ensembleDeuxiemes;
+
+		for (int i = 0; i < 5; i++) {
+			// Trouver le maximum et le deuxi me maximum
+			for (int j = 0; j < nbJoueurs; j++) {
+				if (maxRetenu[j][i] > valPremier) {
+					valDeuxieme = valPremier;
+					ensembleDeuxiemes = ensemblePremiers;
+					valPremier = maxRetenu[j][i];
+					ensemblePremiers = { j }; // R initialiser avec le joueur courant
+				}
+				else if (maxRetenu[j][i] == valPremier) {
+					ensemblePremiers.push_back(j); // Ajouter   l'ensemble des premiers
+				}
+				else if (maxRetenu[j][i] > valDeuxieme && maxRetenu[j][i] < valPremier) {
+					valDeuxieme = maxRetenu[j][i];
+					ensembleDeuxiemes = { j }; // R initialiser avec le joueur courant
+				}
+				else if (maxRetenu[j][i] == valDeuxieme) {
+					ensembleDeuxiemes.push_back(j); // Ajouter   l'ensemble des deuxi mes
+				}
+			}
+
+			// Attribuer les bonus
+			if (ensemblePremiers.size() > 1) {
+				//  galit  pour le premier
+				for (int joueur : ensemblePremiers) {
+					bonus[joueur][i] = 2; // +2 chacun
+				}
+			}
+			else {
+				// 1er joueur
+				for (int joueur : ensemblePremiers) {
+					bonus[joueur][i] = 3; // +3 pour le premier
+				}
+			}
+
+			// Attribuer le bonus pour le deuxi me plus  tendu
+			if (ensembleDeuxiemes.size() > 1) {
+				//  galit  pour le deuxi me, rien   attribuer
+				for (int joueur : ensembleDeuxiemes) {
+					continue;
+					// bonus[joueur][i] = 0; // 0 pour  galit 
+				}
+			}
+			else {
+				// 2e joueur
+				for (int joueur : ensembleDeuxiemes) {
+					bonus[joueur][i] = 1; // +1 pour le deuxi me
+				}
+			}
+		}
+	}
+}
+
+void EvalScore::ScoreHabitat::updateScore(int indice, EnvJoueur& joueur)
+{
+	auto scoreHabitat = joueur.getScoreHabitat(); 
+	auto bonus = getBonusTous();
+	auto maxRetenu = getTailleMaxTous();
+	for (int i = 0; i < 5; i++) {
+		scoreHabitat[i] = maxRetenu[indice][i] + bonus[indice][i];
+	}
+	return;
+}
+
+void EvalScore::ScoreHabitat::parcourHabitat(Position position, Habitat currentHabitat, const std::unordered_map<Position, Tuile>& carte, std::vector<Position> positionDirectionVisitees, std::unordered_map<Position, std::array<bool, 6>> carteAParcourir, std::vector<Position> zone)
+{
+	zone.push_back(position);
+	const std::array<Habitat, 6> ensemble = carte.at(position).getHabitats();
+	// dans indiceMemeHabitat on a deja fait la verification si deja visite ou non
+	std::vector<int> indicesAParcourir = indiceMemeHabitat(currentHabitat, ensemble, carteAParcourir.at(position));
+	for (auto currentIndice : indicesAParcourir) {
+		const Position voisin = position.getPositionAdjacente(static_cast<Direction>(currentIndice));
+		// verif si voisin existe dans carte
+		if (carte.find(voisin) != carte.end()) {
+			// verif si deja visitee
+			if (std::find(positionDirectionVisitees.begin(), positionDirectionVisitees.end(), voisin) == positionDirectionVisitees.end()) {
+				// verif voisin
+				Direction directionVoisin = getDirectionOpposee(static_cast<Direction> (currentIndice));
+				Habitat voisinHabitat = carte.at(voisin).getHabitats()[static_cast<int>(directionVoisin)];
+				// verif si (dans voisin) cote adjacent est meme habitat avec Direction getDirectionOpposee(Direction dir);
+				if (voisinHabitat != currentHabitat) {
+					// non = fin de parcours dans cette direction
+					continue;
+				}
+				else {
+					// oui
+					parcourHabitat(voisin, currentHabitat, carte, positionDirectionVisitees, carteAParcourir, zone);
+				}
+			}
+		}
+		// MAJ currentIndice parcouru
+		carteAParcourir.at(position)[currentIndice] = true;
+	}
+	return;
+}
+
+std::unordered_map<Position, std::array<bool, 6>> EvalScore::ScoreHabitat::parcourirCarte(const std::unordered_map<Position, Tuile>& carte)
+{
+	std::unordered_map<Position, std::array<bool, 6>> carteAParcourir;
+
+	for (const auto& paire : carte) {
+		carteAParcourir[paire.first] = std::array<bool, 6>{ false, false, false, false, false, false };// pour les 6 directions
+	}
+
+	return carteAParcourir;
+}
+
+int EvalScore::ScoreHabitat::getFirstFalseIndex(const std::array<bool, 6>& directions)
+{
+	for (int i = 0; i < directions.size(); ++i) {
+		if (!directions[i]) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+std::vector<int> EvalScore::ScoreHabitat::indiceMemeHabitat(Habitat habitat, const std::array<Habitat, 6> ensemble, std::array<bool, 6> dejaVisite)
+{
+	std::vector<int> vecteurIndice;
+	for (int i = 0; i < ensemble.size(); i++) {
+		if (!dejaVisite[i] && ensemble[i] == habitat) {
+			vecteurIndice.push_back(i);
+		}
+	}
+	return vecteurIndice;
+}
+
+int EvalScore::ScoreHabitat::retournerMax(std::array<std::vector<std::vector<Position>>, 5> carteIndexee, int indice) {
+	if (indice < 0 || indice >= carteIndexee.size()) {
+		throw std::out_of_range("Indice hors limites.");
+	}
+
+	int courantHabitatMax = 0;
+	for (const auto& ensembleZones : carteIndexee[indice]) {
+		int nouveauTaille = static_cast<unsigned int>(ensembleZones.size());
+		if (nouveauTaille > courantHabitatMax) {
+			courantHabitatMax = nouveauTaille;
+		}
+	}
+	return courantHabitatMax;
+}
+
+void EvalScore::calculScoreFaune(std::array<int, 5> cartesMarquageChoisies, Partie& partie)
+{
+	std::vector<std::unique_ptr<CarteMarquage>> cartes;
+	cartes.emplace_back(std::make_unique<CarteSaumon>());
+	cartes.emplace_back(std::make_unique<CarteOurs>());
+	cartes.emplace_back(std::make_unique<CarteBuse>());
+	cartes.emplace_back(std::make_unique<CarteRenard>());
+	cartes.emplace_back(std::make_unique<CarteWapiti>());
+
+	int nbJoueur = partie.getNbJoueurs();
+	auto& joueursModifiable = partie.getJoueursModifiable();
+	// parcours faune
+	for (auto& joueur : joueursModifiable) {
+		int i = 0;
+		for (const auto& carteMarquage : cartes) {
+			joueur.getScoreFaune()[i] = carteMarquage->methodeCalculA(joueur.getTuiles());
+			i++;
+		}
+	}
+	return;
+}
+
+void EvalScore::ScoreHabitat::caclulScoreHabitat(Partie& partie)
+{
+	// ajustement de la taille
+	int nbJoueur = partie.getNbJoueurs();
+	setTailleMaxTous(nbJoueur);
+	setBonusTous(nbJoueur);
+	const auto& joueurs = partie.getJoueurs();
+	for (int i = 0; i < nbJoueur; i++) {
+		updateTailleMaxTous(i, repartitionZone(joueurs[i]));
+	}
+	auto& joueursModifiable = partie.getJoueursModifiable();
+	updateBonusTous(nbJoueur);
+	for (int i = 0; i < nbJoueur; i++) {
+		updateScore(i, joueursModifiable[i]);
+	}
+}
+
+
+
 int EvalScore::CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
 
 	std::unordered_set<Position> PositionsVisitees;
@@ -152,7 +410,7 @@ int EvalScore::CarteRenard::methodeCalculA(const std::unordered_map<Position, Tu
 			}
 		}
 		//on compte le nombre de types adj pour chaque renard et on l'ajoute   AdjRenards
-		AdjRenards.push_back(FaunesAdjacentes.size());
+		AdjRenards.push_back(static_cast<int>(FaunesAdjacentes.size()));
 		PositionsVisitees.insert(position);
 	}
 	//insert boucle pour parcourir le vecteur ou set, puis le switch
@@ -309,261 +567,4 @@ int EvalScore::CarteWapiti::explorerChaineWapitiA(const std::unordered_map<Posit
 	Position suivante = position.getPositionAdjacente(direction.value());
 	return 1 + explorerChaineWapitiA(carte, suivante, PositionsVisitees, direction);
 
-}
-
-
-std::array<std::vector<std::vector<Position>>, 5> EvalScore::ScoreHabitat::repartitionZone(const EnvJoueur& joueur)
-{
-	const std::unordered_map<Position, Tuile>& carte = joueur.getTuiles();
-	std::unordered_map<Position, std::array<bool, 6>> carteAParcourir = parcourirCarte(carte);
-	std::array<std::vector<std::vector<Position>>, 5> carteIndexee;
-	std::vector<Position> positionsVisitees;
-	for (const auto& [position, directions] : carteAParcourir) {
-		if (std::find(positionsVisitees.begin(), positionsVisitees.end(), position) != positionsVisitees.end()) {
-			// appartenance, alors skip iteration
-		}
-		else {
-			// cas ou on n'a pas parcouru les 6 directions de la Tuile
-			int currentIndice = getFirstFalseIndex(directions);
-			while (currentIndice != -1) {
-				const Tuile& currentTuile = carte.at(position);
-				Habitat currentHabitat = currentTuile.getHabitats()[currentIndice];
-				// MAJ carteIndexee du currentTuile
-				int currentIndice = carteIndexee[static_cast<int>(currentHabitat)].size() + 1;
-				carteIndexee[static_cast<int>(currentHabitat)].resize(currentIndice);
-				parcourHabitat(position, currentHabitat, carte, positionsVisitees, carteAParcourir, carteIndexee[static_cast<int>(currentHabitat)][currentIndice]);
-			}
-			// fini de parcourir une tuile
-			positionsVisitees.push_back(position);
-		}
-	}
-}
-
-void EvalScore::ScoreHabitat::updateTailleMaxTous(int indice, std::array<std::vector<std::vector<Position>>, 5> carteIndexee)
-{
-	auto maxRetenu = getTailleMaxTous();
-	auto maxJoueur = maxRetenu[indice];
-	int courantIndice = 0;
-	for (auto valeurMax : maxJoueur) {
-		valeurMax = retournerMax(carteIndexee, courantIndice);
-		courantIndice++;
-	}
-}
-
-void EvalScore::ScoreHabitat::updateBonusTous(int nbJoueurs)
-{
-	// ref tableau du Rapport 1
-	auto bonus = getBonusTous();
-	auto maxRetenu = getTailleMaxTous();
-
-	if (nbJoueurs == 1) {
-		for (int i = 0; i < 5; i++) {
-			if (maxRetenu[0][i] >= 7) {
-				bonus[0][i] = 2;
-			}
-		}
-	}
-	else if (nbJoueurs == 2) {
-		// chaque type faune
-		for (int i = 0; i < 5; i++) {
-			// V rifier le joueur 1
-			if (maxRetenu[0][i] > maxRetenu[1][i]) {
-				bonus[0][i] = 2; // 1er joueur
-			}
-			else if (maxRetenu[0][i] < maxRetenu[1][i]) {
-				bonus[1][i] = 2; // 1er joueur
-			}
-			else {
-				bonus[0][i] = 1; //  galit 
-				bonus[1][i] = 1;
-			}
-		}
-	}
-	else {
-		// 3 et 4 joueurs
-		int valPremier = 0;
-		int valDeuxieme = 0;
-		std::vector<int> ensemblePremiers;
-		std::vector<int> ensembleDeuxiemes;
-
-		for (int i = 0; i < 5; i++) {
-			// Trouver le maximum et le deuxi me maximum
-			for (int j = 0; j < nbJoueurs; j++) {
-				if (maxRetenu[j][i] > valPremier) {
-					valDeuxieme = valPremier;
-					ensembleDeuxiemes = ensemblePremiers;
-					valPremier = maxRetenu[j][i];
-					ensemblePremiers = { j }; // R initialiser avec le joueur courant
-				}
-				else if (maxRetenu[j][i] == valPremier) {
-					ensemblePremiers.push_back(j); // Ajouter   l'ensemble des premiers
-				}
-				else if (maxRetenu[j][i] > valDeuxieme && maxRetenu[j][i] < valPremier) {
-					valDeuxieme = maxRetenu[j][i];
-					ensembleDeuxiemes = { j }; // R initialiser avec le joueur courant
-				}
-				else if (maxRetenu[j][i] == valDeuxieme) {
-					ensembleDeuxiemes.push_back(j); // Ajouter   l'ensemble des deuxi mes
-				}
-			}
-
-			// Attribuer les bonus
-			if (ensemblePremiers.size() > 1) {
-				//  galit  pour le premier
-				for (int joueur : ensemblePremiers) {
-					bonus[joueur][i] = 2; // +2 chacun
-				}
-			}
-			else {
-				// 1er joueur
-				for (int joueur : ensemblePremiers) {
-					bonus[joueur][i] = 3; // +3 pour le premier
-				}
-			}
-
-			// Attribuer le bonus pour le deuxi me plus  tendu
-			if (ensembleDeuxiemes.size() > 1) {
-				//  galit  pour le deuxi me, rien   attribuer
-				for (int joueur : ensembleDeuxiemes) {
-					continue;
-					// bonus[joueur][i] = 0; // 0 pour  galit 
-				}
-			}
-			else {
-				// 2e joueur
-				for (int joueur : ensembleDeuxiemes) {
-					bonus[joueur][i] = 1; // +1 pour le deuxi me
-				}
-			}
-		}
-	}
-}
-
-void EvalScore::ScoreHabitat::updateScore(int indice, EnvJoueur& joueur)
-{
-	auto scoreHabitat = joueur.getScoreHabitat();
-	auto bonus = getBonusTous();
-	auto maxRetenu = getTailleMaxTous();
-	for (int i = 0; i < 5; i++) {
-		scoreHabitat[i] = maxRetenu[indice][i] + bonus[indice][i];
-	}
-	return;
-}
-
-void EvalScore::ScoreHabitat::parcourHabitat(Position position, Habitat currentHabitat, const std::unordered_map<Position, Tuile>& carte, std::vector<Position> positionDirectionVisitees, std::unordered_map<Position, std::array<bool, 6>> carteAParcourir, std::vector<Position> zone)
-{
-	zone.push_back(position);
-	const std::array<Habitat, 6> ensemble = carte.at(position).getHabitats();
-	// dans indiceMemeHabitat on a deja fait la verification si deja visite ou non
-	std::vector<int> indicesAParcourir = indiceMemeHabitat(currentHabitat, ensemble, carteAParcourir.at(position));
-	for (auto currentIndice : indicesAParcourir) {
-		const Position voisin = position.getPositionAdjacente(static_cast<Direction>(currentIndice));
-		// verif si voisin existe dans carte
-		if (carte.find(voisin) != carte.end()) {
-			// verif si deja visitee
-			if (std::find(positionDirectionVisitees.begin(), positionDirectionVisitees.end(), voisin) == positionDirectionVisitees.end()) {
-				// verif voisin
-				Direction directionVoisin = getDirectionOpposee(static_cast<Direction> (currentIndice));
-				Habitat voisinHabitat = carte.at(voisin).getHabitats()[static_cast<int>(directionVoisin)];
-				// verif si (dans voisin) cote adjacent est meme habitat avec Direction getDirectionOpposee(Direction dir);
-				if (voisinHabitat != currentHabitat) {
-					// non = fin de parcours dans cette direction
-					continue;
-				}
-				else {
-					// oui
-					parcourHabitat(voisin, currentHabitat, carte, positionDirectionVisitees, carteAParcourir, zone);
-				}
-			}
-		}
-		// MAJ currentIndice parcouru
-		carteAParcourir.at(position)[currentIndice] = true;
-	}
-	return;
-}
-
-std::unordered_map<Position, std::array<bool, 6>> EvalScore::ScoreHabitat::parcourirCarte(const std::unordered_map<Position, Tuile>& carte)
-{
-	std::unordered_map<Position, std::array<bool, 6>> carteAParcourir;
-
-	for (const auto& paire : carte) {
-		carteAParcourir[paire.first] = std::array<bool, 6>{ false, false, false, false, false, false };// pour les 6 directions
-	}
-
-	return carteAParcourir;
-}
-
-int EvalScore::ScoreHabitat::getFirstFalseIndex(const std::array<bool, 6>& directions)
-{
-	for (int i = 0; i < directions.size(); ++i) {
-		if (!directions[i]) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-std::vector<int> EvalScore::ScoreHabitat::indiceMemeHabitat(Habitat habitat, const std::array<Habitat, 6> ensemble, std::array<bool, 6> dejaVisite)
-{
-	std::vector<int> vecteurIndice;
-	for (int i = 0; i < ensemble.size(); i++) {
-		if (!dejaVisite[i] && ensemble[i] == habitat) {
-			vecteurIndice.push_back(i);
-		}
-	}
-	return vecteurIndice;
-}
-
-int EvalScore::ScoreHabitat::retournerMax(std::array<std::vector<std::vector<Position>>, 5> carteIndexee, int indice) {
-	if (indice < 0 || indice >= carteIndexee.size()) {
-		throw std::out_of_range("Indice hors limites.");
-	}
-
-	int courantHabitatMax = 0;
-	for (const auto& ensembleZones : carteIndexee[indice]) {
-		auto nouveauTaille = ensembleZones.size();
-		if (nouveauTaille > courantHabitatMax) {
-			courantHabitatMax = nouveauTaille;
-		}
-	}
-	return courantHabitatMax;
-}
-
-void EvalScore::calculScoreFaune(std::array<int, 5> cartesMarquageChoisies, Partie& partie)
-{
-	std::vector<std::unique_ptr<CarteMarquage>> cartes;
-	cartes.emplace_back(std::make_unique<CarteSaumon>());
-	cartes.emplace_back(std::make_unique<CarteOurs>());
-	cartes.emplace_back(std::make_unique<CarteBuse>());
-	cartes.emplace_back(std::make_unique<CarteRenard>());
-	cartes.emplace_back(std::make_unique<CarteWapiti>());
-
-	int nbJoueur = partie.getNbJoueurs();
-	auto& joueursModifiable = partie.getJoueursModifiable();
-	// parcours faune
-	for (auto& joueur : joueursModifiable) {
-		int i = 0;
-		for (const auto& carteMarquage : cartes) {
-			joueur.getScoreFaune()[i] = carteMarquage->methodeCalculA(joueur.getTuiles());
-			i++;
-		}
-	}
-	return;
-}
-
-void EvalScore::ScoreHabitat::caclulScoreHabitat(Partie& partie)
-{
-	// ajustement de la taille
-	int nbJoueur = partie.getNbJoueurs();
-	setTailleMaxTous(nbJoueur);
-	setBonusTous(nbJoueur);
-	const auto& joueurs = partie.getJoueurs();
-	for (int i = 0; i < nbJoueur; i++) {
-		updateTailleMaxTous(i, repartitionZone(joueurs[i]));
-	}
-	auto& joueursModifiable = partie.getJoueursModifiable();
-	updateBonusTous(nbJoueur);
-	for (int i = 0; i < nbJoueur; i++) {
-		updateScore(i, joueursModifiable[i]);
-	}
 }

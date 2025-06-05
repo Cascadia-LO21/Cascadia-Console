@@ -30,7 +30,7 @@ private:
 public:
 
     // La pioche est initialisée en même temps que Partie.
-    // Mais le vecteur de joeur est vide encore.
+    // Mais le vecteur de joueur est vide encore.
     Partie(int nombreJoueurs = 1) :
         nbJoueurs(nombreJoueurs), compteurTour(0), joueurs(), joueurCourant(0), pause(false),
         pioche(std::make_unique<Pioche>(nombreJoueurs)),
@@ -60,6 +60,10 @@ public:
     Variante getVariante() const { return variante; }
     const Pioche& getPioche() const { return *pioche; }
     void affichePioche() const;
+    unsigned int getMaxNbJoueurs() const { return MAX_NB_JOUEURS; }
+    unsigned int getMaxNbTours() const { return MAX_NB_TOURS; }
+
+    std::vector<EnvJoueur>& getJoueursModifiable() { return joueurs; }
 
 
     void lancer();
@@ -72,11 +76,6 @@ public:
     void jouerTourIndividuel();
     void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
-    
-    void saisirJoueurs();
-    unsigned int saisirNombre(unsigned int max) const;
-    const Position saisirPositionTuile() const ;
-    const Position saisirPositionJeton(Faune f) const;
 
 
     void calculerScores();

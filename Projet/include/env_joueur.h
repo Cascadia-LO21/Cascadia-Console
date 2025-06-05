@@ -22,8 +22,10 @@ class EnvJoueur {
 	std::unordered_map<Position, Tuile> tuiles;//la map, pas beosin de désallouer à la fin, on stocke directement les tuiles dans unordered map par valeur
 	std::unordered_map<Faune, std::unordered_set<Position>> mapPositionsJetons; //map de clé type faune vers un set de positions où le jeton est placé
 	
-	size_t nbJetonNature;
-	size_t scoreFinal;
+	std::array<int, 5> scoreHabitat;
+	std::array<int, 5> scoreFaune;
+	unsigned int nbJetonNature;
+	unsigned int scoreFinal;
 
 	// Undo system
 	std::optional<Position> dernierePosition; //la dernière position jouée
@@ -33,7 +35,7 @@ class EnvJoueur {
 public:
 
 	//constructeur principal
-	EnvJoueur(const std::string& pseudo, size_t nbJetonNature = 0, size_t scoreFinal = 0)
+	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0, unsigned int scoreFinal = 0)
 		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
 	};
 
@@ -95,9 +97,9 @@ public:
 	void setPseudo(const std::string& pseudo) {
 		this->pseudo = pseudo;
 	};
-	size_t getScore() const { return scoreFinal; };
-	void setScore(size_t score) { scoreFinal = score; };
-	size_t getNbJetonsNature() const { return nbJetonNature; };
+	unsigned int getScore() const { return scoreFinal; };
+	void setScore(unsigned int score) { scoreFinal = score; };
+	unsigned int getNbJetonsNature() const { return nbJetonNature; };
 	std::optional<Position> getDernierePosition() const { return dernierePosition; };
 	std::optional<Tuile> getDerniereTuile() const { return derniereTuile; };
 
@@ -105,6 +107,12 @@ public:
 	const std::unordered_map<Faune, std::unordered_set<Position>>& getMapPositionsJetons() const { return mapPositionsJetons; }
 	bool getPlacementEnAttente() const { return placementEnAttente; }
 
+
+	void setScoreHabitat() { scoreHabitat = std::array<int, 5>{}; }
+	std::array<int, 5> getScoreHabitat() { return scoreHabitat; }
+
+	void setScoreFaune() { scoreFaune = std::array<int, 5>{}; }
+	std::array<int, 5> getScoreFaune() { return scoreFaune; }
 };
 
 
