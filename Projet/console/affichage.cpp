@@ -184,3 +184,16 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 	os << "\n======= FIN DE L'ENVIRONNEMENT DE " << env.getPseudo() << " =======\n";
 	return os;
 }
+
+
+// Affiche les pseudos de tous les joeurs.
+void afficheJoueurs(const Partie& p) {
+	if (p.getJoueurs().empty())
+		throw std::runtime_error("Aucun joueur encore.");
+	for (const auto& j : p.getJoueurs())
+		std::cout << j << std::endl;
+}
+
+void affichePioche(const Partie& p) {
+	std::cout << p.getPioche();
+}

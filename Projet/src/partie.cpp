@@ -9,7 +9,7 @@
 #include "affichage.h"
 
 // Avant le démarrage d'une partie, la pioche doit être initialiser.
-void Partie::initialiserPioche(int nbJoueur) {
+void Partie::initialiserPioche(unsigned int nbJoueur) {
 	pioche = std::make_unique<Pioche>(nbJoueur);
 }
 
@@ -31,214 +31,20 @@ void Partie::ajouterJoueur(const std::string& nom) {
     nbJoueurs++;
 }
 
-// Affiche les pseudos de tous les joeurs.
-void Partie::afficheJoueurs() const {
-    if (joueurs.empty())
-        throw std::runtime_error("Aucun joueur encore.");
-    for (const auto& j : joueurs)
-        std::cout << j << std::endl; 
-}
+// Preparatif avant le demarrage officiel d'une partie
+void Partie::preparer() {
 
-void Partie::affichePioche() const {
-    if (pioche) std::cout << *pioche;
-    else std::cout << "La pioche est à créer.";
-}
-
-// Gere le tour individuel d'un joueur, notamment si utiliser Jeton Nature ou pas
-void Partie::jouerTourIndividuel() {
-    // 0.1 Afficher le plateau du joueur ET la pioche
-    EnvJoueur& player = joueurs.at(joueurCourant);
-    std::cout << player << std::endl;
-    //affichePioche();
-
-    // 0.2 Detecter si Jetons Identiques dans Pioche : si oui, on les enleve, sans les remettre dans le sac de Jetons
-    while (pioche->quatreJetonsIdentiques()) {
-        affichePioche();
-        pioche->resetAllJetonFaune();
-        std::cout << "\n>>> Oh non ! Tous les jetons sont identiques dans la pioche ! Reglons cela !\n" << pioche;
-    }
-
-    // 0.3 Trois jetons identiques : option de reset (une seule fois)
-    char tmp;
-    if (pioche->troisJetonsIdentiques()) {
-        affichePioche();
-        std::cout << "\n>>> 3 Jetons identiques dans la pioche ! Les retire-t-on ? (o/n) : ";
-        std::cin >> tmp;
-        if (tmp == 'o') pioche->resetTroisJetonsIdentiques();
-    }
-
-    //std::cout << "\n>> Voici la pioche : \n";
-    affichePioche();
-
-    // 1. Demander si usage Jeton Nature
-    unsigned int rep = 0;
-    bool jetonNatureUsed = false;
-    if (player.getNbJetonsNature() > 0) {
-        std::cout << "\n>>> Veux-tu utiliser un Jeton Nature ?\n";
-        std::cout << "\n>>> Tu peux :\
-                      \n\t1. Choisir de ne pas utiliser. \
-                      \n\t2. Choisir une paire (Tuile,Jeton) libre. \
-                      \n\t3. Remplacer les Jetons que tu n'aimes pas.\n";
-        std::cout << ">>> Saisis ton choix (1-3) : ";
-        rep = saisirNombre(3); 
-
-        if (rep != 1) {
-            jetonNatureUsed = true;
-            player.decNbJetonsNature();
-        }
-
-        // 1.bis. Si Jeton Nature recouru pour remplacer les Jetons indesirables
-        if (rep == 3) {
-            std::vector<unsigned int> jetonsIndesirables{};
-            while (tmp == 'o' && jetonsIndesirables.size() < pioche->getMax()) {
-                std::cout << "\n>>> Quel jeton enlever ? ";
-                jetonsIndesirables.push_back(saisirNombre(pioche->getMax()));
-                std::cout << "\n>>> Encore ? (o/n) : ";
-                std::cin >> tmp;
-                if (tmp == 'n') break;
-            }
-            pioche->resetJetonFaune(jetonsIndesirables);
-            affichePioche();
-        }
-    }
-
-    // Variable pour stocker le choix de tuile et de jeton
-    unsigned int tuile = 0, jeton = 0;
-    Position posTuile, posJeton;
-    bool placementReussi = false;
-    Tuile tuileTmp;
-
-    // 2. Boucle principale pour gérer le choix de tuile et de jeton, et la possibilité de recommencer
-    while (!placementReussi) {
-        // 2.1 Choix d'une Tuile
-        std::cout << "\n>>> Quelle tuile veux-tu " << player.getPseudo() << " ? \n";
-        tuile = saisirNombre(pioche->getMax());
-        pioche->retirerTuileVisible(tuile);
-        affichePioche(); // la pioche presente une Tuile absente
-
-        posTuile = saisirPositionTuile();
-        tuileTmp = pioche->getPiocheVisible().at(tuile).first; //creer une copie
-        //player.placerTuile(posTuile, tuileTmp);
-
-        // 2.1.1 Demander s'il regrette son placement de Tuile
-        std::cout << "\n>>> Veux-tu revenir en arriere pour choisir une autre tuile ? (o/n)";
-        std::cin >> tmp;
-        if (tmp == 'o') {
-            pioche->setVisibilite(tuile, true); // la tuile redevient visible
-            player.undoDernierPlacement(); // attention: retour de la fonction non recupere
-            affichePioche(); // la pioche affiche l'etat precedent avec toutes les pieces
-            continue; // On recommence le choix de la tuile
-        }
-
-        // 2.2 Choix d'un Jeton Faune
-        if (jetonNatureUsed && rep == 2) { // le joueur peut choisir librement le Jeton qu'il veut
-            std::cout << "\n>>> Quel jeton faune veux-tu ?\n ";
-            jeton = saisirNombre(pioche->getMax());
-        }
-        else { // sans jeton nature, le jeton est automatiquement celui associé a la tuile
-            jeton = tuile; // meme indice
-        }
-        pioche->retirerJetonVisible({ jeton });
-        affichePioche(); // la pioche doit presenter une Tuile absente et un Jeton absent
-
-        // Tentative de placement du jeton
-        Faune faune = pioche->getPiocheVisible().at(jeton).second.getType();
-        posJeton = saisirPositionJeton(faune);
-        int succesJetonPlace = player.placerJetonFaune(posJeton, faune);
-
-        // 2.2.1 Gestion des cas d'erreur de placement
-        if (succesJetonPlace == -1) {
-            std::cout << "\n>>> Aucune tuile ne peut accueillir ce jeton. Veux-tu recommencer ? (o/n)";
-            std::cin >> tmp;
-            if (tmp == 'o') {
-                pioche->setVisibilite(tuile, true);
-                player.undoDernierPlacement();
-                affichePioche();
-                continue; // On recommence le choix de la tuile
-            }
-        }
-        else if (succesJetonPlace == 0) {
-            do {
-                std::cout << "\n>>> Impossible de placer le Jeton sur la Tuile choisie !";
-                std::cout << "\n>>> Veux-tu :\n\t1. Saisir une nouvelle position\n\t2. Recommencer depuis le choix de la tuile\n";
-                std::cout << ">>> Saisis ton choix (1 ou 2) : ";
-                unsigned int choix = saisirNombre(2);
-                if (choix == 2) {
-                    pioche->setVisibilite(tuile, true);
-                    player.undoDernierPlacement();
-                    affichePioche();
-                    break; // on sort de la boucle do...while, puis continue dans la boucle principale
-                }
-
-                // si choix = 1
-                posJeton = saisirPositionJeton(faune);
-                succesJetonPlace = player.placerJetonFaune(posJeton, pioche->getPiocheVisible().at(jeton).second);
-            } while (succesJetonPlace == 0);
-
-            if (succesJetonPlace == 1) {
-                placementReussi = true;
-            }
-            // Si le joueur a choisi de recommencer, on continue dans la boucle principale
-            // (donc pas besoin de faire placementReussi = true ici)
-            continue;
-        }
-
-        else if (succesJetonPlace == 1) {
-            placementReussi = true;
-            if (tuileTmp.getDonneJetonNature()) player.incNbJetonsNature();
-        }
-    }
-
-    // 3. Jeton Place, alors la position de la Tuile est definitive
-    //player.confirmerPlacement(posTuile);
-    player.placerTuileDefinitive(posTuile, tuileTmp);
-    std::cout << "\n>>> Les pieces sont placees dans ton plateau avec succes !";
-    std::cout << player;
-    pioche->slide(0, true); // slide tuiles
-    pioche->slide(0, false); // slide jetons
-
-    // 4. Si joueur solitaire, alors son tour est toujours suivi de l'extraction artificielle d'une paire de la pioche
-    if (nbJoueurs == 1) {
-        pioche->retirerTuileJetonDebut();
-        std::cout << "\n>>> L'ordinateur a extrait une paire.\n";
-        affichePioche();
-        pioche->slide(0, true); // slide tuiles
-        pioche->slide(0, false); // slide jetons
-    }
-
-    // 5. remplissage de la pioche visible en piochant des pieces de la pioche cachee
-    pioche->rafraichirPioche();
-}
-
-
-// Gere les tours de chaque joueur dans le tour courant. Fonctionne bien aussi avec 1 joueur
-void Partie::jouerTourCollectif() {
-    std::cout << ">> " << joueurs.at(joueurCourant).getPseudo() << 
-        " joue (tour " << compteurTour +1 << ")" << std::endl;
-
-    jouerTourIndividuel();
-    prochainJoueur(); // si jeu solitaire, alors le prochain joueur sera toujours lui-meme
-
-}
-
-// Controle le deroulement d'une partie entiere.
-// Suppose d'avoir defini les joueurs et instancier la pioche pour pouvoir commencer à jouer sereinement.
-void Partie::lancer() {
-    std::cout << "[JEU CASCADIA]\n";
-    std::cout << ">> Saisie des joueurs : " << std::endl;
-    saisirJoueurs();
-
-    /// 1. Verifications des conditions preliminaires pour que le jeu puisse etre demarre.
+    // joueurs prets ?
     if (joueurs.empty()) {
         throw std::runtime_error("Impossible de démarrer : aucun joueur encore.");
     }
 
-    // S'assurer que les attributs sont dans des états primitifs
+    // compteurs prets ?
     if (nbJoueurs != joueurs.size()) nbJoueurs = static_cast<int>(joueurs.size());
     if (joueurCourant != 0) joueurCourant = 0;
     if (compteurTour != 0) compteurTour = 0;
 
-    // Vérifier si la pioche est initialisée: si non, on l'initialise alors
+    // pioche prete ?
     if (!pioche) { initialiserPioche(nbJoueurs); }
 
     // distribuer une tuile de depart à chaque joueur : celle-ci proviennent de la Pioche, instancié à partir de donnees JSON
@@ -248,32 +54,16 @@ void Partie::lancer() {
             "Veuillez ajouter de nouvelles tuiles de depart ou bien diminuer le nombre de joueurs.");
 
     for (unsigned int i = 0; i < nbJoueurs; i++) {
-        std::vector<Tuile> t = GestionPieces::piocherTuileDepart(pioche->getTuilesDepartDispo()); 
+        std::vector<Tuile> t = GestionPieces::piocherTuileDepart(pioche->getTuilesDepartDispo());
         joueurs.at(i).setTuilesDepart(t);
     }
+}
 
-    std::cout << "> Tout est pret : joueurs, pioche, tuiles de depart distribuees.\n";
-    std::cout << "> La partie peut commencer !\n" << std::endl;
+// Controle le deroulement d'une partie entiere.
+// Suppose d'avoir defini les joueurs et instancier la pioche pour pouvoir commencer à jouer sereinement.
+void Partie::lancer() {
 
-    /// 2. Boucle principale du jeu
-    while (!verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
-        std::cout << "> TOUR " << (compteurTour + 1) << " / " << MAX_NB_TOURS << std::endl;
-        jouerTourCollectif();
-        compteurTour++;
 
-        // Systeme de pause/reprise de la partie (a mieux implementer dans la version graphique du jeu)
-        char tmp;
-        std::cout << ">> Souhaitez-vous faire une pause ? (o/n)" << std::endl;
-        std::cin >> tmp;
-        if (tmp == 'o') pauser();
-        while (pause) {
-            std::cout << ">>> Reposez-vous..." << std::endl;
-            std::cout << ">> Souhaitez-vous reprendre la partie ? (o/n)" << std::endl;
-            std::cin >> tmp;
-            if (tmp == 'o') reprendre();
-        }     
-
-    }
 
     // TODO: recuperer les fonctions du namespace EvalScore pour calculer les scores
     /// 3. Afficher le résultat final
@@ -282,7 +72,6 @@ void Partie::lancer() {
     //calculerGagnant();
     //afficherGagnant();
 
-    std::cout << "[FIN DU JEU CASCADIA]" << std::endl;
 }
 
 void Partie::reset() {
@@ -358,9 +147,27 @@ void Partie::afficherGagnant() const {
 }
 
 
-
-
-void testPartie() {
-    Partie p;
-    p.lancer();
+void Partie::revenir(unsigned int indexTuile, unsigned int indexJeton) {
+    pioche->setVisibilite(indexTuile, true);
+    pioche->setVisibilite(indexJeton, true);
+    getEnvJoueurCourantModifiable().undoDernierPlacement();
 }
+
+void Partie::apresPlacementDefinitif(const Position& posTuile, unsigned int indexTuile) {
+    EnvJoueur& player = getEnvJoueurCourantModifiable();
+    Tuile& tuile = pioche->getTuile(indexTuile);
+    player.placerTuileDefinitive(posTuile, tuile);
+    pioche->slide(0, true); // slide tuiles
+    pioche->slide(0, false); // slide jetons
+
+    // Si joueur solitaire, alors son tour est toujours suivi de l'extraction artificielle d'une paire de la pioche
+    if (nbJoueurs == 1) {
+        pioche->retirerTuileJetonDebut();
+        pioche->slide(0, true); // slide tuiles
+        pioche->slide(0, false); // slide jetons
+    }
+
+    // remplissage de la pioche visible en piochant des pieces de la pioche cachee
+    pioche->rafraichirPioche();
+}
+

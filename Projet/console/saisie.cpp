@@ -3,14 +3,6 @@
 #include "saisie.h"
 #include "affichage.h"
 
-void saisirJoueur(unsigned int max, std::vector<EnvJoueur>& joueurs) {
-    std::string nom;
-    std::cout << "\n>>> Saisis le nom d'un joueur a ajouter : ";
-    std::cin >> nom;
-    joueurs.emplace_back(nom); 
-}
-
-
 // Verifie si le nombre saisi par le user est correct en terme de bornes et de caractere numerique
 unsigned int saisirNombre(unsigned int max) {
     unsigned int tmp;
@@ -37,7 +29,7 @@ unsigned int saisirNombre(unsigned int max) {
 
 
 // Pour placer une tuile ou un jeton, on doit demander au joueur la position où placer
-const Position saisirPositionTuile(Partie p) {
+const Position saisirPositionTuile(const Partie& p) {
     EnvJoueur player = p.getEnvJoueurCourant();
     bool posValide = false;
     Tuile tuile;
@@ -83,7 +75,7 @@ const Position saisirPositionTuile(Partie p) {
 }
 
 // retourne une position où il y a une tuile qui peut accueillir la faune f
-const Position saisirPositionJeton(Partie p, Faune f) {
+const Position saisirPositionJeton(const Partie& p, Faune f) {
     EnvJoueur player = p.getEnvJoueurCourant();
     bool posValide = false;
     int q, r, s;

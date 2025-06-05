@@ -32,6 +32,8 @@ std::array<std::vector<std::vector<Position>>, 5> EvalScore::ScoreHabitat::repar
 			positionsVisitees.push_back(position);
 		}
 	}
+
+	return carteIndexee;
 }
 
 void EvalScore::ScoreHabitat::updateTailleMaxTous(int indice, std::array<std::vector<std::vector<Position>>, 5> carteIndexee)

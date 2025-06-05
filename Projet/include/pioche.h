@@ -103,6 +103,10 @@ public:
 
 	int getMax() const { return MAX; }
 
+	Tuile& getTuile(unsigned int index) {
+		return piocheVisible.at(index).first;
+	}
+
 
 
 	/// AUTRES METHODES ///

@@ -19,3 +19,6 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p);
 std::ostream& operator<<(std::ostream& os, const EnvJoueur& env);
 
 std::ostream& operator<<(std::ostream& os, const Partie& partie);
+
+void affichePioche(const Partie& p);
+void afficheJoueurs(const Partie& p);

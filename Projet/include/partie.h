@@ -25,13 +25,13 @@ private:
     std::optional<std::vector<int>> gagnant; // pour gerer les cas d'égalité
     std::optional<std::vector<int>> scores;
 
-    void initialiserPioche(int nbJoueur = 1); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
+    void initialiserPioche(unsigned int nbJoueur = 1); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
 
 public:
 
     // La pioche est initialisée en même temps que Partie.
     // Mais le vecteur de joueur est vide encore.
-    Partie(int nombreJoueurs = 1) :
+    Partie(unsigned int nombreJoueurs = 1) :
         nbJoueurs(nombreJoueurs), compteurTour(0), joueurs(), joueurCourant(0), pause(false),
         pioche(std::make_unique<Pioche>(nombreJoueurs)),
         marquage(Marquage::A), variante(Variante::standard) {}
@@ -50,22 +50,25 @@ public:
     void setVariante(Variante v = Variante::standard) { variante = v; }
 
   
-    int getNbJoueurs() const { return nbJoueurs; }
-    int getNbTours() const { return MAX_NB_TOURS; }
-    int getIndexJoueurCourant() const{ return joueurCourant; }
+    unsigned int getNbJoueurs() const { return nbJoueurs; }
+    unsigned int getCompteurTour() const { return compteurTour; }
+    unsigned int getIndexJoueurCourant() const{ return joueurCourant; }
     const EnvJoueur& getEnvJoueurCourant() const { return joueurs.at(joueurCourant); }
+    EnvJoueur& getEnvJoueurCourantModifiable() { return joueurs.at(joueurCourant); }
     const std::vector<EnvJoueur>& getJoueurs() const { return joueurs; }
-    void afficheJoueurs() const;
     Marquage getMarquage() const { return marquage; }
     Variante getVariante() const { return variante; }
     const Pioche& getPioche() const { return *pioche; }
-    void affichePioche() const;
+    Pioche& getPiocheModifiable() { return *pioche; }
     unsigned int getMaxNbJoueurs() const { return MAX_NB_JOUEURS; }
     unsigned int getMaxNbTours() const { return MAX_NB_TOURS; }
+    bool getPause() const { return pause; }
+
+    void incCompteurTour() { compteurTour++; }
 
     std::vector<EnvJoueur>& getJoueursModifiable() { return joueurs; }
 
-
+    void preparer();
     void lancer();
     void prochainJoueur() { joueurCourant = (joueurCourant + 1) % nbJoueurs; }
     void pauser() { if (!pause) pause = true; }
@@ -73,8 +76,8 @@ public:
     void reset(); 
 
 
-    void jouerTourIndividuel();
-    void jouerTourCollectif(); // un tour fait jouer tous les joueurs
+    //void jouerTourIndividuel();
+    //void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
 
 
@@ -82,7 +85,7 @@ public:
     void afficherScores() const;
     void calculerGagnant();
     void afficherGagnant() const;
+
+    void revenir(unsigned int indexTuile, unsigned int indexJeton);
+    void apresPlacementDefinitif(const Position& posTuile, unsigned int indexTuile);
 };
-
-
-void testPartie();
