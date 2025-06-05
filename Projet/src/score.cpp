@@ -224,14 +224,15 @@ int EvalScore::ScoreHabitat::retournerMax(std::array<std::vector<std::vector<Pos
 	return courantHabitatMax;
 }
 
-void EvalScore::calculScoreFaune(std::array<int, 5> cartesMarquageChoisies, Partie& partie)
+// Attention: cette fonction ne mobilise que la carte marquage A
+void EvalScore::calculScoreFaune(Partie& partie)
 {
 	std::vector<std::unique_ptr<CarteMarquage>> cartes;
-	cartes.emplace_back(std::make_unique<CarteSaumon>());
-	cartes.emplace_back(std::make_unique<CarteOurs>());
-	cartes.emplace_back(std::make_unique<CarteBuse>());
-	cartes.emplace_back(std::make_unique<CarteRenard>());
-	cartes.emplace_back(std::make_unique<CarteWapiti>());
+	cartes.push_back(std::make_unique<CarteSaumon>());
+	cartes.push_back(std::make_unique<CarteOurs>());
+	cartes.push_back(std::make_unique<CarteBuse>());
+	cartes.push_back(std::make_unique<CarteRenard>());
+	cartes.push_back(std::make_unique<CarteWapiti>());
 
 	int nbJoueur = partie.getNbJoueurs();
 	auto& joueursModifiable = partie.getJoueursModifiable();
@@ -252,10 +253,12 @@ void EvalScore::ScoreHabitat::caclulScoreHabitat(Partie& partie)
 	int nbJoueur = partie.getNbJoueurs();
 	setTailleMaxTous(nbJoueur);
 	setBonusTous(nbJoueur);
+
 	const auto& joueurs = partie.getJoueurs();
 	for (int i = 0; i < nbJoueur; i++) {
 		updateTailleMaxTous(i, repartitionZone(joueurs[i]));
 	}
+
 	auto& joueursModifiable = partie.getJoueursModifiable();
 	updateBonusTous(nbJoueur);
 	for (int i = 0; i < nbJoueur; i++) {

@@ -34,23 +34,26 @@ namespace EvalScore {
 		int retournerMax(std::array<std::vector<std::vector<Position>>, 5> carteIndexee, int indice);
 
 		int getFirstFalseIndex(const std::array<bool, 6>& directions);
+
 		void setTailleMaxTous(int taille) {
 			if (taille < 1 || taille > 4) {
-				throw std::out_of_range("La taille doit  tre entre 1 et 4.");
+				throw std::out_of_range("La taille doit etre entre 1 et 4.");
 			}
 			tailleMaxTous.resize(taille);
 		}
+
 		void setBonusTous(int taille) {
 			if (taille < 1 || taille > 4) {
-				throw std::out_of_range("La taille doit  tre entre 1 et 4.");
+				throw std::out_of_range("La taille doit etre entre 1 et 4.");
 			}
 			bonusTous.resize(taille, std::array<int, 5>{});
 		}
+
 		std::vector<std::array<int, 5>> getTailleMaxTous() { return tailleMaxTous; }
 		std::vector<std::array<int, 5>> getBonusTous() { return bonusTous; }
 	};
 
-	void calculScoreFaune(std::array<int, 5> cartesMarquageChoisies, Partie& partie);
+	void calculScoreFaune(Partie& partie);
 
 
 
