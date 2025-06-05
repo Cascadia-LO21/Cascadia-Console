@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
+#include <queue>
 
 int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
 
@@ -57,9 +58,7 @@ int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 				nbPairesOurs++;
 			}
 		}
-
 	}
-
 	//Calcul du score total
 	switch (nbPairesOurs) {
 	case 0: return 0;
@@ -68,6 +67,45 @@ int CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 	case 3: return 19;
 	default: return 27; // 4+ paires d'ours
 	}
+}
+
+int CarteOurs::methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const
+{
+	if (carte.count(Faune::ours) == 0) return 0;
+
+	const auto& positionsOurs = carte.at(Faune::ours); //recup les positions ours
+	std::unordered_set<Position> positionsVisitees;
+
+	for (const Position& pos : positionsOurs) {
+		if (positionsVisitees.count(pos)) continue;
+
+		std::unordered_set<Position> groupe;
+		std::queue<Position> file;
+		file.push(pos);
+
+		while (!file.empty()) {
+			Position current = file.front();
+			file.pop();
+
+			if (positionsVisitees.count(current)) continue;
+			positionsVisitees.insert(current);
+			groupe.insert(current);
+
+			for (const Position& voisine : current.getVecteurPositionsAdjacentes()) {
+				// s'assurer que voisine est ours
+				if (positionsOurs.count(voisine) && !positionsVisitees.count(voisine)) { 
+					file.push(voisine); //
+				}
+			}
+		}
+
+		if (groupe.size() == 3) {
+			return 10;
+		}
+	}
+
+	// aucun groupe de 3 ours trouvé
+	return 0;
 }
 
 
@@ -119,6 +157,13 @@ int CarteBuse::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) 
 	}
 }
 
+int CarteBuse::methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const
+{
+
+	
+	return 0;
+}
+
 
 int CarteRenard::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const
 {
@@ -164,6 +209,11 @@ int CarteRenard::methodeCalculA(const std::unordered_map<Position, Tuile>& carte
 		}
 	}
 	return scoreTotal;
+}
+
+int CarteRenard::methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const
+{
+	return 0;
 }
 
 
@@ -233,6 +283,66 @@ int CarteSaumon::explorerChaineSaumonA(const std::unordered_map<Position,Tuile>&
 		}
 	}
 	
+	return taille;
+}
+
+int CarteSaumon::methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const
+{
+	if (carte.count(Faune::saumon) == 0) return 0; // pas de saumon du tout
+
+	const auto& positionsSaumon = carte.at(Faune::saumon); // recup liste des saumons
+	std::unordered_set<Position> positionsVisitees;
+	std::vector<int> taillesChaines;
+	int scoreTotal = 0;
+
+	for (const Position& position : positionsSaumon) {
+		if (positionsVisitees.count(position)) continue;
+
+		int tailleChaine = explorerChaineSaumonB(carte, position, positionsVisitees, nullptr);
+		if (tailleChaine > 0) {
+			taillesChaines.push_back(tailleChaine);
+		}
+	}
+
+	for (int chaine : taillesChaines) {
+		switch (chaine) {
+		case 0: scoreTotal += 0; break;
+		case 1: scoreTotal += 2; break;
+		case 2: scoreTotal += 4; break;
+		case 3: scoreTotal += 9; break;
+		case 4: scoreTotal += 11; break;
+		default: scoreTotal += 17; break; // 5+
+		}
+	}
+	return scoreTotal;
+}
+int CarteSaumon::explorerChaineSaumonB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+	const Position& position,
+	std::unordered_set<Position>& positionsVisitees,
+	const Position* pos_pere) const
+{
+	if (carte.count(Faune::saumon) == 0) return 0;
+
+	const auto& positionsSaumon = carte.at(Faune::saumon);
+
+	positionsVisitees.insert(position);
+	int nbSaumonsAdj = 0;
+	int taille = 1;
+
+	for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
+		if (pos_pere && posVoisine == *pos_pere) continue;
+		if (positionsSaumon.count(posVoisine) == 0) continue; // Pas de saumon à cette position
+
+		nbSaumonsAdj++;
+		if (nbSaumonsAdj > 2) return 0; // Chaine invalide
+
+		if (positionsVisitees.count(posVoisine) == 0) {
+			int tailleSuite = explorerChaineSaumonB(carte, posVoisine, positionsVisitees, &position);
+			if (tailleSuite == 0) return 0;
+			taille += tailleSuite;
+		}
+	}
+
 	return taille;
 }
 
@@ -307,4 +417,24 @@ int CarteWapiti::explorerChaineWapitiA(const std::unordered_map<Position, Tuile>
 	Position suivante = position.getPositionAdjacente(direction.value());
 	return 1 + explorerChaineWapitiA(carte, suivante, PositionsVisitees, direction);
 	
+}
+
+int CarteWapiti::methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const
+{
+	return 0;
+}
+
+
+int main() {
+	std::unordered_map<Position, Tuile> carteTest;
+
+	//generer des tuiles
+	/*
+	std::cout << "Score Ours (A) : " << carteOurs.methodeCalculA(carteTest) << std::endl;
+	std::cout << "Score Buse (A) : " << carteBuse.methodeCalculA(carteTest) << std::endl;
+	std::cout << "Score Renard (A) : " << carteRenard.methodeCalculA(carteTest) << std::endl;
+	std::cout << "Score Saumon (A) : " << carteSaumon.methodeCalculA(carteTest) << std::endl;
+	std::cout << "Score Wapiti (A) : " << carteWapiti.methodeCalculA(carteTest) << std::endl;
+	*/
+	return 0;
 }

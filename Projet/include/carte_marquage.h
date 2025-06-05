@@ -27,6 +27,9 @@ class CarteMarquage {
 public:
 	CarteMarquage(Faune f) : faune(f) {}
 	virtual int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const = 0;
+	virtual int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const = 0;
+	virtual int methodeCalculC(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const = 0;
+	virtual int methodeCalculD(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const = 0;
 	Faune getFaune() const { return faune; }
 	virtual ~CarteMarquage() = default; //a redefinir dans classes filles
 };
@@ -35,19 +38,26 @@ class CarteSaumon : public CarteMarquage {
 public:
 	CarteSaumon() : CarteMarquage(Faune::saumon) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int explorerChaineSaumonA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& positionsVisitees, const Position* pere) const; //fct recursive qui sera appelée dans methodeCalculA, retourn la taille d'une chaine
+	int explorerChaineSaumonA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& positionsVisitees, const Position* pere) const;
+	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
+	int explorerChaineSaumonB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+		const Position& position,
+		std::unordered_set<Position>& positionsVisitees,
+		const Position* pos_pere) const;
 };
 
 class CarteOurs : public CarteMarquage {
 public:
 	CarteOurs() : CarteMarquage(Faune::ours) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
+	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
 };
 
 class CarteBuse : public CarteMarquage {
 public:
 	CarteBuse() : CarteMarquage(Faune::buse) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
+	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
 
 };
 
@@ -55,6 +65,7 @@ class CarteRenard : public CarteMarquage {
 public:
 	CarteRenard() : CarteMarquage(Faune::renard) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
+	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
 };
 
 class CarteWapiti : public CarteMarquage {
@@ -62,34 +73,15 @@ public:
 	CarteWapiti() : CarteMarquage(Faune::wapiti) {}
 	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
 	int explorerChaineWapitiA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, std::optional<Direction> direction) const;
+	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
 };
 
-/* A GARDER JUSQU'À AVOIR FINI TOUTES LES FONCTIONS :
 
-BUSE : 
-	switch (count) {
-	case 0: return 0;
-	case 2: return 5;
-	case 3: return 8;
-	case 4: return 11;
-	case 5: return 14;
-	case 6: return 18;
-	case 7: return 22;
-	default: return 26; //8+ buses
-	}
+/*
+void testCartesA(const std::unordered_map<Position, Tuile>& carte) ;
 
-WAPITI :
-	switch (count) {
-	case 0: return 0;
-	case 1: return 2;
-	case 2: return 5;
-	case 3: return 9;
-	default:
-		return 13; //4 et plus
-	}
-
-OURS : c'est bon
-
-SAUMON : done
-
+int main() {
+	std::unordered_map();
+	testCartesA(carte);
+}
 */
