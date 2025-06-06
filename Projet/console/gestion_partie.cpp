@@ -45,9 +45,13 @@ void jouerTour(Partie& p) {
         placementReussi = placerTuileEtJeton(p, player, rep, jetonNatureUsed);
     }
 
+    //std::cout << "JAI REUSSI A PLACER, mtn je veux le confirmer\n";
+
     // Après placement définitif
-    p.apresPlacementDefinitif();
-    std::cout << "\n>> Les pieces sont placees dans ton plateau avec succes !";
+    p.apresPlacementDefinitif(player); /// BIG PB: FAIT PLANTER LE PRGRM
+    //std::cout << "JAI REUSSI A confirmer\n";
+
+    std::cout << "\n>> Les pieces sont placees dans ton plateau avec succes !\n";
     std::cout << player;
 
     p.prochainJoueur();
@@ -77,13 +81,16 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
 
     // Choix de la tuile
     affichePioche(p);
-    std::cout << "\n>> Quelle tuile veux-tu '" << player.getPseudo() << "' ? \n";
+    std::cout << "\n>> Quelle tuile veux-tu [" << player.getPseudo() << "] ? \n";
     indexTuile = saisirNombre(p.getPioche().getMax());
     p.getPiocheModifiable().retirerTuileVisible(indexTuile);
     affichePioche(p);
 
     posTuile = saisirPositionTuile(p);
     tuileTmp = p.getPioche().getPiocheVisible().at(indexTuile).first;
+    player.placerTuile(posTuile, tuileTmp); //ajouter la tuile temporairement dans le plateau du joueur, faudra confirmer a la fin
+    //std::cout << "tuileTmp:" << tuileTmp << "\n";
+    bool donneJetonNature = tuileTmp.getDonneJetonNature();
 
     // Retour en arrière
     std::cout << "\n>>> Veux-tu revenir en arriere pour choisir une autre tuile ? (o/n)";
@@ -108,39 +115,61 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
 
     // Placement du jeton
     Faune faune = p.getPioche().getPiocheVisible().at(indexJeton).second.getType();
-    posJeton = saisirPositionJeton(p, faune);
-    int succesJetonPlace = player.placerJetonFaune(posJeton, faune);
+    
+    try {
+        posJeton = saisirPositionJeton(p, faune);
+        //std::cout << "saisirPOS ok.\n";
+        int succesJetonPlace = player.placerJetonFaune(posJeton, faune);
+        //std::cout << "placerJetonFaune ok.\n";
 
-    // Gestion des erreurs
-    if (succesJetonPlace == -1) {
-        std::cout << "\n>>> Aucune tuile ne peut accueillir ce jeton. Veux-tu recommencer ? (o/n) : ";
-        std::cin >> tmp;
-        if (tmp == 'o') {
-            p.revenir(indexTuile, indexJeton);
-            affichePioche(p);
-            return false;
-        }
-    }
-    else if (succesJetonPlace == 0) {
-        do {
-            std::cout << "\n>>> Impossible de placer le Jeton sur la Tuile choisie !";
-            std::cout << "\n>>> Veux-tu :\n\t1. Saisir une nouvelle position\n\t2. Recommencer depuis le choix de la tuile\n";
-            std::cout << ">>> Saisis ton choix (1 ou 2) : ";
-            unsigned int choix = saisirNombre(2);
-            if (choix == 2) {
+        // Gestion des erreurs
+        if (succesJetonPlace == -1) {
+            //std::cout << "je suis dans la boucle si succes = -1\n";
+            std::cout << "\n>>> Aucune tuile ne peut accueillir ce jeton. Veux-tu recommencer ? (o/n) : ";
+            std::cin >> tmp;
+            if (tmp == 'o') {
                 p.revenir(indexTuile, indexJeton);
                 affichePioche(p);
                 return false;
             }
-            posJeton = saisirPositionJeton(p, faune);
-            succesJetonPlace = player.placerJetonFaune(posJeton, faune);
-        } while (succesJetonPlace != 1);
+        }
+        else if (succesJetonPlace == 0) {
+            std::cout << "je suis dans la boucle si succes = 0\n";
+
+            do {
+                std::cout << "\n>>> Impossible de placer le Jeton sur la Tuile choisie !";
+                std::cout << "\n>>> Veux-tu :\n\t1. Saisir une nouvelle position\n\t2. Recommencer depuis le choix de la tuile\n";
+                std::cout << ">>> Saisis ton choix (1 ou 2) : ";
+                unsigned int choix = saisirNombre(2);
+                if (choix == 2) {
+                    p.revenir(indexTuile, indexJeton);
+                    affichePioche(p);
+                    return false;
+                }
+                posJeton = saisirPositionJeton(p, faune);
+                succesJetonPlace = player.placerJetonFaune(posJeton, faune);
+            } while (succesJetonPlace != 1);
+        }
+        if (succesJetonPlace == 1) {
+            std::cout << "je suis dans la boucle si succes = 1 !\n";
+            if (donneJetonNature) { 
+                player.incNbJetonsNature(); 
+                std::cout << "je suis dans la boucle si succes = 1 et jai incremente nbjetonnature de joueur\n";
+
+            }
+            std::cout << "je suis dans la boucle si succes = 1 A LA FIN\n";
+            return true;
+        }
+
+        std::cout << "je suis a la toute fin de la fonction\n";
+
+        return false;
+
     }
-    else if (succesJetonPlace == 1) {
-        if (tuileTmp.getDonneJetonNature()) player.incNbJetonsNature();
-        return true;
+    catch (const std::exception& e) {
+        std::cout << "Erreur : " << e.what() << "\n";
+        return false;
     }
-    return false;
 }
 
 

@@ -219,7 +219,7 @@ std::vector<Tuile> EnvJoueur::getTuilesAvecVoisinLibre() const {
 		std::vector<Position> posVoisines = position.getVecteurPositionsAdjacentes();
 		bool aVoisinLibre = false;
 		for (const Position& voisin : posVoisines) {
-			if (!aTuile(voisin)) {
+			if (!aTuile(voisin) && tuile.getPlacementConfirme()) { // on ne presente que les tuiles dont le placement est confirme
 				aVoisinLibre = true;
 				break; // Pas besoin de continuer si un voisin libre est trouvé
 			}

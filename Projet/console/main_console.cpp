@@ -19,7 +19,16 @@
 #include "gestion_partie.h"
 
 int main() {
-	//std::cout << "hello world\n" << std::endl;
+
+	//std::vector<Tuile> v = GestionPieces::instancierTuilesDepart()[0];
+	//EnvJoueur e("to");
+	//e.setTuilesDepart(v);
+	//std::cout << e.aTuile(Position(0,0,0));
+	//std::cout << e.getTuile(Position(0,0,0))->getPlacementConfirme();
+
+
+
+	////std::cout << "hello world\n" << std::endl;
 
 	// 1. Creation de la partie
 	Partie p;

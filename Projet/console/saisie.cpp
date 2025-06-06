@@ -10,22 +10,23 @@ unsigned int saisirNombre(unsigned int max) {
     unsigned int tmp;
 
     while (true) {
-        std::cout << ">>> Entre un nombre (entre 1 et " << max << ") : ";
+        std::cout << "\n>>> Entre un nombre (entre 1 et " << max << ") : ";
         if (std::cin >> tmp) {
-            tmp--; // car du cote users, les indices commencent a 1
+            //tmp--; // car du cote users, les indices commencent a 1
 
-            if (tmp >= 0 || tmp < max) {
+            if (tmp-1 >= 0 || tmp-1 < max) {
                 break; // saisie valide
             }
 
         }
         else {
-            std::cout << ">>>> Erreur : veuillez saisir un nombre entier." << std::endl;
+            std::cout << "\n>>>> Erreur : veuillez saisir un nombre entier." << std::endl;
             std::cin.clear(); // réinitialise l’état de cin
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // vide le buffer
         }
     }
 
+    std::cout << "Le choix choisi est : tmp = " << tmp << "\n";
     return tmp;
 }
 
@@ -92,7 +93,7 @@ const Position saisirPositionTuile(const Partie& p) {
 
 // retourne une position où il y a une tuile qui peut accueillir la faune f
 const Position saisirPositionJeton(const Partie& p, Faune f) {
-    EnvJoueur player = p.getEnvJoueurCourant();
+    const EnvJoueur& player = p.getEnvJoueurCourant();
     bool posValide = false;
     int q, r, s;
 
@@ -103,13 +104,15 @@ const Position saisirPositionJeton(const Partie& p, Faune f) {
     while (!posValide) {
         std::cout << "\nVoici les positions qui peuvent accueillir la faune " << fauneToString(f) << "\n";
         std::cout << player.getPosLibresPourJeton(f);
+        // TODO : attention, BOUCLE INFINI, si personne ne peut accueillir jeton
         std::cout << "\n>> Rentre les 3 coordonnées de la Tuile sur laquelle tu veux placer.\n"
-            << "Repète les étapes suivantes 3 fois : saisis un nombre puis appuie sur ENTRER.\n";
+                  << "Repète les étapes suivantes 3 fois : saisis un nombre puis appuie sur ENTRER.\n";
         std::cout << "\n>> Coordonnée 1 : "; std::cin >> q;
         std::cout << ">> Coordonnée 2 : "; std::cin >> r;
         std::cout << ">> Coordonnée 3 : "; std::cin >> s;
 
-        if (!player.aTuile(Position(q, r, s))) {
+        Position p(q, r, s);
+        if (!player.aTuile(p)) {
             std::cout << "\n>> Attention: tu n'as pas de tuile placee a cette position! Veille a bien choisir parmi celles proposees !" << std::endl;
             continue; // on redemande une nouvelle position
         }

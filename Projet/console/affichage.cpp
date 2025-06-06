@@ -223,7 +223,7 @@ void afficherTour(Partie& p) {
 	std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
 	std::cout << "> [TOUR " << (p.getCompteurTour() + 1) << " / " << p.getMaxNbTours() << "]" << std::endl;
-	std::cout << ">> Au tour de '" << p.getEnvJoueurCourant().getPseudo() << "' de jouer\n";
+	std::cout << ">> Au tour de [" << p.getEnvJoueurCourant().getPseudo() << "] de jouer\n";
 }
 
 void afficherMenuJetonNature() {
