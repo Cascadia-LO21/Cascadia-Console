@@ -77,13 +77,13 @@ void EnvJoueur::placerTuile(const Position& coord, Tuile& tuile) {
 	tuiles[coord] = tuile;
 
 	//se rappeler de ce placement
-	dernierePosition = coord;
+	dernierePosition = coord; 
 	derniereTuile = tuile;
 	placementEnAttente = true; //on a un placement en attente de confirmation
 
 };
 
-void EnvJoueur::confirmerPlacement(const Position& p) {
+void EnvJoueur::confirmerPlacement() {
 	if (!placementEnAttente) {
 		throw std::logic_error("Aucun placement en attente à confirmer");
 	}
@@ -91,15 +91,15 @@ void EnvJoueur::confirmerPlacement(const Position& p) {
 		throw std::logic_error("Aucune tuile ou position en attente de confirmation");
 	}
 
-	//marquer dans la tuile que sa position est confirmée
-	tuiles[dernierePosition.value()].setPosition(p);
+	// marquer dans la tuile que sa position est confirmée
+	tuiles[dernierePosition.value()].setPosition(dernierePosition.value()); // mettre a jour la position de la tuile en attente
 	tuiles[dernierePosition.value()].confirmerPlacement();
 	// maintenant, la Tuile a bien : une position definitive ET placementConfirme = true
 
-	//vider les variables d'attente
+	// reinitialiser les variables d'attente
 	placementEnAttente = false;
-	dernierePosition.reset(); //on n'a plus de position en attente
-	derniereTuile.reset(); //on n'a plus de tuile en attente
+	dernierePosition.reset();
+	derniereTuile.reset(); 
 };
 
 bool EnvJoueur::undoDernierPlacement() {
@@ -118,10 +118,10 @@ bool EnvJoueur::undoDernierPlacement() {
 	return true; //annulation réussie
 }
 
-void EnvJoueur::placerTuileDefinitive(const Position& coord, Tuile& tuile) {
-	placerTuile(coord, tuile);
-	confirmerPlacement(coord);
-}
+//void EnvJoueur::placerTuileDefinitive() {
+//	placerTuile(coord, tuile);
+//	confirmerPlacement(coord);
+//}
 
 //retourne -1 si le jeton ne peut être placé nulpart, 0 si le jeton ne peut etre placé à cette position, 1 si le jeton est placé avec succès
 int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) {
@@ -206,7 +206,10 @@ void EnvJoueur::placerTuileDepart(const Position& coord, Tuile& tuile){
 
 void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, Tuile& tuile){
 	placerTuileDepart(coord, tuile);
-	confirmerPlacement(coord);
+	confirmerPlacement();
+	//tuiles[coord] = tuile;
+	//tuile.setPosition(coord);
+	//tuile.confirmerPlacement();
 }
 
 std::vector<Tuile> EnvJoueur::getTuilesAvecVoisinLibre() const {

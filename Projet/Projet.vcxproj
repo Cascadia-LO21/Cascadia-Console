@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="console\affichage.cpp" />
+    <ClCompile Include="console\gestion_partie.cpp" />
     <ClCompile Include="console\main_console.cpp" />
     <ClCompile Include="console\saisie.cpp" />
     <ClCompile Include="gui\main_qt.cpp" />
@@ -146,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="console\affichage.h" />
+    <ClInclude Include="console\gestion_partie.h" />
     <ClInclude Include="console\saisie.h" />
     <ClInclude Include="include\carte_marquage.h" />
     <ClInclude Include="include\enums.h" />

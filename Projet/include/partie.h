@@ -87,5 +87,6 @@ public:
     void afficherGagnant() const;
 
     void revenir(unsigned int indexTuile, unsigned int indexJeton);
-    void apresPlacementDefinitif(const Position& posTuile, unsigned int indexTuile);
+    //void apresPlacementDefinitif(const Position& posTuile, unsigned int indexTuile);
+    void apresPlacementDefinitif();
 };

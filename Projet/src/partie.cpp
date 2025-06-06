@@ -153,10 +153,10 @@ void Partie::revenir(unsigned int indexTuile, unsigned int indexJeton) {
     getEnvJoueurCourantModifiable().undoDernierPlacement();
 }
 
-void Partie::apresPlacementDefinitif(const Position& posTuile, unsigned int indexTuile) {
+void Partie::apresPlacementDefinitif() {
     EnvJoueur& player = getEnvJoueurCourantModifiable();
-    Tuile& tuile = pioche->getTuile(indexTuile);
-    player.placerTuileDefinitive(posTuile, tuile);
+    //Tuile& tuile = pioche->getTuile(indexTuile);
+    player.confirmerPlacement();
     pioche->slide(0, true); // slide tuiles
     pioche->slide(0, false); // slide jetons
 

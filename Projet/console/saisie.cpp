@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <cctype>
 #include "saisie.h"
 #include "affichage.h"
 
@@ -25,6 +27,20 @@ unsigned int saisirNombre(unsigned int max) {
     }
 
     return tmp;
+}
+
+bool saisirReponse() {
+    std::string rep;
+    std::vector<std::string> positif = { "o", "oui", "yes", "y", "ok","1"};
+    std::vector<std::string> negatif = { "n", "non", "no", "0" };
+    while (true) {
+        std::cin >> rep;
+        std::transform(rep.begin(), rep.end(), rep.begin(), ::tolower); // convertir en minuscule
+        
+        if (std::find(positif.begin(), positif.end(), rep) != positif.end()) return true;
+        if (std::find(negatif.begin(), negatif.end(), rep) != negatif.end())  return false;
+        else std::cout << ">> Saisie invalide. Faut repondre par o/n : ";
+    }
 }
 
 
@@ -104,4 +120,18 @@ const Position saisirPositionJeton(const Partie& p, Faune f) {
 
     return Position(q, r, s);
 
+}
+
+void saisirJoueurs(Partie& p) {
+    std::cout << "> Saisie des joueurs : " << std::endl;
+    char tmp;
+    do {
+        std::string nom;
+        std::cout << "\n>> Saisis le nom d'un joueur a ajouter : ";
+        std::cin >> nom;
+        p.ajouterJoueur(nom);
+        std::cout << "\n>> Ajouter encore ? (o/n) : ";
+        std::cin >> tmp;
+        if (tmp == 'n') break;
+    } while (p.getNbJoueurs() < p.getMaxNbJoueurs());
 }

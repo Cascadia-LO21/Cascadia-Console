@@ -36,7 +36,7 @@ public:
 
 	//constructeur principal
 	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0, unsigned int scoreFinal = 0)
-		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
+		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal), scoreHabitat{}, scoreFaune{} {
 	};
 
 	//check si ya uen tuile sur cette case (tuile non confirmée inclus)
@@ -66,13 +66,13 @@ public:
 	void placerTuile(const Position& coord, Tuile& tuile);
 
 	//étape 2: confirmer le placement de la tuile
-	void confirmerPlacement(const Position& p);
+	void confirmerPlacement();
 
 	//annuler le dernier placement
 	bool undoDernierPlacement();
 
-	//alternative combine étapes 1 et 2, placer une tuile et confirmer son placement
-	void placerTuileDefinitive(const Position& coord, Tuile& tuile);
+	////alternative combine étapes 1 et 2, placer une tuile et confirmer son placement
+	//void placerTuileDefinitive();
 
 	//=============fin systeme placement tuile + undo
 	
