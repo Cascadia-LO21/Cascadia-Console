@@ -74,7 +74,9 @@ void EnvJoueur::placerTuile(const Position& coord, Tuile& tuile) {
 	}
 
 	//placer la tuile
+	tuile.setPosition(coord); // la tuile a une position, mais non confirme pour l'instant
 	tuiles[coord] = tuile;
+	//tuiles[coord].setPosition(coord);
 
 	//se rappeler de ce placement
 	dernierePosition = coord; 
@@ -92,8 +94,12 @@ void EnvJoueur::confirmerPlacement() {
 	}
 
 	// marquer dans la tuile que sa position est confirmée
-	tuiles[dernierePosition.value()].setPosition(dernierePosition.value()); // mettre a jour la position de la tuile en attente
+	//tuiles[dernierePosition.value()].setPosition(dernierePosition.value()); // mettre a jour la position de la tuile en attente
 	tuiles[dernierePosition.value()].confirmerPlacement();
+
+	std::cout << "\nDANS CONFIRME PLACEMENT, eske la pos encore là ? : " <<
+		tuiles[dernierePosition.value()].positionDefinie();
+
 	// maintenant, la Tuile a bien : une position definitive ET placementConfirme = true
 
 	// reinitialiser les variables d'attente
@@ -108,6 +114,7 @@ bool EnvJoueur::undoDernierPlacement() {
 	}
 
 	//retirer la tuile de la map
+	derniereTuile->setPositionNull(); // supprimer la derniere position non confirmee
 	tuiles.erase(dernierePosition.value()); // rien a modifier dans la tuile, qui n'a toujours pas de position definie
 
 	//vider les variables d'attente
@@ -195,37 +202,67 @@ void EnvJoueur::setTuilesDepart(std::vector<Tuile>& tuilesDepart) {
 	placerTuileDefinitiveDepart(Position(0, 0, 0), tuilesDepart[2]);
 }
 
+// ICI position definie ok
 void EnvJoueur::placerTuileDepart(const Position& coord, Tuile& tuile){
 
+	//tuile.setPosition(coord); // update position avant de le mettre dans la map
 	tuiles[coord] = tuile;
+	tuiles[coord].setPosition(coord);
+	std::cout << "\nJAI SET LA POSTION DE LA TUILE DEPART : ";
+	std::cout << tuiles[coord].positionDefinie();
+
 	dernierePosition = coord;
-	derniereTuile = tuile;
+	derniereTuile = tuiles[coord];
 	placementEnAttente = true;
 
 }
 
-void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, Tuile& tuile){
-	placerTuileDepart(coord, tuile);
-	confirmerPlacement();
-	//tuiles[coord] = tuile;
-	//tuile.setPosition(coord);
-	//tuile.confirmerPlacement();
-}
+//void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, Tuile& tuile){
+//	placerTuileDepart(coord, tuile);
+//	std::cout << "\n1. et mtn eske pos encore là? " << tuile.positionDefinie();
+//
+//	confirmerPlacement();
+//	std::cout << "\n2. et mtn eske pos encore là? " << tuile.positionDefinie();
+//
+//
+//	//tuiles[coord] = tuile;
+//	//tuile.setPosition(coord);
+//	//tuile.confirmerPlacement();
+//}
 
+
+void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, Tuile& tuile) {
+	tuiles[coord] = tuile; // Copie la tuile dans la map 
+	Tuile& tuileDansMap = tuiles[coord]; // Référence sur la tuile dans la map 
+	tuileDansMap.setPosition(coord); // Met à jour la position de la tuile dans la map
+
+	dernierePosition = coord;
+	derniereTuile = tuileDansMap;
+	placementEnAttente = true;
+
+	//std::cout << "\n1. et mtn eske pos encore là? " << tuileDansMap.positionDefinie();
+
+	confirmerPlacement(); // Confirme le placement de la tuile dans la map
+
+	std::cout << "\n2. et mtn eske pos encore là? " << tuileDansMap.positionDefinie();
+} 
+
+
+// retourne un vecteur de Tuile qui ont encore des cotes libres
 std::vector<Tuile> EnvJoueur::getTuilesAvecVoisinLibre() const {
-	std::vector<Tuile> res;
+	std::vector<Tuile> res; 
 
 	for (const auto& [position, tuile] : tuiles) {
 		std::vector<Position> posVoisines = position.getVecteurPositionsAdjacentes();
 		bool aVoisinLibre = false;
 		for (const Position& voisin : posVoisines) {
-			if (!aTuile(voisin) && tuile.getPlacementConfirme()) { // on ne presente que les tuiles dont le placement est confirme
-				aVoisinLibre = true;
+			if (!aTuile(voisin)) {  // si la tuile a proximite n'est pas encore occupee par une Tuile
+				aVoisinLibre = true; // alors la place est libre et peut accueillir une Tuile
 				break; // Pas besoin de continuer si un voisin libre est trouvé
 			}
 		}
-		if (aVoisinLibre && std::find(res.begin(), res.end(), tuile) == res.end()) {
-			res.push_back(tuile);
+		if (aVoisinLibre && std::find(res.begin(), res.end(), tuile) == res.end()) { // la tuile n'est pas encore visite
+			res.push_back(tuile); // tuile a des places libres autour d'elle
 		}
 	}
 	return res;

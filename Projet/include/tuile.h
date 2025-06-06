@@ -42,7 +42,7 @@ public:
 		faunes(other.faunes),
 		donneJetonNature(other.donneJetonNature),
 		faunePlace(other.faunePlace),
-		position(other.position ? std::make_unique<Position>(*other.position) : nullptr),
+		position(other.position != nullptr ? std::make_unique<Position>(*other.position) : nullptr),
 		placementConfirme(other.placementConfirme) {
 	}
 
@@ -86,6 +86,8 @@ public:
 		if (!placementConfirme)
 			position = std::make_unique<Position>(pos.getQ(), pos.getR(), pos.getS());
 	}
+
+	void setPositionNull() { position = nullptr; }
 
 	void placerJetonFaune(Faune faune);
 

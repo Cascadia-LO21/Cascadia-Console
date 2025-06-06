@@ -12,6 +12,8 @@ bool saisirReponse();
 
 const Position saisirPositionTuile(const Partie& p);
 
-const Position saisirPositionJeton(const Partie& p, Faune f);
+const std::optional<Position> saisirPositionJeton(const Partie& p, Faune f);
+
+Position saisirCoordonnees();
 
 void saisirJoueurs(Partie& p);

@@ -26,7 +26,12 @@ std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
 
 	flux << "TUILE : \n";
 
-	if (tuile.getPlacementConfirme())
+	//PB: LES TUILES DE DEPART N ONT PAS DE pos MAIS placementConfirme...
+	//std::cout << "AVANT AFFICHER LA TUILE, eske POS TUILE existe :" << tuile.positionDefinie();
+	//std::cout << tuile.getPosition(); //PLANTE
+
+	flux << "\n";
+	if (tuile.positionDefinie())
 		flux << "\t- Position : " << tuile.getPosition() << "\n";
 
 	flux << "\t- Habitats : ";
@@ -144,7 +149,7 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 
 std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 	os << "\n>> ENVIRONNEMENT DE [" << env.getPseudo() << "] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-	os << "Nombre Jetons Nature: " << env.getNbJetonsNature() << "\n";
+	os << "\n> Nombre Jetons Nature: " << env.getNbJetonsNature() << "\n";
 
 	const auto& tuiles = env.getTuiles();
 	if (tuiles.empty()) {
@@ -157,12 +162,12 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 	// afficher le système d'affichage
 	//std::cout << "\n" << std::string(25, '-');
 	//os << "\nFormat d'affichage: (q,r,s): ([NON CONFIRME]) ([REPERE]) [Faune(s)] [Habitats] \n";
-	os << "\nOrdre Habitats: NordEst, Est, SudEst, SudOuest, Ouest, NordOuest\n";
+	os << "\n> Ordre Habitats: NordEst, Est, SudEst, SudOuest, Ouest, NordOuest\n";
 	//std::cout << std::string(25, '-') << "\n\n";
 	//os << "Légende faune: s=saumon, o=ours, b=buse, r=renard, w=wapiti\n";
 
 	// afficher informations tuile
-	os << "Detail des tuiles dans l'environnement:\n";
+	//os << "Detail des tuiles dans l'environnement:\n";
 	for (const auto& [pos, tuile] : tuiles) {
 		os << "\n" << pos;
 
@@ -170,19 +175,19 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 		if (tuile.getDonneJetonNature()) { os << " [REPERE]"; }
 
 		if (tuile.JetonFaunePresent()) {
-			os << "\tJeton Faune Place: " << fauneToString(tuile.getFaunePlace()) << "\n";
+			os << "\n   (occupe) Jeton Faune present : " << fauneToString(tuile.getFaunePlace()) << "\n";
 		}
 		else {
-			os << "\n\tPossible de placer: ";
+			os << "\n   (libre) Faunes possibles : ";
 			for (const auto& faune : tuile.getFaunes()) {
-				os << fauneToString(faune) << " ";
+				os << fauneToString(faune) << ", ";
 			}
 			os << "\n";
 		}
 
-		os << "\tHabitats: ";
+		os << "   Habitats: ";
 		for (const auto& habitat : tuile.getHabitats()) {
-			os << habitatToString(habitat) << " ";
+			os << habitatToString(habitat) << ", ";
 		}
 		os << "\n";
 	}

@@ -18,6 +18,16 @@ public:
 		}
 	}
 
+	Position& operator=(const Position& pos) {
+		if (*this != pos) {
+			q = pos.getQ();
+			r = pos.getR();
+			s = pos.getS();
+		}
+
+		return *this;
+	}
+
 	int getQ() const { return q; }
 	int getR() const { return r; }
 	int getS() const { return s; }
