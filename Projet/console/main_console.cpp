@@ -33,8 +33,8 @@ int main() {
 	// 1. Creation de la partie
 	Partie p;
 	afficherMessageBienvenu();
-	choisirVariante(p);
-	choisirMarquage(p);
+	//choisirVariante(p);
+	//choisirMarquage(p);
 
 	// 2. Saisie des joueurs
 	saisirJoueurs(p);

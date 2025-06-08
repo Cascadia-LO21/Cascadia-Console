@@ -170,24 +170,31 @@ Direction saisirDirection(const std::vector<Direction>& dirValides) {
     }
     std::cout << std::endl;
 
-    bool valide = false;
-    Direction dir;
-    std::string dirString;
-    do {
+    while (true) {
         std::cout << "\n>> Saisis le sigle d'une direction : ";
-        std::cin >> dirString;
-        dir = stringToDirection(dirString);
+        std::string dirString; 
+        std::cin >> dirString; 
+        dirString = toLowerNoSpace(dirString); //convertir tout en minuscule
+
+        Direction dir;
+        try {
+            dir = stringToDirection(dirString);
+        }
+        catch (const std::invalid_argument&) {
+            std::cout << "\n>> Saisie inconnue, recommence.\n";
+            continue;
+        }
 
         // Vérifie si la direction est dans la liste des directions valides
         if (std::find(dirValides.begin(), dirValides.end(), dir) != dirValides.end()) {
-            valide = true;
+            return dir;
         }
         else {
-            std::cout << "\n>> Saisie invalide, recommence.\n";
+            std::cout << "\n>> Cette direction n'est pas disponible, recommence.\n";
         }
-    } while (!valide);
-    return dir;
+    }
 }
+
 
 
 std::string toLowerNoSpace(const std::string& s) {
