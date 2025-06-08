@@ -25,6 +25,8 @@ void afficheJoueurs(const Partie& p);
 void afficheEnvJoueurCourant(const Partie& p);
 
 void afficherMessageBienvenu();
+void afficherMarquage();
+void afficherVariante();
 void afficherMessagePret();
 void afficherTour(Partie& p);
 void afficherMenuJetonNature();

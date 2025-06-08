@@ -97,7 +97,7 @@ void EnvJoueur::confirmerPlacement() {
 	//tuiles[dernierePosition.value()].setPosition(dernierePosition.value()); // mettre a jour la position de la tuile en attente
 	tuiles[dernierePosition.value()].confirmerPlacement();
 
-	std::cout << "\nDANS CONFIRME PLACEMENT, eske la pos encore là ? : " <<
+	//std::cout << "\nDANS CONFIRME PLACEMENT, eske la pos encore là ? : " <<
 		tuiles[dernierePosition.value()].positionDefinie();
 
 	// maintenant, la Tuile a bien : une position definitive ET placementConfirme = true

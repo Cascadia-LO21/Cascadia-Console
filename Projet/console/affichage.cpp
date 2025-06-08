@@ -213,6 +213,19 @@ void afficherMessageBienvenu() {
 	std::cout << "[JEU CASCADIA]\n";
 }
 
+// pour simplifier, une partie est regie par le meme type de carte marquage pour toutes les faunes
+// par exemple, une partie est regie par des cartes marquage A seulement
+void afficherMarquage() {
+	std::cout << "\n> Choisir le mode de marquage de la partie en tapant un chiffre entre 1 et 4:";
+	std::cout << "\n\t1. A\n\t2. B\n\t3. C\n\t4. D\n\t5. Defaut\n\t6. Aleatoire"; 
+}
+
+void afficherVariante() {
+	std::cout << "\n> Choisir la variante de la partie en tapant un chiffre entre 1 et 3:";
+	std::cout << "\n\t1. Standard\n\t2. Famille\n\t3. Intermediaire";
+
+}
+
 void afficherMessagePret() {
 	std::cout << "\n> Tout est pret : joueurs, pioche, tuiles de depart distribuees.\n";
 	std::cout << "> La partie peut commencer !\n" << std::endl;

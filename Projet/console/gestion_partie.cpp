@@ -53,20 +53,8 @@ void jouerTour(Partie& p) {
     p.incCompteurTour();
 }
 
-//void gererJetonsIndesirables(Partie& p) {
-//    std::vector<unsigned int> jetonsIndesirables{};
-//    char tmp;
-//    do {
-//        std::cout << "\n>> Quel jeton enlever ? ";
-//        jetonsIndesirables.push_back(saisirNombre(p.getPioche().getMax())); 
-//        std::cout << "\n>> Encore ? (o/n) : ";
-//        std::cin >> tmp; 
-//        if (tmp == 'n') break;
-//    } while (tmp == 'o' && jetonsIndesirables.size() < p.getPioche().getMax());
-//    p.getPiocheModifiable().resetJetonFaune(jetonsIndesirables);
-//}
-
 void gererJetonsIndesirables(Partie& p) {
+    affichePioche(p);
     std::vector<unsigned int> jetonsIndesirables{};
     bool tmp;
     do {
@@ -91,6 +79,7 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
 
     // Choix de la tuile
     affichePioche(p);
+    afficheEnvJoueurCourant(p);
     std::cout << "\n>> Quelle tuile veux-tu [" << player.getPseudo() << "] ? \n";
     indexTuile = saisirNombre(p.getPioche().getMax())-1;
     p.getPiocheModifiable().retirerTuileVisible(indexTuile);
@@ -108,7 +97,7 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
     if (saisirReponse()) {
         p.getPiocheModifiable().setVisibilite(indexTuile, true);
         player.undoDernierPlacement();
-        affichePioche(p);
+        //affichePioche(p);
         return false;
     }
 
@@ -172,17 +161,13 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
         } while (succesJetonPlace != 1);
     }
     if (succesJetonPlace == 1) {
-        //std::cout << "je suis dans la boucle si succes = 1 !\n";
         if (donneJetonNature) { 
             player.incNbJetonsNature(); 
-            std::cout << "je suis dans la boucle si succes = 1 et jai incremente nbjetonnature de joueur\n";
+            //std::cout << "je suis dans la boucle si succes = 1 et jai incremente nbjetonnature de joueur\n";
 
         }
-        std::cout << "je suis dans la boucle si succes = 1 A LA FIN\n";
         return true;
     }
-
-    std::cout << "je suis a la toute fin de la fonction\n";
 
     return false;
 
@@ -198,4 +183,62 @@ void gestionPause(Partie& p) {
         if (saisirReponse()) p.reprendre();
     }
 
+}
+
+void choisirVariante(Partie& p) {
+    afficherVariante();
+    unsigned int rep = saisirNombre(3);
+    switch (rep)
+    {
+    case 1:
+        p.setVariante(Variante::standard);
+        break;
+    case 2:
+        p.setVariante(Variante::famille);
+        break;
+    case 3:
+        p.setVariante(Variante::intermediaire);
+        break;
+    default:
+        p.setVariante(Variante::standard);
+    }
+}
+
+void choisirMarquage(Partie& p) {
+    if (p.getVariante() == Variante::famille) {
+        p.setMarquage(Marquage::famille);
+    }
+    else if (p.getVariante() == Variante::intermediaire) {
+        p.setMarquage(Marquage::intermediaire);
+    }
+    else { // si la variante est standard, il faut demander quel type de carte marquage
+        afficherMarquage();
+        unsigned int rep = saisirNombre(6);
+        switch (rep) {
+        case 1:
+            p.setMarquage(Marquage::A);
+            break;
+        case 2:
+            p.setMarquage(Marquage::B);
+            break;
+        case 3:
+            p.setMarquage(Marquage::C);
+            break;
+        case 4:
+            p.setMarquage(Marquage::D);
+            break;
+        case 5: // defaut
+            p.setMarquage(Marquage::A);
+            break;
+        case 6: // marquage aleatoire parmi A, B, C, D
+        {
+            int randomValue = 1 + rand() % 4; // génère 1, 2, 3 ou 4
+            p.setMarquage(static_cast<Marquage>(randomValue - 1)); // A=0, B=1, etc.
+        }
+        break;
+        default:
+            p.setMarquage(Marquage::A);
+            break;
+        }
+    }
 }

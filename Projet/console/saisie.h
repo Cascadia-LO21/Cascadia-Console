@@ -14,6 +14,10 @@ const Position saisirPositionTuile(const Partie& p);
 
 const std::optional<Position> saisirPositionJeton(const Partie& p, Faune f);
 
-Position saisirCoordonnees();
+Position saisirCoordonnees(const EnvJoueur& j);
 
 void saisirJoueurs(Partie& p);
+
+Direction saisirDirection(const std::vector<Direction>& dirValides);
+
+std::string toLowerNoSpace(const std::string& s);

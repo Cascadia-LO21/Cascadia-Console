@@ -93,8 +93,8 @@ bool Partie::verifierFinPartie() const {
 }
 
 void Partie::revenir(unsigned int indexTuile, unsigned int indexJeton) {
-    pioche->setVisibilite(indexTuile, true);
-    pioche->setVisibilite(indexJeton, true);
+    pioche->setVisibilite(indexTuile, true); //tuile
+    pioche->setVisibilite(indexJeton, false); //jeton
     getEnvJoueurCourantModifiable().undoDernierPlacement();
 }
 
@@ -102,11 +102,9 @@ void Partie::apresPlacementDefinitif(EnvJoueur& player) {
     //EnvJoueur& player = getEnvJoueurCourantModifiable();
     //Tuile& tuile = pioche->getTuile(indexTuile);
     player.confirmerPlacement();
-    std::cout << "JAI REUSSI A CONFIRME PLACEMENT\n";
+    //std::cout << "JAI REUSSI A CONFIRME PLACEMENT\n";
     pioche->slide(0, true); // slide tuiles
     pioche->slide(0, false); // slide jetons
-    std::cout << "JAI REUSSI A slide\n";
-
 
     // Si joueur solitaire, alors son tour est toujours suivi de l'extraction artificielle d'une paire de la pioche
     if (nbJoueurs == 1) {

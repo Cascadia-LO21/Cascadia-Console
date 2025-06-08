@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include <vector>
 #include "enums.h"
+#include "saisie.h"
+
 
 std::string habitatToString(Habitat habitat) {
 	switch (habitat) {
@@ -102,15 +104,29 @@ std::string directionToString(Direction dir) {
 	}
 }
 
+std::string directionToStringSigle(Direction dir) {
+	switch (dir) {
+	case Direction::Est:       return "E";
+	case Direction::NordEst:   return "NE";
+	case Direction::NordOuest: return "NO";
+	case Direction::Ouest:     return "O";
+	case Direction::SudOuest:  return "SO";
+	case Direction::SudEst:    return "SE";
+	default:                   return "Inconnu";
+	}
+}
+
 // = 0, Est = 1, SudEst = 2, SudOuest = 3, Ouest = 4, NordOuest = 5
-Direction stringToDirection(const std::string s)
-{
-	if (s == "NE" || s == "ne")	return Direction::NordEst;
-	if (s == "E" || s == "e")	return Direction::Est;
-	if (s == "SE" || s == "se")	return Direction::SudEst;
-	if (s == "SO" || s == "so")	return Direction::SudOuest;
-	if (s == "O" || s == "o")	return Direction::Ouest;
-	if (s == "NO" || s == "no")	return Direction::NordOuest;
+Direction stringToDirection(const std::string s) {
+	std::string input = toLowerNoSpace(s);
+
+	if (input == "ne" || input == "nordest")   return Direction::NordEst;
+	if (input == "e" || input == "est")        return Direction::Est;
+	if (input == "se" || input == "sudest")    return Direction::SudEst;
+	if (input == "so" || input == "sudouest")  return Direction::SudOuest;
+	if (input == "o" || input == "ouest")      return Direction::Ouest;
+	if (input == "no" || input == "nordouest") return Direction::NordOuest;
+
 	throw std::invalid_argument("Direction inconnue : " + s);
 }
 
