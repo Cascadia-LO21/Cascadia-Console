@@ -20,21 +20,11 @@
 
 int main() {
 
-	//std::vector<Tuile> v = GestionPieces::instancierTuilesDepart()[0];
-	//EnvJoueur e("to");
-	//e.setTuilesDepart(v);
-	//std::cout << e.aTuile(Position(0,0,0));
-	//std::cout << e.getTuile(Position(0,0,0))->getPlacementConfirme();
-
-
-
-	////std::cout << "hello world\n" << std::endl;
-
 	// 1. Creation de la partie
 	Partie p;
 	afficherMessageBienvenu();
-	//choisirVariante(p);
-	//choisirMarquage(p);
+	//choisirVariante(p); // a decommenter !
+	//choisirMarquage(p); // a decommenter !
 
 	// 2. Saisie des joueurs
 	saisirJoueurs(p);
@@ -47,13 +37,14 @@ int main() {
 	while (!p.verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
 		afficherTour(p);
 		gererJetonsIdentiques(p);
-		afficheEnvJoueurCourant(p);
+		//afficheEnvJoueurCourant(p);
 		//affichePioche(p); 
 		jouerTour(p);
 		gestionPause(p);
 	}
 
 	// 5. Calcul des scores
+
 
 	afficherMessageFin();
 

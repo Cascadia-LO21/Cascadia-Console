@@ -15,7 +15,7 @@ void Partie::initialiserPioche(unsigned int nbJoueur) {
 
 // Ajoute un nouveau EnvJoueur aux vecteur de EnvJoueur
 void Partie::ajouterJoueur(const EnvJoueur& joueur) {
-    if (joueurs.size() >= nbJoueurs) {
+    if (joueurs.size() >= MAX_NB_JOUEURS) {
         throw std::runtime_error("Impossible d'ajouter un joueur : nombre maximum atteint (" + std::to_string(nbJoueurs) + ")");
     }
     joueurs.push_back(joueur); // copie du joueur
@@ -24,7 +24,7 @@ void Partie::ajouterJoueur(const EnvJoueur& joueur) {
 
 // Cette surcharge permet d'écrire par exemple: ajouterJoueur("toto")
 void Partie::ajouterJoueur(const std::string& nom) {
-    if (joueurs.size() >= nbJoueurs) {
+    if (joueurs.size() >= MAX_NB_JOUEURS) {
         throw std::runtime_error("Impossible d'ajouter un joueur : nombre maximum atteint (" + std::to_string(nbJoueurs) + ")");
     }
     joueurs.emplace_back(nom); // creation et ajout d'un EnvJoueur
@@ -40,12 +40,12 @@ void Partie::preparer() {
     }
 
     // compteurs prets ?
-    if (nbJoueurs != joueurs.size()) nbJoueurs = static_cast<int>(joueurs.size());
+    if (nbJoueurs != joueurs.size()) nbJoueurs = static_cast<unsigned int>(joueurs.size());
     if (joueurCourant != 0) joueurCourant = 0;
     if (compteurTour != 0) compteurTour = 0;
 
     // pioche prete ?
-    if (!pioche) { initialiserPioche(nbJoueurs); }
+    initialiserPioche(nbJoueurs); 
 
     // distribuer une tuile de depart à chaque joueur : celle-ci proviennent de la Pioche, instancié à partir de donnees JSON
     if (nbJoueurs > pioche->getTuilesDepartDispo().size()) // pas assez de tuiles de depart pour le nombre total de joueurs
@@ -89,7 +89,7 @@ void Partie::reset() {
 
 // exemple : avec 20 tours, dès que le compteur fini son 20e tour, le jeu s'arrete
 bool Partie::verifierFinPartie() const {
-    return compteurTour == MAX_NB_TOURS + 1;
+    return compteurTour == MAX_NB_TOURS;
 }
 
 void Partie::revenir(unsigned int indexTuile, unsigned int indexJeton) {

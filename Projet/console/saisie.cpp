@@ -151,15 +151,18 @@ Position saisirCoordonnees(const EnvJoueur& player) {
 
 void saisirJoueurs(Partie& p) {
     std::cout << "> Saisie des joueurs : " << std::endl;
-    //char tmp;
+    //unsigned int nbJoueurs = 0;
     do {
         std::string nom;
         std::cout << "\n>> Saisis le nom d'un joueur a ajouter : ";
         std::cin >> nom;
         p.ajouterJoueur(nom);
-        std::cout << "\n>> Ajouter encore ? (o/n) : ";
-        //std::cin >> tmp;
-        if (!saisirReponse()) break;
+        //nbJoueurs++;
+   
+        if (p.getNbJoueurs() < p.getMaxNbJoueurs()) {
+            std::cout << "\n>> Ajouter encore ? (o/n) : ";
+            if (!saisirReponse()) break;
+        }
     } while (p.getNbJoueurs() < p.getMaxNbJoueurs());
 }
 

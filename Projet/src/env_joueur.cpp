@@ -244,7 +244,7 @@ void EnvJoueur::placerTuileDefinitiveDepart(const Position& coord, Tuile& tuile)
 
 	confirmerPlacement(); // Confirme le placement de la tuile dans la map
 
-	std::cout << "\n2. et mtn eske pos encore là? " << tuileDansMap.positionDefinie();
+	//std::cout << "\n2. et mtn eske pos encore là? " << tuileDansMap.positionDefinie();
 } 
 
 

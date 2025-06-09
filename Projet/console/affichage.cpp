@@ -191,7 +191,7 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 
 std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 	os << "\n>> ENVIRONNEMENT DE [" << env.getPseudo() << "] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-	os << "\n> Nombre Jetons Nature : " << env.getNbJetonsNature() << "\n";
+	os << "\n> Nombre Jetons Nature : " << env.getNbJetonsNature() << "\n\n";
 
 	const auto& tuiles = env.getTuiles();
 	if (tuiles.empty()) {

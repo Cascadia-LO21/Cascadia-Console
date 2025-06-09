@@ -49,8 +49,11 @@ void jouerTour(Partie& p) {
     std::cout << "\n>> Les pieces sont placees dans ton plateau avec succes !\n";
     std::cout << player;
 
+    // on incremente le compteur de tour qu'apres que le dernier joueur ait joué son tour
+    if(p.getIndexJoueurCourant() == p.getNbJoueurs() - 1)
+        p.incCompteurTour();
+
     p.prochainJoueur();
-    p.incCompteurTour();
 }
 
 void gererJetonsIndesirables(Partie& p) {
