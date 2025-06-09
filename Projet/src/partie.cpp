@@ -76,11 +76,11 @@ void Partie::lancer() {
 
 void Partie::reset() {
     joueurs.clear();
-    scores = std::nullopt;
+    //scores = std::nullopt;
     pioche = nullptr;
     nbJoueurs = 0;
     compteurTour = 0;
-    gagnant = std::nullopt;
+    //gagnant = std::nullopt;
     reprendre(); // ou: pause = false;
     marquage = Marquage::A;
     variante = Variante::standard;
