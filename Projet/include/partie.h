@@ -3,12 +3,10 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
-#include <ostream>
 #include <optional>
 #include "enums.h"
 #include "env_joueur.h"
 #include "pioche.h"
-#include "gestion_pieces.h"
 
 class Partie {
 private:
@@ -38,7 +36,7 @@ public:
         marquage(Marquage::A), variante(Variante::standard) {}
 
  
-    void setNbJoueurs(int i = 1) {
+    void setNbJoueurs(unsigned int i = 1) {
         if (i >= 1 && i <= MAX_NB_JOUEURS) 
             nbJoueurs = i;
         else 
