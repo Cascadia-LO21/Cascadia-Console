@@ -11,6 +11,7 @@
 
 
 //Fonction de hashage pour Position
+/*
 namespace std {
 	template <>
 	struct hash<Position> {
@@ -22,6 +23,7 @@ namespace std {
 		}
 	};
 }
+*/
 
 // Classe abstraite de base
 class CarteMarquage {
@@ -162,65 +164,3 @@ public:
     }
 };
 
-/*  BEGINNING OLD VERSION
-
-// Classe abstraite avec méthode virtuelle pure methode calcul
-class CarteMarquage {
-	Faune faune;
-public:
-	CarteMarquage(Faune f) : faune(f) {}
-	virtual int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const = 0;
-	virtual int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const = 0;
-	virtual int methodeCalculC(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const = 0;
-	virtual int methodeCalculD(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const = 0;
-	Faune getFaune() const { return faune; }
-	virtual ~CarteMarquage() = default;
-};
-
-class CarteSaumon : public CarteMarquage {
-public:
-	CarteSaumon() : CarteMarquage(Faune::saumon) {}
-	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int explorerChaineSaumonA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& positionsVisitees, const Position* pere) const;
-	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const override;
-	int explorerChaineSaumonB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
-		const Position& position,
-		std::unordered_set<Position>& positionsVisitees,
-		const Position* pos_pere) const;
-};
-
-class CarteOurs : public CarteMarquage {
-public:
-	CarteOurs() : CarteMarquage(Faune::ours) {}
-	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
-};
-
-class CarteBuse : public CarteMarquage {
-public:
-	CarteBuse() : CarteMarquage(Faune::buse) {}
-	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
-
-};
-
-class CarteRenard : public CarteMarquage {
-public:
-	CarteRenard() : CarteMarquage(Faune::renard) {}
-	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
-};
-
-class CarteWapiti : public CarteMarquage {
-public:
-	CarteWapiti() : CarteMarquage(Faune::wapiti) {}
-	int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	int explorerChaineWapitiA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, std::optional<Direction> direction) const;
-	int methodeCalculB(const std::unordered_map<Faune, std::unordered_set<Position>>& carte) const;
-};
-
-
-
-
-END OLD VERSION
-*/

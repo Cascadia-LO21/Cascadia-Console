@@ -562,3 +562,28 @@ int CarteWapitiB::CalculScore(const EnvJoueur& envJ) const
 
 	return (scoreTotal = nbF1 * 2 + nbF2 * 5 + nbF3 * 9 + nbF4 * 13);
 }
+
+int CarteSaumonC::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
+}
+
+int CarteOursC::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
+}
+
+int CarteBuseC::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
+}
+
+int CarteRenardC::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
+}
+
+int CarteWapitiC::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
+}
