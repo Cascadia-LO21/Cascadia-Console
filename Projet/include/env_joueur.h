@@ -31,7 +31,7 @@ class EnvJoueur {
 	bool placementEnAttente = false; //est ce qu'il y a un placement en attente de confirmation?
 
 public:
-	//constructeur principal!!!!!!!!!!!!!!!!TO LOOK AT AGAIN
+	//constructeur principal!!!!!!!!!!!!!!!!
 	EnvJoueur(const std::string& pseudo, size_t nbJetonNature = 0, size_t scoreFinal = 0)
 		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
 	};

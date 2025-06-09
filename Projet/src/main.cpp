@@ -55,7 +55,7 @@ void testCartes() {
     Tuile t18(hab, fauBRO, false);
     Tuile t19(hab, fauBRO, false);
 
-    Mario.placerTuileDefinitive(Position(3, -2, -1), t1);
+    Mario.placerTuileDefinitiveDepart(Position(3, -2, -1), t1);
     std::cout << "Tuile t1 placee\n";
 
     //Mario.placerJetonFaune(Position(3, -2, -1), jetonWapiti);
@@ -68,7 +68,7 @@ void testCartes() {
         std::cerr << "Exception lors du placement du jeton : " << e.what() << std::endl;
     }
 
-    std::cout << "Jeton Wapiti place sur t1\n";
+    //std::cout << "Jeton Wapiti place sur t1\n";
 
     Mario.placerTuileDefinitive(Position(2, -1, -1), t2);
     Mario.placerJetonFaune(Position(2, -1, -1), jetonWapiti);
