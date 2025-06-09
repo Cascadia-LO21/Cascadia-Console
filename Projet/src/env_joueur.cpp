@@ -126,7 +126,7 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 	for (const auto& [pos, tuile] : tuiles) {
 		if (!tuile.JetonFaunePresent()) { // est ce qu'il y a un jeton placé déjà sur cette tuile?
 			const auto& faunes = tuile.getFaunes();
-			if (!std::any_of(faunes.begin(), faunes.end(),
+			if (std::any_of(faunes.begin(), faunes.end(),
 				[&](const JetonFaune& j) { return j.getType() == jeton.getType(); })) {// Vérifie si faunes contient le type du jeton entrée
 				peutPlacerJeton = true;
 				break;
