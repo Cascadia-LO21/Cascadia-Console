@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <stdexcept>
-#include <ostream>
 #include <functional>
 #include "enums.h"
 
@@ -47,7 +46,7 @@ public:
 	//donne la position de la tuile trouv� dans cette direction
 	const Position getPositionAdjacente(Direction direction) const;
 	//donne la direction de la tuile trouv� � cette position
-	const Direction getDirectionAdjacente(Position pos) const;
+    Direction getDirectionAdjacente(Position pos) const;
 
 };
 

@@ -4,17 +4,12 @@
 #include <vector>
 #include <unordered_map>
 #include <optional>
-#include <ostream>
-#include <stdexcept>
-#include <algorithm>
-#include <iostream>
 #include "enums.h"
 #include "unordered_set"
 
 #include "position.h"
 #include "tuile.h"
 #include "jeton_faune.h"
-#include "pioche.h"
 
 
 class EnvJoueur {
@@ -35,8 +30,8 @@ class EnvJoueur {
 public:
 
 	//constructeur principal
-	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0, unsigned int scoreFinal = 0)
-		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal), scoreHabitat{}, scoreFaune{} {
+    EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0, unsigned int scoreFinal = 0)
+        : pseudo(pseudo), scoreHabitat{}, scoreFaune{}, nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
 	};
 
 	//check si ya uen tuile sur cette case (tuile non confirmée inclus)

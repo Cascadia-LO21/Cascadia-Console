@@ -62,7 +62,7 @@ const Position Position::getPositionAdjacente(Direction direction) const
 	return Position(q + pos.getQ(), r + pos.getR(), s + pos.getS());
 }
 
-const Direction Position::getDirectionAdjacente(Position pos) const {
+Direction Position::getDirectionAdjacente(Position pos) const {
 	if (!estAdjacente(pos)) {
 		return Direction::Inconnue;
 	}

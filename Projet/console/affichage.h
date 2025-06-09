@@ -1,5 +1,6 @@
 #pragma once
 #include <ostream>
+#include <iostream>
 #include "jeton_faune.h"
 #include "position.h"
 #include "pioche.h"
