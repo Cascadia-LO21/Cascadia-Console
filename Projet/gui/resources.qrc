@@ -1,20 +1,20 @@
 <RCC>
   <qresource prefix="/tokens">
-    <file>img/tokens/bear.png</file>
-    <file>img/tokens/bearActive.png</file>
-    <file>img/tokens/bearInactive.png</file>
-    <file>img/tokens/elk.png</file>
-    <file>img/tokens/elkActive.png</file>
-    <file>img/tokens/elkInactive.png</file>
-    <file>img/tokens/fox.png</file>
-    <file>img/tokens/foxActive.png</file>
-    <file>img/tokens/foxInactive.png</file>
-    <file>img/tokens/hawk.png</file>
-    <file>img/tokens/hawkActive.png</file>
-    <file>img/tokens/hawkInactive.png</file>
-    <file>img/tokens/salmon.png</file>
-    <file>img/tokens/salmonActive.png</file>
-    <file>img/tokens/salmonInactive.png</file>
-    <file>img/tokens/nature-token.png</file>
+    <file>../img/tokens/bear.png</file>
+    <file>../img/tokens/bearActive.png</file>
+    <file>../img/tokens/bearInactive.png</file>
+    <file>../img/tokens/elk.png</file>
+    <file>../img/tokens/elkActive.png</file>
+    <file>../img/tokens/elkInactive.png</file>
+    <file>../img/tokens/fox.png</file>
+    <file>../img/tokens/foxActive.png</file>
+    <file>../img/tokens/foxInactive.png</file>
+    <file>../img/tokens/hawk.png</file>
+    <file>../img/tokens/hawkActive.png</file>
+    <file>../img/tokens/hawkInactive.png</file>
+    <file>../img/tokens/salmon.png</file>
+    <file>../img/tokens/salmonActive.png</file>
+    <file>../img/tokens/salmonInactive.png</file>
+    <file>../img/tokens/nature-token.png</file>
   </qresource>
 </RCC>
