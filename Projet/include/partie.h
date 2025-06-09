@@ -13,6 +13,7 @@
 class Partie {
 private:
     static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
+    //static constexpr unsigned int MAX_NB_TOURS = 3; // testing purpose only
     static constexpr unsigned int MAX_NB_JOUEURS = 4;
     unsigned int nbJoueurs;
     unsigned int compteurTour;
@@ -29,11 +30,11 @@ private:
 
 public:
 
-    // La pioche est initialisée en même temps que Partie.
-    // Mais le vecteur de joueur est vide encore.
-    Partie(unsigned int nombreJoueurs = 1) :
-        nbJoueurs(nombreJoueurs), compteurTour(0), joueurs(), joueurCourant(0), pause(false),
-        pioche(std::make_unique<Pioche>(nombreJoueurs)),
+    // La pioche est vide encore
+    // Le vecteur de joueurs est vide encore
+    Partie() :
+        nbJoueurs(0), compteurTour(0), joueurs{}, joueurCourant(0), pause(false),
+        pioche(nullptr),
         marquage(Marquage::A), variante(Variante::standard) {}
 
  
@@ -88,5 +89,5 @@ public:
 
     void revenir(unsigned int indexTuile, unsigned int indexJeton);
     //void apresPlacementDefinitif(const Position& posTuile, unsigned int indexTuile);
-    void apresPlacementDefinitif();
+    void apresPlacementDefinitif(EnvJoueur& player);
 };

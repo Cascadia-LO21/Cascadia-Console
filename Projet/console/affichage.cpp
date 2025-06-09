@@ -19,37 +19,84 @@ std::ostream& operator<<(std::ostream& flux, const std::vector<Position>& vect) 
 }
 
 
+//std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
+//	const auto& habitats = tuile.getHabitats();
+//	const auto& faunes = tuile.getFaunes();
+//
+//	flux << "TUILE : \n";
+//
+//	//PB: LES TUILES DE DEPART N ONT PAS DE pos MAIS placementConfirme...
+//	//std::cout << "AVANT AFFICHER LA TUILE, eske POS TUILE existe :" << tuile.positionDefinie();
+//	//std::cout << tuile.getPosition(); //PLANTE
+//
+//	flux << "\n";
+//	if (tuile.positionDefinie())
+//		flux << "\t- Position : " << tuile.getPosition() << "\n";
+//
+//	flux << "\t- Habitats : ";
+//	for (Habitat h : habitats) {
+//		flux << habitatToString(h) << ", ";
+//	}
+//	flux << "\n";
+//
+//	if (tuile.JetonFaunePresent()) {
+//		flux << "\t- Faune placée : " << fauneToString(tuile.getFaunePlace()) << ".\n";
+//	}
+//	else {
+//		flux << "\t- Faunes possibles : ";
+//		for (Faune f : faunes) {
+//			flux << fauneToString(f) << ", ";
+//		}
+//		flux << "\n";
+//
+//		if (tuile.getDonneJetonNature())
+//			flux << "\t- Donne Jeton Nature.\n";
+//	}
+//
+//	return flux;
+//}
 
-std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
-	const auto& habitats = tuile.getHabitats();
-	const auto& faunes = tuile.getFaunes();
+// Si tuile libre dans pioche
+//[REPERE]
+// ┃ Faunes : buse, renard
+// ┃ Habitats : fleuve(NE), riviere(E), fleuve(SE), riviere(SO), montagne(O), montagne(NO), 
+// ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-	flux << "TUILE : \n";
+// Si tuile libre dans Map en attente
+//(0,0,0) [REPERE] [NON CONFIRME] 
+// ┃ Faunes : buse, renard
+// ┃ Habitats : fleuve(NE), riviere(NE), fleuve(NE), riviere(NE), montagne(NE), montagne(NE), 
+// ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-	if (tuile.getPlacementConfirme())
-		flux << "\t- Position : " << tuile.getPosition() << "\n";
+// Si tuile confirme avec faune dans Map
+//(0,0,0) [buse]
+// │ Habitats : fleuve(NE), riviere(NE), fleuve(NE), riviere(NE), montagne(NE), montagne(NE), 
+// └──────────────────────────────────────────────────────────────────────────────────────────┘
+std::ostream& operator<<(std::ostream& os, const Tuile& tuile) {
+	//os << "\n";
+	if (tuile.positionDefinie()) os << tuile.getPosition() << " ";
+	if (tuile.getDonneJetonNature()) os << "[REPERE] "; 
+	if (tuile.positionDefinie() && !tuile.getPlacementConfirme()) { os << "[NON CONFIRME] "; }
 
-	flux << "\t- Habitats : ";
-	for (Habitat h : habitats) {
-		flux << habitatToString(h) << ", ";
-	}
-	flux << "\n";
-
-	if (tuile.JetonFaunePresent()) {
-		flux << "\t- Faune placée : " << fauneToString(tuile.getFaunePlace()) << ".\n";
-	}
+	// faunes
+	if (tuile.JetonFaunePresent()) os << "[" << fauneToString(tuile.getFaunePlace()) << "] ";
 	else {
-		flux << "\t- Faunes possibles : ";
-		for (Faune f : faunes) {
-			flux << fauneToString(f) << ", ";
+		os << "\n│ Faunes : ";
+		for (auto faune : tuile.getFaunes()) {
+			os << fauneToString(faune) << ", ";
 		}
-		flux << "\n";
-
-		if (tuile.getDonneJetonNature())
-			flux << "\t- Donne Jeton Nature.\n";
 	}
 
-	return flux;
+	// habitats
+	os << "\n│ Habitats: ";
+	std::array<Habitat,6> hab = tuile.getHabitats();
+	for (int i = 0; i < 6; i++) {
+		os << habitatToString(hab[i]) << "(" << directionToStringSigle(static_cast<Direction>(i)) << "), ";
+	}
+	os << "\n└──────────────────────────────────────────────────────────────────────────────────────────┘\n";
+
+
+	return os;
 }
 
 //ostream pour vecteur de tuile like in envjoueur
@@ -76,7 +123,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Tuile>& tuiles) {
 // J4:
 // <description du jeton 4>
 std::ostream& operator<<(std::ostream& os, const Pioche& p) {
-	os << "\n>> PIOCHE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	os << "\n>> PIOCHE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
 	const auto& visibilite = p.getVisibilite();
 	size_t n = p.getPiocheVisible().size();
@@ -136,15 +183,15 @@ std::ostream& operator<<(std::ostream& os, const Pioche& p) {
 	}
 
 	//os << "\n======= FIN PIOCHE ======= \n\n" << std::endl;
-	std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	//std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 
 	return os;
 }
 
 
 std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
-	os << "\n>> ENVIRONNEMENT DE [" << env.getPseudo() << "] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-	os << "Nombre Jetons Nature: " << env.getNbJetonsNature() << "\n";
+	os << "\n>> ENVIRONNEMENT DE [" << env.getPseudo() << "] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	os << "\n> Nombre Jetons Nature : " << env.getNbJetonsNature() << "\n\n";
 
 	const auto& tuiles = env.getTuiles();
 	if (tuiles.empty()) {
@@ -154,40 +201,9 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 		return os;
 	}
 
-	// afficher le système d'affichage
-	//std::cout << "\n" << std::string(25, '-');
-	//os << "\nFormat d'affichage: (q,r,s): ([NON CONFIRME]) ([REPERE]) [Faune(s)] [Habitats] \n";
-	os << "\nOrdre Habitats: NordEst, Est, SudEst, SudOuest, Ouest, NordOuest\n";
-	//std::cout << std::string(25, '-') << "\n\n";
-	//os << "Légende faune: s=saumon, o=ours, b=buse, r=renard, w=wapiti\n";
+	for (const auto& [pos, tuile] : tuiles) os << tuile;
 
-	// afficher informations tuile
-	os << "Detail des tuiles dans l'environnement:\n";
-	for (const auto& [pos, tuile] : tuiles) {
-		os << "\n" << pos;
-
-		if (!tuile.getPlacementConfirme()) { os << " [NON CONFIRME] "; }
-		if (tuile.getDonneJetonNature()) { os << " [REPERE]"; }
-
-		if (tuile.JetonFaunePresent()) {
-			os << "\tJeton Faune Place: " << fauneToString(tuile.getFaunePlace()) << "\n";
-		}
-		else {
-			os << "\n\tPossible de placer: ";
-			for (const auto& faune : tuile.getFaunes()) {
-				os << fauneToString(faune) << " ";
-			}
-			os << "\n";
-		}
-
-		os << "\tHabitats: ";
-		for (const auto& habitat : tuile.getHabitats()) {
-			os << habitatToString(habitat) << " ";
-		}
-		os << "\n";
-	}
-	//os << "\n======= FIN DE L'ENVIRONNEMENT DE " << env.getPseudo() << " =======\n";
-	std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	//std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 	return os;
 }
 
@@ -208,6 +224,19 @@ void afficherMessageBienvenu() {
 	std::cout << "[JEU CASCADIA]\n";
 }
 
+// pour simplifier, une partie est regie par le meme type de carte marquage pour toutes les faunes
+// par exemple, une partie est regie par des cartes marquage A seulement
+void afficherMarquage() {
+	std::cout << "\n> Choisir le mode de marquage de la partie en tapant un chiffre entre 1 et 4:";
+	std::cout << "\n\t1. A\n\t2. B\n\t3. C\n\t4. D\n\t5. Defaut\n\t6. Aleatoire"; 
+}
+
+void afficherVariante() {
+	std::cout << "\n> Choisir la variante de la partie en tapant un chiffre entre 1 et 3:";
+	std::cout << "\n\t1. Standard\n\t2. Famille\n\t3. Intermediaire";
+
+}
+
 void afficherMessagePret() {
 	std::cout << "\n> Tout est pret : joueurs, pioche, tuiles de depart distribuees.\n";
 	std::cout << "> La partie peut commencer !\n" << std::endl;
@@ -219,11 +248,12 @@ void affichePioche(const Partie& p) {
 
 
 void afficherTour(Partie& p) {
-	std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
-	std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	//std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	//std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	std::cout << "╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n\n";
 
 	std::cout << "> [TOUR " << (p.getCompteurTour() + 1) << " / " << p.getMaxNbTours() << "]" << std::endl;
-	std::cout << ">> Au tour de '" << p.getEnvJoueurCourant().getPseudo() << "' de jouer\n";
+	std::cout << "\n>> Au tour de [" << p.getEnvJoueurCourant().getPseudo() << "] de jouer\n";
 }
 
 void afficherMenuJetonNature() {

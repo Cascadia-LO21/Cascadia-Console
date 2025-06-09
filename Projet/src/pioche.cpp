@@ -97,8 +97,11 @@ void Pioche::resetTroisJetonsIdentiques() {
 	}
 
 	// la Faune recherchee doit etre apparue 3 fois
-	for (int i : fauneCount) {
-		if (i == 3) fauneIdentique = static_cast<Faune>(i);
+	for (unsigned int i = 0; i < fauneCount.size(); ++i) {
+		if (fauneCount[i] == 3) {
+			fauneIdentique = static_cast<Faune>(i);
+			break;
+		}
 	}
 
 	// recherche des indices de ces 3 Faunes identiques

@@ -10,7 +10,7 @@
 //#include "jeton_faune.h"
 //#include "pioche.h"
 //#include "env_joueur.h"
-#include "partie.h"
+//#include "partie.h"
 //#include "carte_marquage.h"
 //#include "gestion_pieces.h"
 //#include "score.h"
@@ -19,11 +19,12 @@
 #include "gestion_partie.h"
 
 int main() {
-	//std::cout << "hello world\n" << std::endl;
 
 	// 1. Creation de la partie
 	Partie p;
 	afficherMessageBienvenu();
+	//choisirVariante(p); // a decommenter !
+	//choisirMarquage(p); // a decommenter !
 
 	// 2. Saisie des joueurs
 	saisirJoueurs(p);
@@ -36,13 +37,14 @@ int main() {
 	while (!p.verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
 		afficherTour(p);
 		gererJetonsIdentiques(p);
-		afficheEnvJoueurCourant(p);
+		//afficheEnvJoueurCourant(p);
 		//affichePioche(p); 
 		jouerTour(p);
 		gestionPause(p);
 	}
 
 	// 5. Calcul des scores
+
 
 	afficherMessageFin();
 
