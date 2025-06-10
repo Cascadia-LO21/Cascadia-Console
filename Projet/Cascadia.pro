@@ -20,7 +20,6 @@ SOURCES += \
     src/position.cpp \
     src/score.cpp \
     src/tuile.cpp \
-    src/main.cpp \ 
 
 # Source files from console (optional unless reused in GUI)
 SOURCES += \
@@ -51,4 +50,5 @@ HEADERS += \
 
 # Qt resource file
 RESOURCES += \
-    gui/resources.qrc
+    gui/resources.qrc \
+    gui/main_qt.cpp
