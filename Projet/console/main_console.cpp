@@ -3,7 +3,7 @@
 /// Projet > Propriétés du projet > C/C++ > Général > Répertoires
 /// Puis, ajoutez : $(projet/include)include; $(projet/console)console
 
-#include <iostream>
+//#include <iostream>
 //#include "enums.h"
 //#include "position.h"
 //#include "tuile.h"
@@ -18,7 +18,7 @@
 #include "affichage.h"
 #include "gestion_partie.h"
 
-int main() {
+int main_console() {
 
 	// 1. Creation de la partie
 	Partie p;

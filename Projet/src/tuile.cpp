@@ -4,6 +4,7 @@
 #include <optional>
 #include <stdexcept>
 #include <memory>
+#include <algorithm>
 #include "tuile.h"
 #include "affichage.h"
 
@@ -20,7 +21,7 @@ void Tuile::pivoterHoraire() {
 }
 
 void Tuile::pivoterAntiHoraire() {
-	rotate(habitats.begin(), habitats.begin() + 1, habitats.end());
+    std::rotate(habitats.begin(), habitats.begin() + 1, habitats.end());
 }
 
 bool Tuile::operator==(const Tuile& autre) const

@@ -1,6 +1,8 @@
 QT += widgets
 CONFIG += c++17 console
 CONFIG -= app_bundle
+CONFIG += console
+#QMAKE_CXXFLAGS += /std:c++17
 
 TEMPLATE = app
 
@@ -20,6 +22,7 @@ SOURCES += \
     src/position.cpp \
     src/score.cpp \
     src/tuile.cpp \
+    gui/main_qt.cpp
 
 # Source files from console (optional unless reused in GUI)
 SOURCES += \
@@ -51,4 +54,3 @@ HEADERS += \
 # Qt resource file
 RESOURCES += \
     gui/resources.qrc \
-    gui/main_qt.cpp
