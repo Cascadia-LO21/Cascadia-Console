@@ -74,6 +74,8 @@ namespace Score {
 		}
 
 	public:
+		ScoreFeuille() :scores{}, strategieFaune(nullptr) {} // la feuille sera completee au fur et a mesure
+
 		void setStrategieFaune(std::unique_ptr<CalculScoreFaune> strat) {
 			strategieFaune = std::move(strat);
 		}
@@ -84,7 +86,7 @@ namespace Score {
 		//void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj, Marquage m = Marquage::A);
 
 		void calculPointsHabitats(const EnvJoueur& player, ScoreJoueur& sj);
-		void calculerBonusHabitats(const std::vector<EnvJoueur>& joueurs);
+		void calculerBonusHabitats();
 
 
 		void calculScoresPartie(const Partie&);
