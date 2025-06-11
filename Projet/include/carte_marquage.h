@@ -10,21 +10,6 @@
 #include <memory>
 
 
-//Fonction de hashage pour Position
-/*
-namespace std {
-	template <>
-	struct hash<Position> {
-		size_t operator()(const Position& coord) const {
-			//on n'utilise que q et r pcq s=-q-r
-			size_t h1 = std::hash<int>{}(coord.getQ()); //donne un hash pour q
-			size_t h2 = std::hash<int>{}(coord.getR()); //donne un hash pour r
-			return h1 ^ (h2 << 1); //combiner deux valeurs hash avec XOR
-		}
-	};
-}
-*/
-
 // Classe abstraite de base
 class CarteMarquage {
 public:
@@ -137,6 +122,8 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
+
+// Variantes
 class VarianteFamiliale : public CarteMarquage {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -152,35 +139,35 @@ class CarteMarquageFactory {
 public:
     static std::unique_ptr<CarteMarquage> creerCarte(const std::string& nom) {
         // Saumon
-        if (nom == "SaumonA") return std::make_unique<CarteSaumonA>();
-        else if (nom == "SaumonB") return std::make_unique<CarteSaumonB>();
-        else if (nom == "SaumonC") return std::make_unique<CarteSaumonC>();
+        if (nom == "saumonA") return std::make_unique<CarteSaumonA>();
+        else if (nom == "saumonB") return std::make_unique<CarteSaumonB>();
+        else if (nom == "saumonC") return std::make_unique<CarteSaumonC>();
 
         // Ours
-        else if (nom == "OursA") return std::make_unique<CarteOursA>();
-        else if (nom == "OursB") return std::make_unique<CarteOursB>();
-        else if (nom == "OursC") return std::make_unique<CarteOursC>();
+        else if (nom == "oursA") return std::make_unique<CarteOursA>();
+        else if (nom == "oursB") return std::make_unique<CarteOursB>();
+        else if (nom == "oursC") return std::make_unique<CarteOursC>();
 
         // Buse
-        else if (nom == "BuseA") return std::make_unique<CarteBuseA>();
-        else if (nom == "BuseB") return std::make_unique<CarteBuseB>();
-        else if (nom == "BuseC") return std::make_unique<CarteBuseC>();
+        else if (nom == "buseA") return std::make_unique<CarteBuseA>();
+        else if (nom == "buseB") return std::make_unique<CarteBuseB>();
+        else if (nom == "buseC") return std::make_unique<CarteBuseC>();
 
         // Renard
-        else if (nom == "RenardA") return std::make_unique<CarteRenardA>();
-        else if (nom == "RenardB") return std::make_unique<CarteRenardB>();
-        else if (nom == "RenardC") return std::make_unique<CarteRenardC>();
+        else if (nom == "renardA") return std::make_unique<CarteRenardA>();
+        else if (nom == "renardB") return std::make_unique<CarteRenardB>();
+        else if (nom == "renardC") return std::make_unique<CarteRenardC>();
 
         // Wapiti
-        else if (nom == "WapitiA") return std::make_unique<CarteWapitiA>();
-        else if (nom == "WapitiB") return std::make_unique<CarteWapitiB>();
-        else if (nom == "WapitiC") return std::make_unique<CarteWapitiC>();
+        else if (nom == "wapitiA") return std::make_unique<CarteWapitiA>();
+        else if (nom == "wapitiB") return std::make_unique<CarteWapitiB>();
+        else if (nom == "wapitiC") return std::make_unique<CarteWapitiC>();
 
         // Variante familiale
-        else if (nom == "Variante familiale") return std::make_unique<VarianteFamiliale>();
+        else if (nom == "familiale") return std::make_unique<VarianteFamiliale>();
 
         // Variante intermédiaire
-        else if (nom == "Variante intermediaire") return std::make_unique<VarianteIntermediaire>();
+        else if (nom == "intermediaire") return std::make_unique<VarianteIntermediaire>();
 
         else throw std::invalid_argument("Type de carte inconnu : " + nom);
     }

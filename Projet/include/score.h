@@ -29,24 +29,14 @@ namespace Score {
 		virtual void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const = 0;
 	};
 
-	class CalculScoreFauneA : public CalculScoreFaune {
+	// Calcul des points selon les cartes de marquage A, B, C, D...
+	class CalculScoreFauneStandard : public CalculScoreFaune {
+		char lettre;
 	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneB : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneC : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneD : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
+		CalculScoreFauneStandard(char l) : lettre(l) {}
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override {
+			calculFauneLettre(player, sj, lettre);
+		}
 	};
 
 	class CalculScoreFauneFamiliale : public CalculScoreFaune {
@@ -101,6 +91,7 @@ namespace Score {
 
 	};
 
+	void calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, char lettre);
 
 }
 

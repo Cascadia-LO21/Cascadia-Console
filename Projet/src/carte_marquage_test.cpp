@@ -1,18 +1,6 @@
-/// Veuillez vous assurer que la version de votre IDE est au moins C++17 avant de compiler.
-/// Pour assurer le bon fonctionnement des inclusions des fichiers headers, modifiez les parametres en suivant
-/// Projet > Proprietes du projet > C/C++ > General > Repertoires
-/// Puis, ajoutez : $(projet/include)include
-
-#include <iostream>
-#include "enums.h"
-#include "position.h"
-#include "tuile.h"
-#include "jeton_faune.h"
-#include "pioche.h"
-#include "env_joueur.h"
-#include "partie.h"
+#include <ostream>
 #include "carte_marquage.h"
-#include "gestion_pieces.h"
+#include "jeton_faune.h"
 
 void testCartes() {
     EnvJoueur Mario("mario");
