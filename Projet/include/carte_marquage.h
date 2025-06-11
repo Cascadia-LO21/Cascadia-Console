@@ -137,6 +137,16 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
+class VarianteFamiliale : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class VarianteIntermediaire : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
 /// Factory avec une définition inline
 class CarteMarquageFactory {
 public:
@@ -165,6 +175,12 @@ public:
         else if (nom == "WapitiA") return std::make_unique<CarteWapitiA>();
         else if (nom == "WapitiB") return std::make_unique<CarteWapitiB>();
         else if (nom == "WapitiC") return std::make_unique<CarteWapitiC>();
+
+        // Variante familiale
+        else if (nom == "Variante familiale") return std::make_unique<VarianteFamiliale>();
+
+        // Variante intermédiaire
+        else if (nom == "Variante intermediaire") return std::make_unique<VarianteIntermediaire>();
 
         else throw std::invalid_argument("Type de carte inconnu : " + nom);
     }

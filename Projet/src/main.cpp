@@ -137,10 +137,10 @@ void testCartes() {
     //Mario.placerJetonFaune(Position(2, -2, 0), jetonWapiti);
 
     Mario.placerTuileDefinitive(Position(3, -1, -2), t21);
-    Mario.placerJetonFaune(Position(3, -1, -2), jetonWapiti);
+    //Mario.placerJetonFaune(Position(3, -1, -2), jetonWapiti);
 
     Mario.placerTuileDefinitive(Position(3, 0, -3), t20);
-    Mario.placerJetonFaune(Position(3, 0, -3), jetonBuse);
+    //Mario.placerJetonFaune(Position(3, 0, -3), jetonBuse);
 
     std::cout << "Avant calcul score\n";
 
@@ -187,6 +187,18 @@ void testCartes() {
     std::cout << "Score renards :" << renardC.CalculScore(Mario) << "\n";
     std::cout << "Score wapitis :" << wapitiC.CalculScore(Mario) << "\n";
     std::cout << "Score ours :" << oursC.CalculScore(Mario) << "\n";
+
+    std::cout << "\nVariante familiale \n";
+
+    VarianteFamiliale varF;
+
+    std::cout << "Score familiale :" << varF.CalculScore(Mario) << "\n";
+
+    std::cout << "\nVariante intermediaire \n";
+
+    VarianteIntermediaire varI;
+
+    std::cout << "Score intermediaire :" << varI.CalculScore(Mario) << "\n";
 
     std::cout << "Fin testCartes()\n";
 }

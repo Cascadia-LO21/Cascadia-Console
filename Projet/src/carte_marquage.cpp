@@ -856,3 +856,89 @@ int CarteWapitiC::CalculScore(const EnvJoueur& envJ) const
 
 	return scoreTotal;
 }
+
+// Variante Familiale
+
+int VarianteFamiliale::CalculScore(const EnvJoueur& envJ) const
+{
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	int scoreTotal = 0;
+
+	for (const auto& [faune, positions] : mapPositionsJetons) {
+		std::unordered_set<Position> nonVisites = positions;
+
+		while (!nonVisites.empty()) {
+			Position posDepart = *nonVisites.begin(); //recuperer la premiere position  non visitee
+			std::stack<Position> pile;
+			pile.push(posDepart);
+			nonVisites.erase(posDepart);
+
+			int tailleGroupe = 0;
+
+			while (!pile.empty()) {
+				Position posCourante = pile.top();
+				pile.pop();
+				tailleGroupe++;
+
+				for (const Position& posVoisine : posCourante.getVecteurPositionsAdjacentes()) {
+					if (nonVisites.count(posVoisine)) {
+						pile.push(posVoisine);
+						nonVisites.erase(posVoisine);
+					}
+				}
+			}
+
+			// Scoring identique pour toutes les faunes
+			switch (tailleGroupe) {
+			case 1: scoreTotal += 2; break;
+			case 2: scoreTotal += 5; break;
+			default: scoreTotal += 9; break;
+			}
+		}
+	}
+
+	return scoreTotal;
+}
+
+int VarianteIntermediaire::CalculScore(const EnvJoueur& envJ) const
+{
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	int scoreTotal = 0;
+
+	for (const auto& [faune, positions] : mapPositionsJetons) {
+		std::unordered_set<Position> nonVisites = positions;
+
+		while (!nonVisites.empty()) {
+			Position posDepart = *nonVisites.begin(); //recuperer la premiere position  non visitee
+			std::stack<Position> pile;
+			pile.push(posDepart);
+			nonVisites.erase(posDepart);
+
+			int tailleGroupe = 0;
+
+			while (!pile.empty()) {
+				Position posCourante = pile.top();
+				pile.pop();
+				tailleGroupe++;
+
+				for (const Position& posVoisine : posCourante.getVecteurPositionsAdjacentes()) {
+					if (nonVisites.count(posVoisine)) {
+						pile.push(posVoisine);
+						nonVisites.erase(posVoisine);
+					}
+				}
+			}
+
+			// Scoring identique pour toutes les faunes
+			switch (tailleGroupe) {
+			case 0: break;
+			case 1: break;
+			case 2: scoreTotal += 5; break;
+			case 3: scoreTotal += 8; break;
+			default: scoreTotal += 12; break; //4+
+			}
+		}
+	}
+
+	return scoreTotal;
+}
