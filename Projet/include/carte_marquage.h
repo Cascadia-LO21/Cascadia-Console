@@ -9,26 +9,10 @@
 #include <unordered_set>
 #include <memory>
 
-
-//Fonction de hashage pour Position
-/*
-namespace std {
-	template <>
-	struct hash<Position> {
-		size_t operator()(const Position& coord) const {
-			//on n'utilise que q et r pcq s=-q-r
-			size_t h1 = std::hash<int>{}(coord.getQ()); //donne un hash pour q
-			size_t h2 = std::hash<int>{}(coord.getR()); //donne un hash pour r
-			return h1 ^ (h2 << 1); //combiner deux valeurs hash avec XOR
-		}
-	};
-}
-*/
-
-// Classe abstraite de base
-class CarteMarquage {
+// Classe abstraite 
+class CarteMarquageStandard {
 public:
-    virtual ~CarteMarquage() = default;
+    virtual ~CarteMarquageStandard() = default;
 
     // Calcul du score avec un environnement commun
     virtual int CalculScore(const EnvJoueur& envJ) const = 0;
@@ -37,7 +21,7 @@ public:
 // --- Déclaration des classes filles ---
 
 // Saumon A, B, C
-class CarteSaumonA : public CarteMarquage {
+class CarteSaumonA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 private:
@@ -47,7 +31,7 @@ private:
         const Position* parent) const;
 };
 
-class CarteSaumonB : public CarteMarquage {
+class CarteSaumonB : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 private:
@@ -57,7 +41,7 @@ private:
         const Position* parent) const;
 };
 
-class CarteSaumonC : public CarteMarquage {
+class CarteSaumonC : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
     int explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
@@ -66,58 +50,80 @@ public:
         const Position* parent) const;
 };
 
-
+class CarteSaumonD : public CarteMarquageStandard {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+    int explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+        const Position& position,
+        std::unordered_set<Position>& visited,
+        const Position* parent) const;
+};
 
 // Ours A, B, C
-class CarteOursA : public CarteMarquage {
+class CarteOursA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteOursB : public CarteMarquage {
+class CarteOursB : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteOursC : public CarteMarquage {
+class CarteOursC : public CarteMarquageStandard {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class CarteOursD : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
 // Buse A, B, C
-class CarteBuseA : public CarteMarquage {
+class CarteBuseA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteBuseB : public CarteMarquage {
+class CarteBuseB : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteBuseC : public CarteMarquage {
+class CarteBuseC : public CarteMarquageStandard {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class CarteBuseD : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
 // Renard A, B, C
-class CarteRenardA : public CarteMarquage {
+class CarteRenardA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteRenardB : public CarteMarquage {
+class CarteRenardB : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteRenardC : public CarteMarquage {
+class CarteRenardC : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-// Wapiti A, B, C
-class CarteWapitiA : public CarteMarquage {
+class CarteRenardD : public CarteMarquageStandard {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+// Wapiti A, B, C, D
+class CarteWapitiA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 private:
@@ -127,30 +133,41 @@ private:
         std::optional<Direction> direction) const;
 };
 
-class CarteWapitiB : public CarteMarquage {
+class CarteWapitiB : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteWapitiC : public CarteMarquage {
+class CarteWapitiC : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class VarianteFamiliale : public CarteMarquage {
+class CarteWapitiD : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class VarianteIntermediaire : public CarteMarquage {
+class CarteMarquageVariante {
 public:
-    int CalculScore(const EnvJoueur& envJ) const override;
+    virtual ~CarteMarquageVariante() = default;
+    virtual std::unordered_map<Faune,int> CalculScore(const EnvJoueur& envJ) const = 0;
 };
 
-/// Factory avec une définition inline
-class CarteMarquageFactory {
+class VarianteFamiliale : public CarteMarquageVariante {
 public:
-    static std::unique_ptr<CarteMarquage> creerCarte(const std::string& nom) {
+    std::unordered_map<Faune, int> CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class VarianteIntermediaire : public CarteMarquageVariante {
+public:
+    std::unordered_map<Faune, int> CalculScore(const EnvJoueur& envJ) const override;
+};
+
+// Factory 1
+class CarteMarquageStandardFactory {
+public:
+    static std::unique_ptr<CarteMarquageStandard> creerCarte(const std::string& nom) {
         // Saumon
         if (nom == "SaumonA") return std::make_unique<CarteSaumonA>();
         else if (nom == "SaumonB") return std::make_unique<CarteSaumonB>();
@@ -176,8 +193,17 @@ public:
         else if (nom == "WapitiB") return std::make_unique<CarteWapitiB>();
         else if (nom == "WapitiC") return std::make_unique<CarteWapitiC>();
 
+        else throw std::invalid_argument("Type de carte inconnu : " + nom);
+    }
+};
+
+// Factory 2
+class CarteMarquageVarianteFactory {
+public: 
+    static std::unique_ptr<CarteMarquageVariante> creerCarte(const std::string& nom) {
+
         // Variante familiale
-        else if (nom == "Variante familiale") return std::make_unique<VarianteFamiliale>();
+        if (nom == "Variante familiale") return std::make_unique<VarianteFamiliale>();
 
         // Variante intermédiaire
         else if (nom == "Variante intermediaire") return std::make_unique<VarianteIntermediaire>();
@@ -185,6 +211,3 @@ public:
         else throw std::invalid_argument("Type de carte inconnu : " + nom);
     }
 };
-
-
-void testCartes();
