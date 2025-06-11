@@ -29,8 +29,11 @@ int CarteSaumonA::CalculScore(const EnvJoueur& envJ) const
 		case 0: scoreTotal += 0; break;
 		case 1: scoreTotal += 2; break;
 		case 2: scoreTotal += 5; break;
-		case 3: scoreTotal += 9; break;
-		default: scoreTotal += 13; break;
+		case 3: scoreTotal += 8; break;
+		case 4: scoreTotal += 12; break;
+		case 5: scoreTotal += 16; break;
+		case 6: scoreTotal += 20; break;
+		default: scoreTotal += 25; break; //7 +
 		}
 	}
 	return scoreTotal;
@@ -131,6 +134,67 @@ int CarteSaumonB::explorerChaine(const std::unordered_map<Faune, std::unordered_
 	return taille;
 }
 
+// Saumon C
+int CarteSaumonC::CalculScore(const EnvJoueur& envJ) const
+{
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+
+	if (mapPositionsJetons.count(Faune::saumon) == 0) return 0; // pas de saumon du tout
+
+	const auto& positionsSaumon = mapPositionsJetons.at(Faune::saumon);
+	std::unordered_set<Position> PositionsVisitees;
+	std::vector<int> taillesChaines;
+	int scoreTotal = 0;
+
+	for (const Position& position : positionsSaumon) {
+		if (PositionsVisitees.count(position)) continue;
+
+		int tailleChaine = explorerChaine(mapPositionsJetons, position, PositionsVisitees, nullptr);
+		if (tailleChaine > 0) {
+			taillesChaines.push_back(tailleChaine);
+		}
+	}
+
+	for (int chaine : taillesChaines) {
+		switch (chaine) {
+		case 0: scoreTotal += 0; break;
+		case 1: scoreTotal += 0; break;
+		case 2: scoreTotal += 0; break;
+		case 3: scoreTotal += 10; break;
+		case 4: scoreTotal += 12; break;
+		default: scoreTotal += 15; break; // 5+
+		}
+	}
+	return scoreTotal;
+}
+
+int CarteSaumonC::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, const Position* parent) const
+{
+	if (carte.count(Faune::saumon) == 0) return 0;
+
+	const auto& positionsSaumon = carte.at(Faune::saumon);
+
+	PositionsVisitees.insert(position);
+	int nbSaumonsAdj = 0;
+	int taille = 1;
+
+	for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
+		if (parent && posVoisine == *parent) continue;
+		if (positionsSaumon.count(posVoisine) == 0) continue; // Pas de saumon à cette position
+
+		nbSaumonsAdj++;
+		if (nbSaumonsAdj > 2) return 0; // Chaine invalide
+
+		if (PositionsVisitees.count(posVoisine) == 0) {
+			int tailleSuite = explorerChaine(carte, posVoisine, PositionsVisitees, &position);
+			if (tailleSuite == 0) return 0;
+			taille += tailleSuite;
+		}
+	}
+
+	return taille;
+}
+
 // Ours A
 
 int CarteOursA::CalculScore(const EnvJoueur& envJ) const
@@ -190,7 +254,7 @@ int CarteOursA::CalculScore(const EnvJoueur& envJ) const
 	}
 }
 
-// OursB
+// Ours B
 
 int CarteOursB::CalculScore(const EnvJoueur& envJ) const
 {
@@ -233,11 +297,56 @@ int CarteOursB::CalculScore(const EnvJoueur& envJ) const
 	return 0;
 }
 
+// Ours C
+
+int CarteOursC::CalculScore(const EnvJoueur& envJ) const
+{
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	if (mapPositionsJetons.count(Faune::ours) == 0) return 0;
+
+	const auto& positionsOurs = mapPositionsJetons.at(Faune::ours);
+	std::unordered_set<Position> dejaVisite;
+	int nbF1 = 0, nbF2 = 0, nbF3 = 0;
+
+	for (const Position& pos : positionsOurs) {
+		if (dejaVisite.count(pos)) continue;
+
+		// Parcours BFS pour trouver la composante connexe
+		std::queue<Position> file;
+		std::vector<Position> groupe;
+		file.push(pos);
+		dejaVisite.insert(pos);
+
+		while (!file.empty()) {
+			Position current = file.front();
+			file.pop();
+			groupe.push_back(current);
+
+			for (const Position& voisine : current.getVecteurPositionsAdjacentes()) {
+				if (positionsOurs.count(voisine) && !dejaVisite.count(voisine)) {
+					file.push(voisine);
+					dejaVisite.insert(voisine);
+				}
+			}
+		}
+
+		// Taille du groupe trouvé
+		size_t taille = groupe.size();
+		if (taille == 1) nbF1++;
+		else if (taille == 2) nbF2++;
+		else if (taille == 3) nbF3++;
+		// Si plus de 3 on ignore
+	}
+
+	int scoreTotal = nbF1 * 2 + nbF2 * 5 + nbF3 * 8;
+	if (nbF1 > 0 && nbF2 > 0 && nbF3 > 0) scoreTotal += 3;
+	return scoreTotal;
+}
+
 // Buse A
 
 int CarteBuseA::CalculScore(const EnvJoueur& envJ) const
 {
-	
 	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
 	if (mapPositionsJetons.count(Faune::buse) == 0) return 0; // pas de buse
 
@@ -254,13 +363,14 @@ int CarteBuseA::CalculScore(const EnvJoueur& envJ) const
 				break;  // On sort de la boucle des positions voisines
 			}
 		}
+
 		if (buseAdj) continue;
 		nbBusesValides++;
 	}
 
 	switch (nbBusesValides) {
 	case 0: return 0;
-	case 1: return 0;
+	case 1: return 2;
 	case 2: return 5;
 	case 3: return 8;
 	case 4: return 11;
@@ -281,6 +391,7 @@ int CarteBuseB::CalculScore(const EnvJoueur& envJ) const
 	const auto& positionsBuse = mapPositionsJetons.at(Faune::buse);
 	const auto& carte = envJ.getTuiles();
 	int nbBusesValides = 0;
+	std::vector<Position> busesAdjBuse;
 
 	for (const Position& position : positionsBuse) {
 		bool buseAdj = false;
@@ -288,8 +399,10 @@ int CarteBuseB::CalculScore(const EnvJoueur& envJ) const
 		for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
 			if (positionsBuse.count(posVoisine)) {
 				buseAdj = true;
+				busesAdjBuse.push_back(posVoisine);
 				break;  // On sort de la boucle des positions voisines
 			}
+
 		}
 		//si on a trouvé une buse adjacente, on passe à la prochaine buse à analyser
 		if (buseAdj) continue;
@@ -301,7 +414,7 @@ int CarteBuseB::CalculScore(const EnvJoueur& envJ) const
 		int s = position.getS();
 
 		for (const Position& posLigne : positionsBuse) {
-			if (posLigne == position) continue;  // on ignore la position elle-meme
+			if (posLigne == position || std::find(busesAdjBuse.begin(), busesAdjBuse.end(), posLigne) != busesAdjBuse.end()) continue;  // on ignore la position elle-meme
 			if (q == posLigne.getQ() || r == posLigne.getR() || s == posLigne.getS()) {
 				ligneVue = true;
 				break;
@@ -311,6 +424,7 @@ int CarteBuseB::CalculScore(const EnvJoueur& envJ) const
 	}
 
 	switch (nbBusesValides) {
+	case 0: return 0;
 	case 1: return 0;
 	case 2: return 5;
 	case 3: return 9;
@@ -320,6 +434,45 @@ int CarteBuseB::CalculScore(const EnvJoueur& envJ) const
 	case 7: return 24;
 	default: return 28; // 8+ buses valides
 	}
+}
+
+// Buse C
+
+int CarteBuseC::CalculScore(const EnvJoueur& envJ) const
+{
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	if (mapPositionsJetons.count(Faune::buse) == 0) return 0;
+
+	const auto& positionsBuse = mapPositionsJetons.at(Faune::buse);
+	std::vector<Position> busesIsolees;
+
+	// recuperer les buses isolées
+	for (const Position& buse : positionsBuse) {
+		bool buseAdj = false;
+		for (const Position& voisine : buse.getVecteurPositionsAdjacentes()) {
+			if (positionsBuse.count(voisine)) {
+				buseAdj = true;
+				break;
+			}
+		}
+		if (!buseAdj) {
+			busesIsolees.push_back(buse);
+		}
+	}
+
+	// compter les lignes de vue entre buses isolees
+	int nbLignesVue = 0;
+	for (size_t i = 0; i < busesIsolees.size(); ++i) {
+		const Position& p1 = busesIsolees[i];
+		for (size_t j = i + 1; j < busesIsolees.size(); ++j) {
+			const Position& p2 = busesIsolees[j];
+			if (p1.getQ() == p2.getQ() || p1.getR() == p2.getR() || p1.getS() == p2.getS()) {
+				nbLignesVue++;
+			}
+		}
+	}
+	return 3 * nbLignesVue;
+
 }
 
 // Renard A
@@ -380,7 +533,7 @@ int CarteRenardB::CalculScore(const EnvJoueur& envJ) const {
 	std::vector<int> PairesAdj; //liste du nombre de paires adj par renard (int entre 0 et 3)
 
 	for (const Position& position : positionsRenard) {
-		
+		int nbPaires = 0;
 		std::unordered_map<Faune, int> FaunesAdj;
 		// itération sur les positions voisines à 'position'
 		for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
@@ -396,8 +549,9 @@ int CarteRenardB::CalculScore(const EnvJoueur& envJ) const {
 			FaunesAdj[tuileVoisine.getFaunePlace()]++;
 		}
 		for (const auto& [faune,nb]: FaunesAdj) {
-			if (nb == 2) PairesAdj.push_back(nb);
+			if (nb == 2) nbPaires++;
 		}
+		PairesAdj.push_back(nbPaires);
 	}
 	for (int renard : PairesAdj) {
 		switch (renard) {
@@ -407,6 +561,46 @@ int CarteRenardB::CalculScore(const EnvJoueur& envJ) const {
 		default: break;
 		}
 	}
+	return scoreTotal;
+}
+
+// Renard C
+
+int CarteRenardC::CalculScore(const EnvJoueur& envJ) const
+{
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	if (mapPositionsJetons.count(Faune::renard) == 0) return 0; // pas de renard
+
+	const auto& positionsRenard = mapPositionsJetons.at(Faune::renard);
+	const auto& carte = envJ.getTuiles();
+
+	int scoreTotal = 0;
+
+	for (const Position& position : positionsRenard) {
+		std::unordered_map<Faune, int> faunesAdj;
+
+		// Parcours des cases adjacentes
+		for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
+			if (!envJ.aTuileConfirmee(posVoisine)) continue;
+
+			const Tuile* tuileVoisine = envJ.getTuile(posVoisine);
+			if (!tuileVoisine->JetonFaunePresent()) continue;
+
+			Faune faune = tuileVoisine->getFaunePlace();
+			if (faune != Faune::renard) {
+				faunesAdj[faune]++;
+			}
+		}
+
+		// Trouver le max
+		int maxAdj = 0;
+		for (const auto& [faune, nb] : faunesAdj) {
+			if (nb > maxAdj) maxAdj = nb;
+		}
+
+		scoreTotal += maxAdj;
+	}
+
 	return scoreTotal;
 }
 
@@ -437,12 +631,9 @@ int CarteWapitiA::CalculScore(const EnvJoueur& envJ) const
 		switch (chaine) {
 		case 0:  scoreTotal += 0;  break;
 		case 1:  scoreTotal += 2;  break;
-		case 2:  scoreTotal += 4;  break;
-		case 3:  scoreTotal += 7;  break;
-		case 4:  scoreTotal += 11; break;
-		case 5:  scoreTotal += 15; break;
-		case 6:  scoreTotal += 20; break;
-		default: scoreTotal += 26; break;  // 7+
+		case 2:  scoreTotal += 5;  break;
+		case 3:  scoreTotal += 9;  break;
+		default: scoreTotal += 13; break;  // 3 +
 		}
 	}
 
@@ -503,22 +694,70 @@ int CarteWapitiB::CalculScore(const EnvJoueur& envJ) const
 		if (wapitisVisites.count(position)) continue;
 
 		for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
-			
-			if (positionsWapiti.count(posVoisine)) {
+
+			if (positionsWapiti.count(posVoisine) && !wapitisVisites.count(posVoisine)) {
 				wapitisAdj.push_back(posVoisine);
-				wapitisVisites.insert(posVoisine);
 			}
 		}
-		if (wapitisAdj.size() > 3) continue; // ce wapiti a au moins 4 wapitis adj, ce qui ne correspond pas aux formes demandees
 
-		if (wapitisAdj.size() == 0) {
+		if (wapitisAdj.empty()) {
 			nbF1++;
-			continue;
+			wapitisVisites.insert(position);
 		}
-		else if (wapitisAdj.size() == 1) {
-			nbF2++;
-			continue;
+		if (wapitisAdj.size() == 1) {
+			int nbAdj = 0;
+			for (const Position& posVoisine : wapitisAdj[0].getVecteurPositionsAdjacentes()) {
+				if (positionsWapiti.count(posVoisine)) {
+					nbAdj++;
+				}
+			}
+			if (nbAdj == 1) {
+				nbF2++;
+				wapitisVisites.insert(position);
+				wapitisVisites.insert(wapitisAdj[0]);
+			}
+			else {
+				nbF1++;
+				wapitisVisites.insert(position);
+			}
 		}
+		if (wapitisAdj.size() == 2 &&
+			wapitisAdj[0].estAdjacente(wapitisAdj[1]) &&
+			!wapitisVisites.count(wapitisAdj[0]) &&
+			!wapitisVisites.count(wapitisAdj[1])) {
+
+			int nbAdj = 0;
+			for (const Position& posVoisine : wapitisAdj[0].getVecteurPositionsAdjacentes()) {
+				if (positionsWapiti.count(posVoisine)) {
+					nbAdj++;
+				}
+			}
+			if (nbAdj == 2) { //c'est bien un triangle
+				nbF3++;
+				wapitisVisites.insert(position);
+				wapitisVisites.insert(wapitisAdj[0]);
+				wapitisVisites.insert(wapitisAdj[1]);
+				continue;
+			}
+
+		}
+		else if (wapitisAdj.size() == 3) {
+			//on récupère les 3 possibilités d'adjacence d'après les indices des positions dans le vecteur
+			bool possibilite1 = (wapitisAdj[0].estAdjacente(wapitisAdj[1]) && wapitisAdj[1].estAdjacente(wapitisAdj[2]));
+			bool possibilite2 = (wapitisAdj[0].estAdjacente(wapitisAdj[2]) && wapitisAdj[1].estAdjacente(wapitisAdj[2]));
+			bool possibilite3 = (wapitisAdj[0].estAdjacente(wapitisAdj[1]) && wapitisAdj[0].estAdjacente(wapitisAdj[2]));
+			bool dejaVisite = (wapitisVisites.count(wapitisAdj[0]) || wapitisVisites.count(wapitisAdj[1]) || wapitisVisites.count(wapitisAdj[2]));
+			if ((possibilite1 || possibilite2 || possibilite3) && !dejaVisite) {
+				nbF4++;
+				wapitisVisites.insert(position);
+				wapitisVisites.insert(wapitisAdj[0]);
+				wapitisVisites.insert(wapitisAdj[1]);
+				wapitisVisites.insert(wapitisAdj[2]);
+			}
+		}
+	}
+
+		/*
 		else if (wapitisAdj.size() == 2) {
 
 			if (!wapitisAdj[0].estAdjacente(wapitisAdj[1])) continue;
@@ -536,11 +775,11 @@ int CarteWapitiB::CalculScore(const EnvJoueur& envJ) const
 			bool possibilite2 = positionsWapiti.count(posPossible2) && wapitisAdj[0].estAdjacente(posPossible2) && wapitisAdj[1].estAdjacente(posPossible2);
 
 			if (possibilite1) {
-				wapitisVisites.insert(posPossible1);
+				//wapitisVisites.insert(posPossible1);
 				nbF4++;
 			}
 			else if (possibilite2) {
-				wapitisVisites.insert(posPossible2);
+				//wapitisVisites.insert(posPossible2);
 				nbF4++;
 			}
 
@@ -558,32 +797,62 @@ int CarteWapitiB::CalculScore(const EnvJoueur& envJ) const
 			bool possibilite3 = (wapitisAdj[0].estAdjacente(wapitisAdj[1]) && wapitisAdj[0].estAdjacente(wapitisAdj[2]));
 			if (possibilite1 || possibilite2 || possibilite3) nbF4++;
 		}
+		
 	}
-
+	*/
+	/*
+	std::cout << "\n nbf1 :" << nbF1;
+	std::cout << "\n nbf2 :" << nbF2;
+	std::cout << "\n nbf3 :" << nbF3;
+	std::cout << "\n nbf4 :" << nbF4;
+	std::cout <<"\n total :"<< nbF1 * 2 + nbF2 * 5 + nbF3 * 9 + nbF4 * 13<<"\n";
+	*/
 	return (scoreTotal = nbF1 * 2 + nbF2 * 5 + nbF3 * 9 + nbF4 * 13);
 }
 
-int CarteSaumonC::CalculScore(const EnvJoueur& envJ) const
-{
-	return 0;
-}
-
-int CarteOursC::CalculScore(const EnvJoueur& envJ) const
-{
-	return 0;
-}
-
-int CarteBuseC::CalculScore(const EnvJoueur& envJ) const
-{
-	return 0;
-}
-
-int CarteRenardC::CalculScore(const EnvJoueur& envJ) const
-{
-	return 0;
-}
+// Wapiti C
 
 int CarteWapitiC::CalculScore(const EnvJoueur& envJ) const
 {
-	return 0;
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	if (mapPositionsJetons.count(Faune::wapiti) == 0) return 0;
+
+	auto positionsWapiti = mapPositionsJetons.at(Faune::wapiti);
+	std::unordered_set<Position> nonVisites = positionsWapiti;
+	int scoreTotal = 0;
+
+	while (!nonVisites.empty()) {
+		// nouveau groupe
+		Position start = *nonVisites.begin();
+		std::stack<Position> pile;
+		pile.push(start);
+		nonVisites.erase(start);
+
+		int tailleGroupe = 0;
+
+		while (!pile.empty()) {
+			Position current = pile.top();
+			pile.pop();
+			tailleGroupe++;
+
+			for (const Position& adj : current.getVecteurPositionsAdjacentes()) {
+				if (nonVisites.count(adj)) {
+					pile.push(adj);
+					nonVisites.erase(adj);
+				}
+			}
+		}
+		switch (tailleGroupe) {
+		case 1: scoreTotal += 2; break;
+		case 2: scoreTotal += 4; break;
+		case 3: scoreTotal += 7; break;
+		case 4: scoreTotal += 10; break;
+		case 5: scoreTotal += 14; break;
+		case 6: scoreTotal += 18; break;
+		case 7: scoreTotal += 23; break;
+		default: scoreTotal += 28; break; //8+
+		}
+	}
+
+	return scoreTotal;
 }

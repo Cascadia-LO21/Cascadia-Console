@@ -60,7 +60,13 @@ private:
 class CarteSaumonC : public CarteMarquage {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
+    int explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+        const Position& position,
+        std::unordered_set<Position>& visited,
+        const Position* parent) const;
 };
+
+
 
 // Ours A, B, C
 class CarteOursA : public CarteMarquage {
