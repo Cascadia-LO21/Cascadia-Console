@@ -78,3 +78,4 @@ void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJou
 		sj.pointsHabitats[h] = zoneMax; // stocker la plus grande taille de la zone h trouvee
 	}
 }
+ 

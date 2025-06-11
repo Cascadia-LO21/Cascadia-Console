@@ -106,6 +106,8 @@ int CarteSaumonB::CalculScore(const EnvJoueur& envJ) const
 	return scoreTotal;
 }
 
+
+
 int CarteSaumonB::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, const Position* parent) const
 {
 	if (carte.count(Faune::saumon) == 0) return 0;
@@ -192,6 +194,13 @@ int CarteSaumonC::explorerChaine(const std::unordered_map<Faune, std::unordered_
 	}
 
 	return taille;
+}
+
+// Saumon D
+
+int CarteSaumonD::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
 }
 
 // Ours A
@@ -342,6 +351,13 @@ int CarteOursC::CalculScore(const EnvJoueur& envJ) const
 	return scoreTotal;
 }
 
+// Ours D
+
+int CarteOursD::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
+}
+
 // Buse A
 
 int CarteBuseA::CalculScore(const EnvJoueur& envJ) const
@@ -474,6 +490,13 @@ int CarteBuseC::CalculScore(const EnvJoueur& envJ) const
 
 }
 
+// Buse D
+
+int CarteBuseD::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
+}
+
 // Renard A
 
 int CarteRenardA::CalculScore(const EnvJoueur& envJ) const
@@ -601,6 +624,13 @@ int CarteRenardC::CalculScore(const EnvJoueur& envJ) const
 	}
 
 	return scoreTotal;
+}
+
+// Renard D
+
+int CarteRenardD::CalculScore(const EnvJoueur& envJ) const
+{
+	return 0;
 }
 
 // Wapiti A 
@@ -856,59 +886,26 @@ int CarteWapitiC::CalculScore(const EnvJoueur& envJ) const
 	return scoreTotal;
 }
 
-// Variante Familiale
+// Wapiti D
 
-int VarianteFamiliale::CalculScore(const EnvJoueur& envJ) const
+int CarteWapitiD::CalculScore(const EnvJoueur& envJ) const
 {
-	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
-	int scoreTotal = 0;
-
-	for (const auto& [faune, positions] : mapPositionsJetons) {
-		std::unordered_set<Position> nonVisites = positions;
-
-		while (!nonVisites.empty()) {
-			Position posDepart = *nonVisites.begin(); //recuperer la premiere position  non visitee
-			std::stack<Position> pile;
-			pile.push(posDepart);
-			nonVisites.erase(posDepart);
-
-			int tailleGroupe = 0;
-
-			while (!pile.empty()) {
-				Position posCourante = pile.top();
-				pile.pop();
-				tailleGroupe++;
-
-				for (const Position& posVoisine : posCourante.getVecteurPositionsAdjacentes()) {
-					if (nonVisites.count(posVoisine)) {
-						pile.push(posVoisine);
-						nonVisites.erase(posVoisine);
-					}
-				}
-			}
-
-			// Scoring identique pour toutes les faunes
-			switch (tailleGroupe) {
-			case 1: scoreTotal += 2; break;
-			case 2: scoreTotal += 5; break;
-			default: scoreTotal += 9; break;
-			}
-		}
-	}
-
-	return scoreTotal;
+	return 0;
 }
 
-int VarianteIntermediaire::CalculScore(const EnvJoueur& envJ) const
+
+// Variante Familiale
+
+std::unordered_map<Faune, int> VarianteFamiliale::CalculScore(const EnvJoueur& envJ) const
 {
 	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
-	int scoreTotal = 0;
+	std::unordered_map<Faune, int> scoreParFaune;
 
 	for (const auto& [faune, positions] : mapPositionsJetons) {
 		std::unordered_set<Position> nonVisites = positions;
 
 		while (!nonVisites.empty()) {
-			Position posDepart = *nonVisites.begin(); //recuperer la premiere position  non visitee
+			Position posDepart = *nonVisites.begin(); // Première position non visitée
 			std::stack<Position> pile;
 			pile.push(posDepart);
 			nonVisites.erase(posDepart);
@@ -928,16 +925,58 @@ int VarianteIntermediaire::CalculScore(const EnvJoueur& envJ) const
 				}
 			}
 
-			// Scoring identique pour toutes les faunes
+			// Scoring identique pour toutes les faunes, mais stocké séparément
 			switch (tailleGroupe) {
-			case 0: break;
-			case 1: break;
-			case 2: scoreTotal += 5; break;
-			case 3: scoreTotal += 8; break;
-			default: scoreTotal += 12; break; //4+
+			case 1: scoreParFaune[faune] += 2; break;
+			case 2: scoreParFaune[faune] += 5; break;
+			default: scoreParFaune[faune] += 9; break;
 			}
 		}
 	}
 
-	return scoreTotal;
+	return scoreParFaune;
+}
+
+// Variante Intermediaire
+
+std::unordered_map<Faune, int> VarianteIntermediaire::CalculScore(const EnvJoueur& envJ) const
+{
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	std::unordered_map<Faune, int> scoreParFaune;
+
+	for (const auto& [faune, positions] : mapPositionsJetons) {
+		std::unordered_set<Position> nonVisites = positions;
+
+		while (!nonVisites.empty()) {
+			Position posDepart = *nonVisites.begin(); // Première position non visitée
+			std::stack<Position> pile;
+			pile.push(posDepart);
+			nonVisites.erase(posDepart);
+
+			int tailleGroupe = 0;
+
+			while (!pile.empty()) {
+				Position posCourante = pile.top();
+				pile.pop();
+				tailleGroupe++;
+
+				for (const Position& posVoisine : posCourante.getVecteurPositionsAdjacentes()) {
+					if (nonVisites.count(posVoisine)) {
+						pile.push(posVoisine);
+						nonVisites.erase(posVoisine);
+					}
+				}
+			}
+
+			// Scoring identique pour toutes les faunes, mais stocké séparément
+			switch (tailleGroupe) {
+			case 1: scoreParFaune[faune] += 0; break;
+			case 2: scoreParFaune[faune] += 5; break;
+			case 3: scoreParFaune[faune] += 8; break;
+			default: scoreParFaune[faune] += 12; break;
+			}
+		}
+	}
+
+	return scoreParFaune;
 }
