@@ -17,7 +17,7 @@ void Tuile::placerJetonFaune(Faune faune) {
 }
 
 void Tuile::pivoterHoraire() {
-	rotate(habitats.rbegin(), habitats.rbegin() + 1, habitats.rend());
+	std::rotate(habitats.rbegin(), habitats.rbegin() + 1, habitats.rend());
 }
 
 void Tuile::pivoterAntiHoraire() {

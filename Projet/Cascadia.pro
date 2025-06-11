@@ -10,6 +10,11 @@ TEMPLATE = app
 INCLUDEPATH += include \
                console
 
+# Source files for gui/
+SOURCES += \
+    gui/jetonfauneitem.cpp \
+    gui/piocheitem.cpp \
+
 # Source files in src/
 SOURCES += \
     src/carte_marquage.cpp \
@@ -30,6 +35,11 @@ SOURCES += \
     console/gestion_partie.cpp \
     console/main_console.cpp \
     console/saisie.cpp
+
+# Header files for gui/
+HEADERS += \
+    gui/jetonfauneitem.h \
+    gui/piocheitem.h \
 
 # Header files in include/
 HEADERS += \

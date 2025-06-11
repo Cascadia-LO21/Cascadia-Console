@@ -12,8 +12,13 @@ using namespace GestionPieces;
 
 
 void Pioche::setTuilesDispo(unsigned int nbJoueurs) {
-	std::vector<Tuile> tuiles_reperes = instancierTuiles("json/tuiles_reperes.json");
-	std::vector<Tuile> tuiles_non_reperes = instancierTuiles("json/tuiles_non_reperes.json");
+	#ifdef QT_VERSION
+		std::vector<Tuile> tuiles_reperes = instancierTuilesQt(":/json/tuiles_reperes.json");
+		std::vector<Tuile> tuiles_non_reperes = instancierTuilesQt(":/json/tuiles_non_reperes.json");
+	#else
+		std::vector<Tuile> tuiles_reperes = instancierTuiles("json/tuiles_reperes.json");
+		std::vector<Tuile> tuiles_non_reperes = instancierTuiles("json/tuiles_non_reperes.json");
+	#endif
 	std::vector<Tuile> ensemble_tuiles = fusionnerVecteursTuiles(tuiles_reperes, tuiles_non_reperes); 
 	GestionPieces::melangerTuiles(ensemble_tuiles); 
 	adapterTailleVecteurTuiles(ensemble_tuiles, nbJoueurs);

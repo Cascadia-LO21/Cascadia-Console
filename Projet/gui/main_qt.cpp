@@ -1,12 +1,32 @@
-/// Veuillez vous assurer que la version de votre IDE est au moins C++17 avant de compiler.
-/// Pour assurer le bon fonctionnement des inclusions des fichiers headers, modifiez les paramètres en suivant
-/// Projet > Propriétés du projet > C/C++ > Général > Répertoires
-/// Puis, ajoutez : $(projet/include)include; $(projet/console)console
-#include <iostream>
+#include <QApplication>
+#include <QMainWindow>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include "piocheitem.h"
 
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
 
-int main() {
-    std::cout<<"HELLO WORLD!!\n";
+    QMainWindow window;
+    window.setWindowTitle("Cascadia - Pioche");
 
-    return 0;
+    // Create graphics scene and view
+    QGraphicsScene* scene = new QGraphicsScene;
+    QGraphicsView* view = new QGraphicsView(scene);
+
+    // Create and add pioche to scene
+    PiocheItem* pioche = new PiocheItem;
+    //pioche = std::make_unique<Pioche>(nbJoueur);
+    scene->addItem(pioche);
+
+    // Set up view
+    view->setRenderHint(QPainter::Antialiasing);
+    view->setDragMode(QGraphicsView::RubberBandDrag);
+
+    window.setCentralWidget(view);
+    window.resize(400, 300);
+    window.show();
+
+    return app.exec();
 }

@@ -13,6 +13,70 @@
 #include "json.hpp"
 using json = nlohmann::json;
 
+#ifdef QT_VERSION
+    #include <QFile>
+    #include <QJsonDocument>
+    #include <QJsonObject>
+    #include <QJsonArray>
+    #include <QJsonValue>
+    #include <QIODevice>
+
+    std::vector<Tuile> GestionPieces::instancierTuiles_qt(const QString& fichier)
+    {
+        QFile file(fichier);
+        if (!file.open(QIODevice::ReadOnly)) {
+            throw std::runtime_error("Impossible d'ouvrir la ressource JSON : " + fichier.toStdString());
+        }
+
+        std::vector<Tuile> tuiles;
+        QByteArray data = file.readAll();
+        file.close();
+
+        QJsonParseError parseError;
+        QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
+
+        if (parseError.error != QJsonParseError::NoError) {
+            throw std::runtime_error("Erreur de parsing JSON : " + parseError.errorString().toStdString());
+        }
+
+        QJsonObject jsonObject = doc.object();
+        QJsonArray tuilesArray = jsonObject["tuiles"].toArray();
+
+        for (const QJsonValue& tuileValue : tuilesArray) {
+            QJsonObject tuile = tuileValue.toObject();
+
+            // Extraction des habitats
+            std::array<Habitat, 6> habitats;
+            QJsonArray habitatsArray = tuile["habitats"].toArray();
+
+            if (habitatsArray.size() != 6) {
+                throw std::runtime_error("Une tuile doit posséder exactement 6 habitats !");
+            }
+
+            for (int i = 0; i < habitatsArray.size(); ++i) {
+                QString habitatStr = habitatsArray[i].toString();
+                habitats[i] = stringToHabitat(habitatStr.toStdString());
+            }
+
+            // Extraction des faunes
+            std::vector<Faune> faunes;
+            QJsonArray faunesArray = tuile["faunes"].toArray();
+
+            for (const QJsonValue& fauneValue : faunesArray) {
+                QString fauneStr = fauneValue.toString();
+                faunes.push_back(stringToFaune(fauneStr.toStdString()));
+            }
+
+            bool donneJetonNature = tuile.value("donneJetonNature").toBool(false);
+
+            // Construction d'une Tuile directement dans le conteneur tuiles
+            tuiles.emplace_back(habitats, faunes, donneJetonNature);
+        }
+
+        return tuiles;
+    }
+#endif
+
 std::vector<Tuile> GestionPieces::instancierTuiles(const std::string& fichier)
 {
 	std::ifstream f(fichier);

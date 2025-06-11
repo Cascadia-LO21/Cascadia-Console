@@ -18,6 +18,7 @@ namespace GestionPieces {
 
 	// Instancie toutes les tuiles à partir d'un fichier JSON
 	std::vector<Tuile> instancierTuiles(const std::string& fichier = "json/tuiles_non_reperes.json");
+	std::vector<Tuile> instancierTuiles_qt(const std::string& fichier = ":/json/tuiles_non_reperes.json");
 
 	// Instancie les tuiles de départ à partir d'un fichier JSON
 	std::vector<std::vector<Tuile>> instancierTuilesDepart(const std::string& fichier = "json/tuiles_depart.json");
