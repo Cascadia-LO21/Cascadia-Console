@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -105,7 +105,12 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+<<<<<<< HEAD
       <AdditionalIncludeDirectories>$(projet/include)include; $(projet/console)console</AdditionalIncludeDirectories>
+=======
+      <AdditionalIncludeDirectories>$(projet/include)include</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+>>>>>>> f18a0e5860890c1903333bc8cb3afdba0323d9ed
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

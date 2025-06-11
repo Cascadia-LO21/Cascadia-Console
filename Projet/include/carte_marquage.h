@@ -4,45 +4,185 @@
 #include "enums.h"
 #include "position.h"
 #include "tuile.h"
+#include "env_joueur.h"
+#include <unordered_map>
+#include <unordered_set>
+#include <memory>
 
-// Classe abstraite avec méthode virtuelle pure
+
+//Fonction de hashage pour Position
+/*
+namespace std {
+	template <>
+	struct hash<Position> {
+		size_t operator()(const Position& coord) const {
+			//on n'utilise que q et r pcq s=-q-r
+			size_t h1 = std::hash<int>{}(coord.getQ()); //donne un hash pour q
+			size_t h2 = std::hash<int>{}(coord.getR()); //donne un hash pour r
+			return h1 ^ (h2 << 1); //combiner deux valeurs hash avec XOR
+		}
+	};
+}
+*/
+
+// Classe abstraite de base
 class CarteMarquage {
-	Faune faune;
-	//TODO : réfléchir à l'implémentation d'un attribut pour quel type de cartes (A,B,C,D) : found.
 public:
-	CarteMarquage(Faune f) : faune(f) {}
-	virtual int methodeCalcul(int count) const = 0;
-	Faune getFaune() const { return faune; }
-	virtual ~CarteMarquage() = default; 
+    virtual ~CarteMarquage() = default;
+
+    // Calcul du score avec un environnement commun
+    virtual int CalculScore(const EnvJoueur& envJ) const = 0;
 };
 
-class CarteSaumon : public CarteMarquage {
+// --- Déclaration des classes filles ---
+
+// Saumon A, B, C
+class CarteSaumonA : public CarteMarquage {
 public:
-	CarteSaumon() : CarteMarquage(Faune::saumon) {}
-	int methodeCalcul(int count)const override;
+    int CalculScore(const EnvJoueur& envJ) const override;
+private:
+    int explorerChaine(const std::unordered_map<Position, Tuile>& carte,
+        const Position& position,
+        std::unordered_set<Position>& PositionsVisitees,
+        const Position* parent) const;
 };
 
-class CarteOurs : public CarteMarquage {
+class CarteSaumonB : public CarteMarquage {
 public:
-	CarteOurs() : CarteMarquage(Faune::ours) {}
-	int methodeCalcul(int count)const override;
+    int CalculScore(const EnvJoueur& envJ) const override;
+private:
+    int explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+        const Position& position,
+        std::unordered_set<Position>& visited,
+        const Position* parent) const;
 };
 
-class CarteBuse : public CarteMarquage {
+class CarteSaumonC : public CarteMarquage {
 public:
-	CarteBuse() : CarteMarquage(Faune::buse) {}
-	int methodeCalcul(int count)const override;
-
+    int CalculScore(const EnvJoueur& envJ) const override;
+    int explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+        const Position& position,
+        std::unordered_set<Position>& visited,
+        const Position* parent) const;
 };
 
-class CarteRenard : public CarteMarquage {
+
+
+// Ours A, B, C
+class CarteOursA : public CarteMarquage {
 public:
-	CarteRenard() : CarteMarquage(Faune::renard) {}
-	int methodeCalcul(int count)const override;
+    int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-class CarteWapiti : public CarteMarquage {
+class CarteOursB : public CarteMarquage {
 public:
-	CarteWapiti() : CarteMarquage(Faune::wapiti) {}
-	int methodeCalcul(int count)const override;
+    int CalculScore(const EnvJoueur& envJ) const override;
 };
+
+class CarteOursC : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+// Buse A, B, C
+class CarteBuseA : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class CarteBuseB : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class CarteBuseC : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+// Renard A, B, C
+class CarteRenardA : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class CarteRenardB : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class CarteRenardC : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+// Wapiti A, B, C
+class CarteWapitiA : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+private:
+    int explorerChaine(const std::unordered_map<Position, Tuile>& carte,
+        const Position& pos,
+        std::unordered_set<Position>& visited,
+        std::optional<Direction> direction) const;
+};
+
+class CarteWapitiB : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class CarteWapitiC : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class VarianteFamiliale : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+class VarianteIntermediaire : public CarteMarquage {
+public:
+    int CalculScore(const EnvJoueur& envJ) const override;
+};
+
+/// Factory avec une définition inline
+class CarteMarquageFactory {
+public:
+    static std::unique_ptr<CarteMarquage> creerCarte(const std::string& nom) {
+        // Saumon
+        if (nom == "SaumonA") return std::make_unique<CarteSaumonA>();
+        else if (nom == "SaumonB") return std::make_unique<CarteSaumonB>();
+        else if (nom == "SaumonC") return std::make_unique<CarteSaumonC>();
+
+        // Ours
+        else if (nom == "OursA") return std::make_unique<CarteOursA>();
+        else if (nom == "OursB") return std::make_unique<CarteOursB>();
+        else if (nom == "OursC") return std::make_unique<CarteOursC>();
+
+        // Buse
+        else if (nom == "BuseA") return std::make_unique<CarteBuseA>();
+        else if (nom == "BuseB") return std::make_unique<CarteBuseB>();
+        else if (nom == "BuseC") return std::make_unique<CarteBuseC>();
+
+        // Renard
+        else if (nom == "RenardA") return std::make_unique<CarteRenardA>();
+        else if (nom == "RenardB") return std::make_unique<CarteRenardB>();
+        else if (nom == "RenardC") return std::make_unique<CarteRenardC>();
+
+        // Wapiti
+        else if (nom == "WapitiA") return std::make_unique<CarteWapitiA>();
+        else if (nom == "WapitiB") return std::make_unique<CarteWapitiB>();
+        else if (nom == "WapitiC") return std::make_unique<CarteWapitiC>();
+
+        // Variante familiale
+        else if (nom == "Variante familiale") return std::make_unique<VarianteFamiliale>();
+
+        // Variante intermédiaire
+        else if (nom == "Variante intermediaire") return std::make_unique<VarianteIntermediaire>();
+
+        else throw std::invalid_argument("Type de carte inconnu : " + nom);
+    }
+};
+

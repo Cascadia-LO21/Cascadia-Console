@@ -37,6 +37,7 @@ public:
 	//constructeur principal
 	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0, unsigned int scoreFinal = 0)
 		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal), scoreHabitat{}, scoreFaune{} {
+
 	};
 
 	//check si ya uen tuile sur cette case (tuile non confirmée inclus)
