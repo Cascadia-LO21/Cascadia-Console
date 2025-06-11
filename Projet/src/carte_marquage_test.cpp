@@ -202,11 +202,3 @@ void testCartes() {
 
     std::cout << "Fin testCartes()\n";
 }
-
-int main() {
-    std::cout << "hello world\n" << std::endl;
-
-    testCartes();
-
-    return 0;
-}

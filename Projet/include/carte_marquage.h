@@ -186,3 +186,5 @@ public:
     }
 };
 
+
+void testCartes();

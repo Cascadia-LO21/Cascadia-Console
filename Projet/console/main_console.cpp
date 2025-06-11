@@ -17,8 +17,12 @@
 #include "saisie.h"
 #include "affichage.h"
 #include "gestion_partie.h"
+#include "carte_marquage.h" // test only
 
 int main() {
+
+	testCartes(); // test only, A COMMENTER
+
 
 	// 1. Creation de la partie
 	Partie p;

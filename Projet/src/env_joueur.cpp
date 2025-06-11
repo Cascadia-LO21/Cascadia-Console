@@ -125,10 +125,10 @@ bool EnvJoueur::undoDernierPlacement() {
 	return true; //annulation réussie
 }
 
-//void EnvJoueur::placerTuileDefinitive() {
-//	placerTuile(coord, tuile);
-//	confirmerPlacement(coord);
-//}
+void EnvJoueur::placerTuileDefinitive(const Position& coord, Tuile& tuile) {
+	placerTuile(coord, tuile);
+	confirmerPlacement();
+}
 
 //retourne -1 si le jeton ne peut être placé nulpart, 0 si le jeton ne peut etre placé à cette position, 1 si le jeton est placé avec succès
 int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) {

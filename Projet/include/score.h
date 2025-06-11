@@ -22,6 +22,46 @@ namespace Score {
 		USI totalFaunes = 0, totalHabitats = 0, totalFinal = 0;
 	};
 
+	// Design Pattern Strategy pour permettre de choisir le mode de calul des Marquages de Faunes selon les variantes
+	class CalculScoreFaune {
+	public:
+		virtual ~CalculScoreFaune() = default;
+		virtual void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const = 0;
+	};
+
+	class CalculScoreFauneA : public CalculScoreFaune {
+	public:
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
+	};
+
+	class CalculScoreFauneB : public CalculScoreFaune {
+	public:
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
+	};
+
+	class CalculScoreFauneC : public CalculScoreFaune {
+	public:
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
+	};
+
+	class CalculScoreFauneD : public CalculScoreFaune {
+	public:
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
+	};
+
+	class CalculScoreFauneFamiliale : public CalculScoreFaune {
+	public:
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
+	};
+
+	class CalculScoreFauneIntermediaire : public CalculScoreFaune {
+	public:
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
+	};
+
+
+
+
 	// Simule la feuille de score relle : confronte les scores des EnvJoueur entre eux, puis calcul des bonus
 	class ScoreFeuille {
 		std::map<std::string, ScoreJoueur> scores; // exemple: le joueur "toto" correspond a une structure ScoreJoueur
@@ -52,7 +92,7 @@ namespace Score {
 
 		// utiliser patron Strategy pour calculer les points de Faune selon les variantes
 		//void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj, Marquage m = Marquage::A);
-		
+
 		void calculPointsHabitats(const EnvJoueur& player, ScoreJoueur& sj);
 		void calculerBonusHabitats(const std::vector<EnvJoueur>& joueurs);
 
@@ -60,46 +100,6 @@ namespace Score {
 		void calculScoresPartie(const Partie&);
 
 	};
-
-
-	// Design Pattern Strategy pour permettre de choisir le mode de calul des Marquages de Faunes selon les variantes
-	class CalculScoreFaune {
-	public:
-		virtual ~CalculScoreFaune() = default;
-		virtual void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const = 0;
-	};
-
-	class CalculScoreFauneA : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneB : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneC : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneC : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneFamiliale : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-	class CalculScoreFauneIntermediaire : public CalculScoreFaune {
-	public:
-		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override;
-	};
-
-
 
 
 }

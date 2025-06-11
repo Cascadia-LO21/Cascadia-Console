@@ -73,7 +73,7 @@ public:
 	bool undoDernierPlacement();
 
 	////alternative combine étapes 1 et 2, placer une tuile et confirmer son placement
-	//void placerTuileDefinitive();
+	void placerTuileDefinitive(const Position& pos, Tuile& tui);
 
 	//=============fin systeme placement tuile + undo
 	
