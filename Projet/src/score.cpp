@@ -1,7 +1,7 @@
 #include <queue>
 #include <unordered_set>
 #include <algorithm>
-
+#include <exception>
 #include "score.h"
 #include "carte_marquage.h"
 
@@ -75,7 +75,19 @@ void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJou
 	}
 }
 
-void Score::ScoreFeuille::calculerBonusHabitats() {
+void Score::ScoreFeuille::calculerBonusHabitats(const std::vector<EnvJoueur>& players) {
+	if (scores.size() != players.size()) throw std::invalid_argument("Il y a plus de joueurs que de scores calcules !");
+	
+	if (scores.size() == 1) { // si jeu solitaire
+		auto& scoreJoueur = scores[players[0].getPseudo()];
+		for (const auto& [hab, taille] : scoreJoueur.pointsHabitats) {
+			if (taille >= 7)
+				scoreJoueur.pointsHabitats[hab] = 2;
+		}
+	}
 
+	else { // si 2+ joueurs
+
+	}
 }
  

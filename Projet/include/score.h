@@ -87,7 +87,7 @@ namespace Score {
 		//void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj, Marquage m = Marquage::A);
 
 		void calculPointsHabitats(const EnvJoueur& player, ScoreJoueur& sj);
-		void calculerBonusHabitats();
+		void calculerBonusHabitats(const std::vector<EnvJoueur>& players);
 
 
 		void calculScoresPartie(const Partie&);
