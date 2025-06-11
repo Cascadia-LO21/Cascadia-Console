@@ -143,27 +143,31 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-
 class CarteWapitiD : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
+
+
+// VARIANTES
 class CarteMarquageVariante {
 public:
     virtual ~CarteMarquageVariante() = default;
-    virtual std::unordered_map<Faune,int> CalculScore(const EnvJoueur& envJ) const = 0;
+    virtual std::unordered_map<Faune, unsigned int> CalculScore(const EnvJoueur& envJ) const = 0;
 };
 
 class VarianteFamiliale : public CarteMarquageVariante {
 public:
-    std::unordered_map<Faune, int> CalculScore(const EnvJoueur& envJ) const override;
+    std::unordered_map<Faune, unsigned int> CalculScore(const EnvJoueur& envJ) const override;
 };
 
 class VarianteIntermediaire : public CarteMarquageVariante {
 public:
-    std::unordered_map<Faune, int> CalculScore(const EnvJoueur& envJ) const override;
+    std::unordered_map<Faune, unsigned int> CalculScore(const EnvJoueur& envJ) const override;
 };
+
+
 
 // Factory 1
 class CarteMarquageStandardFactory {
@@ -212,3 +216,6 @@ public:
         throw std::invalid_argument("Type de carte inconnu : " + nom);
     }
 };
+
+
+void testCartes();

@@ -1,5 +1,5 @@
 #include <queue>
-#include <set>
+#include <unordered_set>
 #include <algorithm>
 
 #include "score.h"
@@ -10,20 +10,16 @@ void Score::calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, char let
 	std::vector<Faune> faunes = { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti };
 	for (auto f : faunes) {
 		std::string nomCarte = fauneToString(f) + lettre; // exemple : "saumonA"
-		auto carte = CarteMarquageFactory::creerCarte(nomCarte);
+		auto carte = CarteMarquageStandardFactory::creerCarte(nomCarte);
 		USI points = carte->CalculScore(player);
 		sj.pointsFaunes[f] = points;
 	}
 }
 
-// TODO
-//void Score::CalculScoreFauneFamiliale::calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const {
-//	auto carteFamiliale = CarteMarquageFactory::creerCarte("familiale");
-//	std::vector<Faune> faunes = { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti };
-//	for (auto f : faunes) {
-//
-//	}
-//}
+void Score::calculFauneVariante(const EnvJoueur& player, ScoreJoueur& sj, std::string variante) {
+	auto carteVar = CarteMarquageVarianteFactory::creerCarte(variante);
+	sj.pointsFaunes = carteVar->CalculScore(player);
+}
 
 // calcule la plus grande zone dans le plateau du joueur pour chaque type d'Habitat
 void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJoueur& sj) {
@@ -31,7 +27,7 @@ void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJou
 	std::vector<Habitat> habitats = { Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie };
 
 	for (auto h : habitats) {
-		std::set<Position> posVisitees;
+		std::unordered_set<Position> posVisitees;
 		USI zoneMax = 0;
 
 		for (const auto& [pos, tuile] : plateau) {
@@ -44,7 +40,7 @@ void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJou
 			// algo de recherche en largeur (BFS), implementee avec une file (FIFO)
 			// pour decouvrir les tuiles adjacentes a celle en question d'abord
 			std::queue<Position> file; // les Positions a visiter
-			std::set<Position> zone; 
+			std::unordered_set<Position> zone; 
 			file.push(pos);
 			zone.insert(pos);
 			//posVisitees.insert(pos);
@@ -77,5 +73,9 @@ void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJou
 		}
 		sj.pointsHabitats[h] = zoneMax; // stocker la plus grande taille de la zone h trouvee
 	}
+}
+
+void Score::ScoreFeuille::calculerBonusHabitats() {
+
 }
  

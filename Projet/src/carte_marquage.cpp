@@ -896,10 +896,10 @@ int CarteWapitiD::CalculScore(const EnvJoueur& envJ) const
 
 // Variante Familiale
 
-std::unordered_map<Faune, int> VarianteFamiliale::CalculScore(const EnvJoueur& envJ) const
+std::unordered_map<Faune, unsigned int> VarianteFamiliale::CalculScore(const EnvJoueur& envJ) const
 {
 	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
-	std::unordered_map<Faune, int> scoreParFaune;
+	std::unordered_map<Faune, unsigned int> scoreParFaune;
 
 	for (const auto& [faune, positions] : mapPositionsJetons) {
 		std::unordered_set<Position> nonVisites = positions;
@@ -910,7 +910,7 @@ std::unordered_map<Faune, int> VarianteFamiliale::CalculScore(const EnvJoueur& e
 			pile.push(posDepart);
 			nonVisites.erase(posDepart);
 
-			int tailleGroupe = 0;
+			unsigned int tailleGroupe = 0;
 
 			while (!pile.empty()) {
 				Position posCourante = pile.top();
@@ -939,10 +939,10 @@ std::unordered_map<Faune, int> VarianteFamiliale::CalculScore(const EnvJoueur& e
 
 // Variante Intermediaire
 
-std::unordered_map<Faune, int> VarianteIntermediaire::CalculScore(const EnvJoueur& envJ) const
+std::unordered_map<Faune, unsigned int> VarianteIntermediaire::CalculScore(const EnvJoueur& envJ) const
 {
 	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
-	std::unordered_map<Faune, int> scoreParFaune;
+	std::unordered_map<Faune, unsigned int> scoreParFaune;
 
 	for (const auto& [faune, positions] : mapPositionsJetons) {
 		std::unordered_set<Position> nonVisites = positions;
@@ -953,7 +953,7 @@ std::unordered_map<Faune, int> VarianteIntermediaire::CalculScore(const EnvJoueu
 			pile.push(posDepart);
 			nonVisites.erase(posDepart);
 
-			int tailleGroupe = 0;
+			unsigned int tailleGroupe = 0;
 
 			while (!pile.empty()) {
 				Position posCourante = pile.top();

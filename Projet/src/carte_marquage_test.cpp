@@ -177,16 +177,15 @@ void testCartes() {
     std::cout << "Score ours :" << oursC.CalculScore(Mario) << "\n";
 
     std::cout << "\nVariante familiale \n";
+    auto varF = CarteMarquageVarianteFactory::creerCarte("familiale");
+    const auto& scoreFam = varF->CalculScore(Mario);
+    for (const auto& [key, value] : scoreFam) {
+        std::cout << key << ": " << value << std::endl;
+    }
 
-    VarianteFamiliale varF;
-
-    std::cout << "Score familiale :" << varF.CalculScore(Mario) << "\n";
-
-    std::cout << "\nVariante intermediaire \n";
-
-    VarianteIntermediaire varI;
-
-    std::cout << "Score intermediaire :" << varI.CalculScore(Mario) << "\n";
+    //std::cout << "\nVariante intermediaire \n";
+    //VarianteIntermediaire varI;
+    //std::cout << "Score intermediaire :" << varI.CalculScore(Mario) << "\n";
 
     std::cout << "Fin testCartes()\n";
 }
