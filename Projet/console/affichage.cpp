@@ -1,4 +1,5 @@
 #include <ostream>
+#include <iomanip>
 #include <affichage.h>
 
 std::ostream& operator<<(std::ostream& os, const JetonFaune& j) {
@@ -218,6 +219,76 @@ void afficheJoueurs(const Partie& p) {
 
 void afficheEnvJoueurCourant(const Partie& p) {
 	std::cout << p.getEnvJoueurCourant();
+}
+
+// affichage proche de vrai feuille de score dans le jeu physique
+void afficheScoreFeuille(const Score::ScoreFeuille& s) {
+	std::vector<Faune> faunes = { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti };
+	std::vector<Habitat> habitats = { Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie };
+
+	const auto& scores = s.getScores();
+
+	std::vector<std::string> pseudos;
+	for (const auto& [pseudo,_] : scores) {
+		pseudos.push_back(pseudo);
+	}
+
+	const int col = 14; // Espacement à inserer
+
+	// En-tete
+	std::cout << std::setw(col) << " ";
+	for (const auto& pseudo : pseudos) {
+		std::cout << std::setw(col) << pseudo;
+	}
+	std::cout << "\n";
+
+	// Faunes
+	for (const auto& f : faunes) {
+		std::cout << std::setw(col) << fauneToString(f);
+		for (const auto& pseudo : pseudos) {
+			std::cout << std::setw(col) << scores.at(pseudo).pointsFaunes.at(f);
+		}
+		std::cout << "\n";
+	}
+
+	// Total Faunes
+	std::cout << std::setw(col) << "Total Faune";
+	for (const auto& pseudo : pseudos) {
+		std::cout << std::setw(col) << scores.at(pseudo).totalFaunes;
+	}
+	std::cout << "\n";
+
+	// Habitats (points/bonus)
+	for (const auto& h : habitats) {
+		std::cout << std::setw(col) << habitatToString(h);
+		for (const auto& pseudo : pseudos) {
+			int pts = scores.at(pseudo).pointsHabitats.at(h);
+			int bonus = scores.at(pseudo).pointsHabitatsBonus.at(h);
+			std::cout << std::setw(col) << (std::to_string(pts) + "/" + std::to_string(bonus));
+		}
+		std::cout << "\n";
+	}
+
+	// Total Habitats
+	std::cout << std::setw(col) << "Total Habitats";
+	for (const auto& pseudo : pseudos) {
+		std::cout << std::setw(col) << scores.at(pseudo).totalHabitats;
+	}
+	std::cout << "\n";
+
+	// Jetons Nature
+	std::cout << std::setw(col) << "Jetons Nature";
+	for (const auto& pseudo : pseudos) {
+		std::cout << std::setw(col) << scores.at(pseudo).nbJetonsNature;
+	}
+	std::cout << "\n";
+
+	// Total 
+	std::cout << std::setw(col) << "Total";
+	for (const auto& pseudo : pseudos) {
+		std::cout << std::setw(col) << scores.at(pseudo).totalFinal;
+	}
+	std::cout << "\n";
 }
 
 void afficherMessageBienvenu() {

@@ -82,6 +82,8 @@ namespace Score {
 		}
 
 		const ScoreJoueur& getScore(const std::string& nom) const { return scores.at(nom); }
+		const std::unordered_map<std::string, ScoreJoueur>& getScores() const { return scores; }
+
 
 		// utiliser patron Strategy pour calculer les points de Faune selon les variantes
 		//void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj, Marquage m = Marquage::A);
@@ -92,8 +94,6 @@ namespace Score {
 
 		void calculScoresPartie(const Partie&);
 
+		std::vector<EnvJoueur> getGagnant() const;
 	};
 }
-
-// TODO : afficher la feuille de score/classement
-// TODO : afficher les scores d'un joueur

@@ -5,6 +5,7 @@
 #include "pioche.h"
 #include "env_joueur.h"
 #include "partie.h"
+#include "score.h"
 
 std::ostream& operator<<(std::ostream& os, const JetonFaune& j);
 
@@ -23,6 +24,7 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env);
 void affichePioche(const Partie& p);
 void afficheJoueurs(const Partie& p);
 void afficheEnvJoueurCourant(const Partie& p);
+void afficheScoreFeuille(const Score::ScoreFeuille& s);
 
 void afficherMessageBienvenu();
 void afficherMarquage();

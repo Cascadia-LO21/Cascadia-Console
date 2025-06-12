@@ -189,4 +189,11 @@ void Score::ScoreFeuille::calculScoresPartie(const Partie& p) {
 	calculerBonusHabitats(players);
 
 }
- 
+
+//std::vector<EnvJoueur> Score::ScoreFeuille::getGagnant() const
+//{
+//	std::vector<EnvJoueur>;
+//
+//
+//}
+// 
