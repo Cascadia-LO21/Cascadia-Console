@@ -20,7 +20,7 @@ public:
 
 // --- Déclaration des classes filles ---
 
-// Saumon A, B, C
+// Saumon
 class CarteSaumonA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -59,7 +59,7 @@ public:
         const Position* parent) const;
 };
 
-// Ours A, B, C
+// Ours
 class CarteOursA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -80,7 +80,7 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-// Buse A, B, C
+// Buse
 class CarteBuseA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -101,7 +101,7 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-// Renard A, B, C
+// Renard
 class CarteRenardA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -122,7 +122,7 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-// Wapiti A, B, C, D
+// Wapiti
 class CarteWapitiA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
