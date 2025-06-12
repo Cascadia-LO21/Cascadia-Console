@@ -12,8 +12,8 @@
 
 class Partie {
 private:
-    static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
-    //static constexpr unsigned int MAX_NB_TOURS = 3; // testing purpose only
+    //static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
+    static constexpr unsigned int MAX_NB_TOURS = 5; // testing purpose only
     static constexpr unsigned int MAX_NB_JOUEURS = 4;
     unsigned int nbJoueurs;
     unsigned int compteurTour;
@@ -68,7 +68,6 @@ public:
     std::vector<EnvJoueur>& getJoueursModifiable() { return joueurs; }
 
     void preparer();
-    void lancer();
     void prochainJoueur() { joueurCourant = (joueurCourant + 1) % nbJoueurs; }
     void pauser() { if (!pause) pause = true; }
     void reprendre() { if (pause) pause = false; }

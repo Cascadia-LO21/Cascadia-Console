@@ -57,10 +57,10 @@
     <ClCompile Include="gui\main_qt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\eval_score.cpp">
+    <ClCompile Include="src\score.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\score.cpp">
+    <ClCompile Include="src\carte_marquage_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -102,9 +102,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="console\saisie.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\eval_score.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\score.h">

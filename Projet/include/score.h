@@ -97,3 +97,5 @@ namespace Score {
 		std::vector<std::string> getGagnants() const;
 	};
 }
+
+void testScore();

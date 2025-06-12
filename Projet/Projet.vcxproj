@@ -143,7 +143,6 @@
     <ClCompile Include="src\partie.cpp" />
     <ClCompile Include="src\pioche.cpp" />
     <ClCompile Include="src\position.cpp" />
-    <ClCompile Include="src\eval_score.cpp" />
     <ClCompile Include="src\score.cpp" />
     <ClCompile Include="src\tuile.cpp" />
   </ItemGroup>
@@ -160,7 +159,6 @@
     <ClInclude Include="include\partie.h" />
     <ClInclude Include="include\pioche.h" />
     <ClInclude Include="include\position.h" />
-    <ClInclude Include="include\eval_score.h" />
     <ClInclude Include="include\score.h" />
     <ClInclude Include="include\tuile.h" />
   </ItemGroup>

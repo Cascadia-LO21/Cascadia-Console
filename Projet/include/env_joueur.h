@@ -21,9 +21,7 @@ class EnvJoueur {
 	std::string pseudo;
 	std::unordered_map<Position, Tuile> tuiles;//la map, pas beosin de désallouer à la fin, on stocke directement les tuiles dans unordered map par valeur
 	std::unordered_map<Faune, std::unordered_set<Position>> mapPositionsJetons; //map de clé type faune vers un set de positions où le jeton est placé
-	
-	std::array<int, 5> scoreHabitat;
-	std::array<int, 5> scoreFaune;
+
 	unsigned int nbJetonNature;
 	unsigned int scoreFinal;
 
@@ -36,7 +34,7 @@ public:
 
 	//constructeur principal
 	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0, unsigned int scoreFinal = 0)
-		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal), scoreHabitat{}, scoreFaune{} {
+		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
 
 	};
 
@@ -86,6 +84,7 @@ public:
 
 	void incNbJetonsNature() { nbJetonNature++; };
 	void decNbJetonsNature() { nbJetonNature--; };
+	void setNbJetonsNature(unsigned int i) { nbJetonNature = i; } //Debug only 
 	
 	//retourne un vecteur de positions possibles pour placer une tuile
 	std::vector<Tuile> getTuilesAvecVoisinLibre() const;
@@ -108,12 +107,6 @@ public:
 	const std::unordered_map<Faune, std::unordered_set<Position>>& getMapPositionsJetons() const { return mapPositionsJetons; }
 	bool getPlacementEnAttente() const { return placementEnAttente; }
 
-
-	void setScoreHabitat() { scoreHabitat = std::array<int, 5>{}; }
-	std::array<int, 5> getScoreHabitat() { return scoreHabitat; }
-
-	void setScoreFaune() { scoreFaune = std::array<int, 5>{}; }
-	std::array<int, 5> getScoreFaune() { return scoreFaune; }
 };
 
 

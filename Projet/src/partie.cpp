@@ -77,8 +77,8 @@ bool Partie::verifierFinPartie() const {
 }
 
 void Partie::revenir(unsigned int indexTuile, unsigned int indexJeton) {
-    pioche->setVisibilite(indexTuile, true); //tuile
-    pioche->setVisibilite(indexJeton, false); //jeton
+    pioche->setVisibilite(indexTuile, true, true); //tuile
+    pioche->setVisibilite(indexJeton, true, false); //jeton
     getEnvJoueurCourantModifiable().undoDernierPlacement();
 }
 
