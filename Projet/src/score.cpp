@@ -4,9 +4,10 @@
 #include <exception>
 #include "score.h"
 #include "carte_marquage.h"
+#include "enums.h"
 
 // appliquer toutes les cartes marquage X sur le player, et ces resultats seront stockes dans un ScoreJoueur
-void Score::calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, char lettre) {
+void Score::calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, std::string lettre) {
 	std::vector<Faune> faunes = { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti };
 	for (auto f : faunes) {
 		std::string nomCarte = fauneToString(f) + lettre; // exemple : "saumonA"
@@ -78,7 +79,7 @@ void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJou
 void Score::ScoreFeuille::calculerBonusHabitats(const std::vector<EnvJoueur>& players) {
 	if (scores.size() != players.size()) throw std::invalid_argument("Il y a plus de joueurs que de scores calcules !");
 	std::vector<Habitat> habitats = { Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie };
-	USI nbJoueurs = scores.size();
+	USI nbJoueurs = static_cast<USI>(scores.size());
 
 	if (nbJoueurs) { // si jeu solitaire
 		auto& scoreJoueur = scores[players[0].getPseudo()];
@@ -94,7 +95,7 @@ void Score::ScoreFeuille::calculerBonusHabitats(const std::vector<EnvJoueur>& pl
 		for (auto h: habitats) {
 
 			// tailles pour chaque joueur
-			std::vector<USI> tailles;
+			std::vector<int> tailles;
 			for (const auto& player : players) {
 				tailles.push_back(scores.at(player.getPseudo()).pointsHabitats.at(h));
 			}
@@ -163,6 +164,29 @@ void Score::ScoreFeuille::calculerBonusHabitats(const std::vector<EnvJoueur>& pl
 			}
 		}
 	}
+
+}
+
+void Score::ScoreFeuille::calculScoresPartie(const Partie& p) {
+	scores.clear();
+	const std::vector<EnvJoueur> players = p.getJoueurs();
+	if (p.getVariante() == Variante::standard)
+		setStrategieFaune(std::make_unique<CalculScoreFauneStandard>(marquageToString(p.getMarquage())));
+	else // si variante famille ou intermediaire ou autre
+		setStrategieFaune(std::make_unique<CalculScoreFauneVariante>(varianteToString(p.getVariante())));
+
+	for (const auto& player : players) {
+		ScoreJoueur sj;
+		strategieFaune->calculPointsFaunes(player, sj);
+		calculPointsHabitats(player, sj);
+		
+		calculTotalFaunes(sj);
+		calculTotalHabitats(sj);
+		sj.nbJetonsNature = player.getNbJetonsNature();
+		scores[player.getPseudo()] = sj;
+	}
+
+	calculerBonusHabitats(players);
 
 }
  

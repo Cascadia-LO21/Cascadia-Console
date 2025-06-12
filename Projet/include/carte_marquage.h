@@ -207,8 +207,8 @@ class CarteMarquageVarianteFactory {
 public: 
     static std::unique_ptr<CarteMarquageVariante> creerCarte(const std::string& nom) {
 
-        // Variante familiale
-        if (nom == "familiale") return std::make_unique<VarianteFamiliale>();
+        // Variante famille
+        if (nom == "famille") return std::make_unique<VarianteFamiliale>();
 
         // Variante intermédiaire
         else if (nom == "intermediaire") return std::make_unique<VarianteIntermediaire>();

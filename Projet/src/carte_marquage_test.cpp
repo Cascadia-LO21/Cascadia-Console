@@ -176,8 +176,8 @@ void testCartes() {
     std::cout << "Score wapitis :" << wapitiC.CalculScore(Mario) << "\n";
     std::cout << "Score ours :" << oursC.CalculScore(Mario) << "\n";
 
-    std::cout << "\nVariante familiale \n";
-    auto varF = CarteMarquageVarianteFactory::creerCarte("familiale");
+    std::cout << "\nVariante famille \n";
+    auto varF = CarteMarquageVarianteFactory::creerCarte("famille");
     const auto& scoreFam = varF->CalculScore(Mario);
     for (const auto& [key, value] : scoreFam) {
         std::cout << key << ": " << value << std::endl;

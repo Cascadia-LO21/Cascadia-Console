@@ -22,7 +22,7 @@ namespace Score {
 		USI totalFaunes = 0, totalHabitats = 0, totalFinal = 0;
 	};
 
-	void calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, char lettre);
+	void calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, std::string lettre);
 	void calculFauneVariante(const EnvJoueur& player, ScoreJoueur& sj, std::string variante);
 
 
@@ -35,9 +35,9 @@ namespace Score {
 
 	// Calcul des points selon les cartes de marquage A, B, C, D...
 	class CalculScoreFauneStandard : public CalculScoreFaune {
-		char lettre;
+		std::string lettre;
 	public:
-		CalculScoreFauneStandard(char l) : lettre(l) {}
+		CalculScoreFauneStandard(std::string l) : lettre(l) {}
 		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override {
 			calculFauneLettre(player, sj, lettre);
 		}
@@ -93,8 +93,6 @@ namespace Score {
 		void calculScoresPartie(const Partie&);
 
 	};
-
-
 }
 
 // TODO : afficher la feuille de score/classement
