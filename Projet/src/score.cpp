@@ -190,10 +190,37 @@ void Score::ScoreFeuille::calculScoresPartie(const Partie& p) {
 
 }
 
-//std::vector<EnvJoueur> Score::ScoreFeuille::getGagnant() const
-//{
-//	std::vector<EnvJoueur>;
-//
-//
-//}
-// 
+
+std::vector<std::string> Score::ScoreFeuille::getGagnants() const {
+	std::vector<std::string> gagnants;
+	int maxScore = -1;
+
+	// trouver le score total maximum
+	for (const auto& [pseudo, sj] : scores) {
+		if (sj.totalFinal > maxScore) {
+			maxScore = sj.totalFinal;
+			gagnants = { pseudo };
+		}
+		else if (sj.totalFinal == maxScore) {
+			gagnants.push_back(pseudo);
+		}
+	}
+
+	if (gagnants.size() == 1) return gagnants;
+
+	// 3. Départage avec les jetons nature
+	int maxJetons = -1;
+	std::vector<std::string> gagnantsJetons;
+	for (const auto& pseudo : gagnants) {
+		int jetons = scores.at(pseudo).nbJetonsNature;
+		if (jetons > maxJetons) {
+			maxJetons = jetons;
+			gagnantsJetons = { pseudo };
+		}
+		else if (jetons == maxJetons) {
+			gagnantsJetons.push_back(pseudo);
+		}
+	}
+
+	return gagnantsJetons;
+}

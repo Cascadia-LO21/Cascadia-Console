@@ -94,6 +94,6 @@ namespace Score {
 
 		void calculScoresPartie(const Partie&);
 
-		std::vector<EnvJoueur> getGagnant() const;
+		std::vector<std::string> getGagnants() const;
 	};
 }

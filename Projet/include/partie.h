@@ -23,8 +23,6 @@ private:
     std::unique_ptr<Pioche> pioche;
     Marquage marquage;
     Variante variante;
-    //std::optional<std::vector<int>> gagnant; // pour gerer les cas d'égalité
-    //std::optional<std::vector<int>> scores;
 
     void initialiserPioche(unsigned int nbJoueur = 1); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
 
@@ -80,12 +78,6 @@ public:
     //void jouerTourIndividuel();
     //void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
-
-
-    //void calculerScores();
-    //void afficherScores() const;
-    //void calculerGagnant();
-    //void afficherGagnant() const;
 
     void revenir(unsigned int indexTuile, unsigned int indexJeton);
     void apresPlacementDefinitif(EnvJoueur& player);

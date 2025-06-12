@@ -25,6 +25,7 @@ void affichePioche(const Partie& p);
 void afficheJoueurs(const Partie& p);
 void afficheEnvJoueurCourant(const Partie& p);
 void afficheScoreFeuille(const Score::ScoreFeuille& s);
+void afficheGagnants(const Score::ScoreFeuille& s);
 
 void afficherMessageBienvenu();
 void afficherMarquage();

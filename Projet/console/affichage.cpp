@@ -291,6 +291,20 @@ void afficheScoreFeuille(const Score::ScoreFeuille& s) {
 	std::cout << "\n";
 }
 
+void afficheGagnants(const Score::ScoreFeuille& s) {
+	auto gagnants = s.getGagnants();
+	if (gagnants.size() == 1) {
+		std::cout << "\n> Le gagnant est : " << gagnants[0] << " ! " << std::endl;
+	}
+	else {
+		std::cout << "\n> Victoire partagee entre : ";
+		for (const auto& pseudo : gagnants)
+			std::cout << "\n>> " << pseudo;
+		std::cout << std::endl;
+	}
+
+}
+
 void afficherMessageBienvenu() {
 	std::cout << "[JEU CASCADIA]\n";
 }
