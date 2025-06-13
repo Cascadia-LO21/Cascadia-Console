@@ -8,6 +8,8 @@
 #include <ostream>
 #include "position.h"
 #include "enums.h"
+#include "json.hpp"
+#include "serializers.h"
 
 class Tuile {
 	std::array<Habitat, 6> habitats;
@@ -18,6 +20,9 @@ class Tuile {
 	bool placementConfirme;
 
 public:
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Tuile, habitats, faunes, donneJetonNature,faunePlace,position,placementConfirme)
+
 	// Constructeur principal
 	Tuile(
 		const std::array<Habitat, 6>& habitats,

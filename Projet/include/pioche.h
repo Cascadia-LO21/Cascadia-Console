@@ -10,7 +10,7 @@
 #include "tuile.h"
 #include "jeton_faune.h"
 #include "enums.h"
-
+#include "json.hpp"
 
 // Cette classe implémente la logique de la pioche, gérant à la fois la pioche visible,
 // à savoir, les 4 paires présentées au joueurs, ainsi que la pioche cachée, que sont
@@ -49,6 +49,8 @@ private:
 	void setPiocheVisible();
 
 public:
+	
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Pioche, MAX, piocheVisible, visibilite, tuilesDispo, jetonsDispo, tuilesDepartDispo)
 
 	Pioche(unsigned int nbJoueurs = 1) :
 		visibilite{ {{true,true},{true,true},{true,true},{true,true} } }, // par defaut, tout est visible dans piocheVisible

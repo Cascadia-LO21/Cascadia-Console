@@ -5,12 +5,16 @@
 #include <ostream>
 #include <functional>
 #include "enums.h"
+#include "json.hpp"
 
 class Position {
 
 	int q, r, s;
+	//int q; int r; int s;
 
 public:
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE(Position, q, r, s)
 
 	Position(int x1 = 0, int x2 = 0, int x3 = 0) : q(x1), r(x2), s(x3) {
 		if (q + r + s != 0) {

@@ -9,6 +9,10 @@
 #include "env_joueur.h"
 #include "pioche.h"
 #include "gestion_pieces.h"
+#include <fstream>
+#include "json.hpp"
+//using json = nlohmann::json;
+#include "serializers.h"
 
 class Partie {
 private:
@@ -27,6 +31,10 @@ private:
     void initialiserPioche(unsigned int nbJoueur = 1); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
 
 public:
+    // pour la sauvegarde : la classe devient serialisable
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Partie, MAX_NB_TOURS, MAX_NB_JOUEURS, nbJoueurs, compteurTour, joueurs,
+        joueurCourant, pause, pioche, marquage, variante)
+
 
     // La pioche est vide encore
     // Le vecteur de joueurs est vide encore

@@ -20,3 +20,4 @@ bool abandonner(Partie& p);
 
 void choisirVariante(Partie& p);
 void choisirMarquage(Partie& p);
+

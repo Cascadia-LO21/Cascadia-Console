@@ -177,6 +177,7 @@ void GestionPieces::adapterTailleVecteurTuiles(std::vector<Tuile>& tuiles, const
     switch (nombreJoueurs) {
     case 1:
         tailleSouhaitee = 43; // prenons 43, vu que les regles officielles ne le precisent pas
+        break;
     case 2:
         tailleSouhaitee = 43;
         break;
