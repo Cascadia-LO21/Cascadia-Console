@@ -103,41 +103,41 @@ Position saisirCoordonnees(const EnvJoueur& player) {
 
     do {
         while (true) {
-            std::cout << "\n> Entre la coordonnee 1 : ";
+            std::cout << "\n>>> Entre la coordonnee 1 : ";
             if (!(std::cin >> q)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "\n> Entree invalide, saisis un entier STP.\n";
+                std::cout << "\n>>> Entree invalide, saisis un entier STP.\n";
                 continue;
             }
             break;
         }
         while (true) {
-            std::cout << "> Entre la coordonnee 2 : ";
+            std::cout << ">>> Entre la coordonnee 2 : ";
             if (!(std::cin >> r)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "\n> Entree invalide, saisis un entier STP.\n";
+                std::cout << "\n>>> Entree invalide, saisis un entier STP.\n";
                 continue;
             }
             break;
         }
         while (true) {
-            std::cout << "> Entre la coordonnee 3 : ";
+            std::cout << ">>> Entre la coordonnee 3 : ";
             if (!(std::cin >> s)) {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "\n> Entree invalide, saisis un entier STP.\n";
+                std::cout << "\n>>> Entree invalide, saisis un entier STP.\n";
                 continue;
             }
             break;
         }
 
         if (q + r + s != 0) {
-            std::cout << "\n> La somme des 3 coordonnees doit faire 0, retente STP. ";
+            std::cout << "\n>>> La somme des 3 coordonnees doit faire 0, retente STP. ";
         }
         else if (!player.getTuile(Position(q, r, s))) {
-            std::cout << "\n> Tu n'as pas de tuile placee ici, retente STP. ";
+            std::cout << "\n>>> Tu n'as pas de tuile placee ici, retente STP. ";
         }
         else {
             return Position(q, r, s);

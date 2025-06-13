@@ -26,7 +26,7 @@ int main() {
 	//testScore();
 	//std::cout << "FIN TEST.";
 
-	unsigned int r = saisirNombre(5);
+	//unsigned int r = saisirNombre(5);
 
 	// =======================================================================
 

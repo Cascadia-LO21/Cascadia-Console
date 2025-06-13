@@ -91,11 +91,24 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
     posTuile = saisirPositionTuile(p);
     tuileTmp = p.getPioche().getPiocheVisible().at(indexTuile).first;
     player.placerTuile(posTuile, tuileTmp); //ajouter la tuile temporairement dans le plateau du joueur, faudra confirmer a la fin
-    //std::cout << "tuileTmp:" << tuileTmp << "\n";
+
+    // Gestion de la rotation des tuiles
+    while (true) {
+        std::cout << "\n>> Veux tu pivoter la tuile ? (o/n) : ";
+        if (!saisirReponse()) break;
+        afficheMenuRotation(); // 1. sens horaire, 2. sens anti horaire
+        unsigned int action = saisirNombre(2);
+        if (action == 1)
+            player.getTuileNonConst(posTuile)->pivoterHoraire();
+        else if(action ==2)
+            player.getTuileNonConst(posTuile)->pivoterAntiHoraire();
+        afficheEnvJoueurCourant(p); // affichage apres rotation
+    }
+
     bool donneJetonNature = tuileTmp.getDonneJetonNature();
 
     // Retour en arrière
-    std::cout << "\n>>> Veux-tu revenir en arriere pour choisir une autre tuile ? (o/n)";
+    std::cout << "\n>> Veux-tu revenir en arriere pour choisir une autre tuile ? (o/n) : ";
     //std::cin >> tmp;
     if (saisirReponse()) {
         p.getPiocheModifiable().setVisibilite(indexTuile, true);
