@@ -33,6 +33,7 @@ public:
 		placementConfirme(place) {
 		if (this->faunes.size() < 1 || this->faunes.size() > 3)
 			throw std::invalid_argument("Nombre de faunes invalide.");
+		if (faunes.size() == 1) nature = true;
 	}
 
 

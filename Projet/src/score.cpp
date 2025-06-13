@@ -1,575 +1,505 @@
-#include "score.h"
-#include <iostream>
-#include <unordered_map>
+#include <queue>
 #include <unordered_set>
-#include <functional>
+#include <algorithm>
+#include <exception>
+#include <iostream>
+#include "score.h"
+#include "carte_marquage.h"
 #include "enums.h"
-#include "position.h"
+#include "affichage.h"
 
-
-std::array<std::vector<std::vector<Position>>, 5> EvalScore::ScoreHabitat::repartitionZone(const EnvJoueur& joueur)
-{
-	const std::unordered_map<Position, Tuile>& carte = joueur.getTuiles();
-	std::unordered_map<Position, std::array<bool, 6>> carteAParcourir = parcourirCarte(carte);
-	std::array<std::vector<std::vector<Position>>, 5> carteIndexee;
-	std::vector<Position> positionsVisitees;
-	for (const auto& [position, directions] : carteAParcourir) {
-		if (std::find(positionsVisitees.begin(), positionsVisitees.end(), position) != positionsVisitees.end()) {
-			// appartenance, alors skip iteration
-		}
-		else {
-			// cas ou on n'a pas parcouru les 6 directions de la Tuile
-			int currentIndice = getFirstFalseIndex(directions);
-			while (currentIndice != -1) {
-				const Tuile& currentTuile = carte.at(position);
-				Habitat currentHabitat = currentTuile.getHabitats()[currentIndice];
-				// MAJ carteIndexee du currentTuile
-				size_t currentIndice = carteIndexee[static_cast<int>(currentHabitat)].size() + 1;
-				carteIndexee[static_cast<int>(currentHabitat)].resize(currentIndice);
-				parcourHabitat(position, currentHabitat, carte, positionsVisitees, carteAParcourir, carteIndexee[static_cast<int>(currentHabitat)][currentIndice]);
-			}
-			// fini de parcourir une tuile
-			positionsVisitees.push_back(position);
-		}
-	}
-
-	return carteIndexee;
-}
-
-void EvalScore::ScoreHabitat::updateTailleMaxTous(int indice, std::array<std::vector<std::vector<Position>>, 5> carteIndexee)
-{
-	auto maxRetenu = getTailleMaxTous();
-	auto maxJoueur = maxRetenu[indice];
-	int courantIndice = 0;
-	for (auto valeurMax : maxJoueur) {
-		valeurMax = retournerMax(carteIndexee, courantIndice);
-		courantIndice++;
+// appliquer toutes les cartes marquage X sur le player, et ces resultats seront stockes dans un ScoreJoueur
+void Score::calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, std::string lettre) {
+	std::vector<Faune> faunes = { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti };
+	for (auto f : faunes) {
+		std::string nomCarte = fauneToString(f) + lettre; // exemple : "saumonA"
+		auto carte = CarteMarquageStandardFactory::creerCarte(nomCarte);
+		USI points = carte->CalculScore(player);
+		sj.pointsFaunes[f] = points;
 	}
 }
 
-void EvalScore::ScoreHabitat::updateBonusTous(int nbJoueurs)
-{
-	// ref tableau du Rapport 1
-	auto bonus = getBonusTous();
-	auto maxRetenu = getTailleMaxTous();
-
-	if (nbJoueurs == 1) {
-		for (int i = 0; i < 5; i++) {
-			if (maxRetenu[0][i] >= 7) {
-				bonus[0][i] = 2;
-			}
-		}
-	}
-	else if (nbJoueurs == 2) {
-		// chaque type faune
-		for (int i = 0; i < 5; i++) {
-			// V rifier le joueur 1
-			if (maxRetenu[0][i] > maxRetenu[1][i]) {
-				bonus[0][i] = 2; // 1er joueur
-			}
-			else if (maxRetenu[0][i] < maxRetenu[1][i]) {
-				bonus[1][i] = 2; // 1er joueur
-			}
-			else {
-				bonus[0][i] = 1; //  galit 
-				bonus[1][i] = 1;
-			}
-		}
-	}
-	else {
-		// 3 et 4 joueurs
-		int valPremier = 0;
-		int valDeuxieme = 0;
-		std::vector<int> ensemblePremiers;
-		std::vector<int> ensembleDeuxiemes;
-
-		for (int i = 0; i < 5; i++) {
-			// Trouver le maximum et le deuxi me maximum
-			for (int j = 0; j < nbJoueurs; j++) {
-				if (maxRetenu[j][i] > valPremier) {
-					valDeuxieme = valPremier;
-					ensembleDeuxiemes = ensemblePremiers;
-					valPremier = maxRetenu[j][i];
-					ensemblePremiers = { j }; // R initialiser avec le joueur courant
-				}
-				else if (maxRetenu[j][i] == valPremier) {
-					ensemblePremiers.push_back(j); // Ajouter   l'ensemble des premiers
-				}
-				else if (maxRetenu[j][i] > valDeuxieme && maxRetenu[j][i] < valPremier) {
-					valDeuxieme = maxRetenu[j][i];
-					ensembleDeuxiemes = { j }; // R initialiser avec le joueur courant
-				}
-				else if (maxRetenu[j][i] == valDeuxieme) {
-					ensembleDeuxiemes.push_back(j); // Ajouter   l'ensemble des deuxi mes
-				}
-			}
-
-			// Attribuer les bonus
-			if (ensemblePremiers.size() > 1) {
-				//  galit  pour le premier
-				for (int joueur : ensemblePremiers) {
-					bonus[joueur][i] = 2; // +2 chacun
-				}
-			}
-			else {
-				// 1er joueur
-				for (int joueur : ensemblePremiers) {
-					bonus[joueur][i] = 3; // +3 pour le premier
-				}
-			}
-
-			// Attribuer le bonus pour le deuxi me plus  tendu
-			if (ensembleDeuxiemes.size() > 1) {
-				//  galit  pour le deuxi me, rien   attribuer
-				for (int joueur : ensembleDeuxiemes) {
-					continue;
-					// bonus[joueur][i] = 0; // 0 pour  galit 
-				}
-			}
-			else {
-				// 2e joueur
-				for (int joueur : ensembleDeuxiemes) {
-					bonus[joueur][i] = 1; // +1 pour le deuxi me
-				}
-			}
-		}
-	}
+void Score::calculFauneVariante(const EnvJoueur& player, ScoreJoueur& sj, std::string variante) {
+	auto carteVar = CarteMarquageVarianteFactory::creerCarte(variante);
+	sj.pointsFaunes = carteVar->CalculScore(player);
 }
 
-void EvalScore::ScoreHabitat::updateScore(int indice, EnvJoueur& joueur)
-{
-	auto scoreHabitat = joueur.getScoreHabitat(); 
-	auto bonus = getBonusTous();
-	auto maxRetenu = getTailleMaxTous();
-	for (int i = 0; i < 5; i++) {
-		scoreHabitat[i] = maxRetenu[indice][i] + bonus[indice][i];
-	}
-	return;
-}
+// calcule la plus grande zone dans le plateau du joueur pour chaque type d'Habitat
+void Score::ScoreFeuille::calculPointsHabitats(const EnvJoueur& player, ScoreJoueur& sj) {
+	const std::unordered_map<Position, Tuile>& plateau = player.getTuiles();
+	std::vector<Habitat> habitats = { Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie };
 
-void EvalScore::ScoreHabitat::parcourHabitat(Position position, Habitat currentHabitat, const std::unordered_map<Position, Tuile>& carte, std::vector<Position> positionDirectionVisitees, std::unordered_map<Position, std::array<bool, 6>> carteAParcourir, std::vector<Position> zone)
-{
-	zone.push_back(position);
-	const std::array<Habitat, 6> ensemble = carte.at(position).getHabitats();
-	// dans indiceMemeHabitat on a deja fait la verification si deja visite ou non
-	std::vector<int> indicesAParcourir = indiceMemeHabitat(currentHabitat, ensemble, carteAParcourir.at(position));
-	for (auto currentIndice : indicesAParcourir) {
-		const Position voisin = position.getPositionAdjacente(static_cast<Direction>(currentIndice));
-		// verif si voisin existe dans carte
-		if (carte.find(voisin) != carte.end()) {
-			// verif si deja visitee
-			if (std::find(positionDirectionVisitees.begin(), positionDirectionVisitees.end(), voisin) == positionDirectionVisitees.end()) {
-				// verif voisin
-				Direction directionVoisin = getDirectionOpposee(static_cast<Direction> (currentIndice));
-				Habitat voisinHabitat = carte.at(voisin).getHabitats()[static_cast<int>(directionVoisin)];
-				// verif si (dans voisin) cote adjacent est meme habitat avec Direction getDirectionOpposee(Direction dir);
-				if (voisinHabitat != currentHabitat) {
-					// non = fin de parcours dans cette direction
-					continue;
-				}
-				else {
-					// oui
-					parcourHabitat(voisin, currentHabitat, carte, positionDirectionVisitees, carteAParcourir, zone);
-				}
-			}
-		}
-		// MAJ currentIndice parcouru
-		carteAParcourir.at(position)[currentIndice] = true;
-	}
-	return;
-}
+	for (auto h : habitats) {
+		std::unordered_set<Position> posVisitees;
+		USI zoneMax = 0;
 
-std::unordered_map<Position, std::array<bool, 6>> EvalScore::ScoreHabitat::parcourirCarte(const std::unordered_map<Position, Tuile>& carte)
-{
-	std::unordered_map<Position, std::array<bool, 6>> carteAParcourir;
+		for (const auto& [pos, tuile] : plateau) {
+			if (posVisitees.count(pos)) 
+				continue; // si deja visitee
 
-	for (const auto& paire : carte) {
-		carteAParcourir[paire.first] = std::array<bool, 6>{ false, false, false, false, false, false };// pour les 6 directions
-	}
+			if (std::find(tuile.getHabitats().begin(), tuile.getHabitats().end(), h) == tuile.getHabitats().end()) 
+				continue; // si la tuile ne possede pas l'habitat en question
 
-	return carteAParcourir;
-}
+			// algo de recherche en largeur (BFS), implementee avec une file (FIFO)
+			// pour decouvrir les tuiles adjacentes a celle en question d'abord
+			std::queue<Position> file; // les Positions a visiter
+			std::unordered_set<Position> zone; 
+			file.push(pos);
+			zone.insert(pos);
+			//posVisitees.insert(pos);
 
-int EvalScore::ScoreHabitat::getFirstFalseIndex(const std::array<bool, 6>& directions)
-{
-	for (int i = 0; i < directions.size(); ++i) {
-		if (!directions[i]) {
-			return i;
-		}
-	}
-	return -1;
-}
+			while (!file.empty()) { // tant qu'il reste des positions a visiter
+				Position current = file.front();
+				file.pop();
+				posVisitees.insert(current);
 
-std::vector<int> EvalScore::ScoreHabitat::indiceMemeHabitat(Habitat habitat, const std::array<Habitat, 6> ensemble, std::array<bool, 6> dejaVisite)
-{
-	std::vector<int> vecteurIndice;
-	for (int i = 0; i < ensemble.size(); i++) {
-		if (!dejaVisite[i] && ensemble[i] == habitat) {
-			vecteurIndice.push_back(i);
-		}
-	}
-	return vecteurIndice;
-}
+				const Tuile& t = *player.getTuile(current);
+				const auto& vecHabitats = t.getHabitats();
 
-int EvalScore::ScoreHabitat::retournerMax(std::array<std::vector<std::vector<Position>>, 5> carteIndexee, int indice) {
-	if (indice < 0 || indice >= carteIndexee.size()) {
-		throw std::out_of_range("Indice hors limites.");
-	}
+				for (USI i = 0; i < t.getHabitats().size(); i++) {
+					if (vecHabitats[i] != h) continue;
 
-	int courantHabitatMax = 0;
-	for (const auto& ensembleZones : carteIndexee[indice]) {
-		int nouveauTaille = static_cast<unsigned int>(ensembleZones.size());
-		if (nouveauTaille > courantHabitatMax) {
-			courantHabitatMax = nouveauTaille;
-		}
-	}
-	return courantHabitatMax;
-}
-
-// Attention: cette fonction ne mobilise que la carte marquage A
-void EvalScore::calculScoreFaune(Partie& partie)
-{
-	std::vector<std::unique_ptr<CarteMarquage>> cartes;
-	cartes.push_back(std::make_unique<CarteSaumon>());
-	cartes.push_back(std::make_unique<CarteOurs>());
-	cartes.push_back(std::make_unique<CarteBuse>());
-	cartes.push_back(std::make_unique<CarteRenard>());
-	cartes.push_back(std::make_unique<CarteWapiti>());
-
-	int nbJoueur = partie.getNbJoueurs();
-	auto& joueursModifiable = partie.getJoueursModifiable();
-	// parcours faune
-	for (auto& joueur : joueursModifiable) {
-		int i = 0;
-		for (const auto& carteMarquage : cartes) {
-			joueur.getScoreFaune()[i] = carteMarquage->methodeCalculA(joueur.getTuiles());
-			i++;
-		}
-	}
-	return;
-}
-
-void EvalScore::ScoreHabitat::caclulScoreHabitat(Partie& partie)
-{
-	// ajustement de la taille
-	int nbJoueur = partie.getNbJoueurs();
-	setTailleMaxTous(nbJoueur);
-	setBonusTous(nbJoueur);
-
-	const auto& joueurs = partie.getJoueurs();
-	for (int i = 0; i < nbJoueur; i++) {
-		updateTailleMaxTous(i, repartitionZone(joueurs[i]));
-	}
-
-	auto& joueursModifiable = partie.getJoueursModifiable();
-	updateBonusTous(nbJoueur);
-	for (int i = 0; i < nbJoueur; i++) {
-		updateScore(i, joueursModifiable[i]);
-	}
-}
-
-
-
-int EvalScore::CarteOurs::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
-
-	std::unordered_set<Position> PositionsVisitees;
-	int nbPairesOurs = 0;
-
-	//parcourt des tuiles de carte
-	for (const auto& [position, tuile] : carte) { // [cle,valeur] appartenant   carte
-
-		//on ignore la tuile si deja visit e
-		if (PositionsVisitees.count(position) == 1) continue;
-		//on ignre la tuile si pas de jeton faune ou jeton non ours, et on la marque comme visitee
-		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::ours) continue;
-
-		//on v rifie s'il y a d'autres ours adjacents
-		int nbOursAdj = 0;
-		Position posOursAdjUnique; //sera instanci  plus tard s'il y a un ours adjacent
-
-		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
-
-		for (unsigned int i = 0; i < 6; i++) {
-			Position posVoisine = vec[i];
-
-			if (carte.count(posVoisine) == 1 && PositionsVisitees.count(posVoisine) == 0) {
-				const Tuile& tuileVoisine = carte.at(posVoisine);
-
-				if (tuileVoisine.JetonFaunePresent() && tuileVoisine.getFaunePlace() == Faune::ours) {
-					nbOursAdj++;
-					posOursAdjUnique = posVoisine;
-				}
-				PositionsVisitees.insert(posVoisine);
-			}
-		}
-		PositionsVisitees.insert(position); //position actuelle
-
-		//on v rifie si l'unique ours adj   la position courante n'est pas adjacent   un autre ours
-		if (nbOursAdj == 1) {
-			int nbOursAdj2 = 0;
-			std::vector<Position> vec = posOursAdjUnique.getVecteurPositionsAdjacentes();
-			for (unsigned int i = 0; i < 6; i++) {
-
-				Position posVoisine = vec[i];
-				if (carte.count(posVoisine) == 1) { //il ne faut pas v rifier si elle a d j   t  visit e
-					const Tuile& tuile_voisine = carte.at(posVoisine);
-					if (tuile_voisine.JetonFaunePresent() && tuile_voisine.getFaunePlace() == Faune::ours) {
-						nbOursAdj2++;
-						PositionsVisitees.insert(posVoisine);
+					// si sur ce cote i il y a l'habitat h, on examine si la tuile adjacente par ici existe et possede l'habitat en question
+					Position posAdj = current.getPositionAdjacente(static_cast<Direction>(i));
+					const Tuile* tAdj = player.getTuile(posAdj); 
+					if (!tAdj) continue; // pas de tuile a cette position
+					if (zone.count(posAdj)) continue; // deja dans la zone
+					if (tAdj->getHabitats()[(i+3)%6] != h) continue; // si le cote en question n'est pas de type h
+					
+					if (!posVisitees.count(posAdj)) {
+						file.push(posAdj);
+						zone.insert(posAdj);
 					}
 				}
 			}
-			if (nbOursAdj2 == 1) {
-				nbPairesOurs++;
-			}
+			if (zone.size() > zoneMax) zoneMax = static_cast<USI>(zone.size());
 		}
-
-	}
-
-	//Calcul du score total
-	switch (nbPairesOurs) {
-	case 0: return 0;
-	case 1: return 4;
-	case 2: return 11;
-	case 3: return 19;
-	default: return 27; // 4+ paires d'ours
+		sj.pointsHabitats[h] = zoneMax; // stocker la plus grande taille de la zone h trouvee
 	}
 }
 
+void Score::ScoreFeuille::calculerBonusHabitats(const std::vector<EnvJoueur>& players) {
+	if (scores.size() != players.size()) throw std::invalid_argument("Il y a plus de joueurs que de scores calcules !");
+	std::vector<Habitat> habitats = { Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie };
+	USI nbJoueurs = static_cast<USI>(scores.size());
 
-int EvalScore::CarteBuse::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const {
-	//initialisations
-	std::unordered_set<Position> PositionsVisitees;
-	int nbBusesIsolees = 0;
+	if (nbJoueurs == 1) { // si jeu solitaire
+		auto& scoreJoueur = scores[players[0].getPseudo()];
+		for (const auto& [hab, taille] : scoreJoueur.pointsHabitats) {
+			if (taille >= 7)
+				scoreJoueur.pointsHabitatsBonus[hab] = 2;
+			else
+				scoreJoueur.pointsHabitatsBonus[hab] = 0;
+		}
+	}
 
-	//parcourt des tuiles de carte
-	for (const auto& [position, tuile] : carte) { // [cle,valeur] appartenant   carte
+	else { // si 2+ joueurs
+		for (auto h: habitats) {
 
-		//on ignore la tuile si deja visit e
-		if (PositionsVisitees.count(position) == 1) continue;
-		//on ignre la tuile si pas de jeton faune ou jeton non buse
-		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::buse) continue;
+			// tailles pour chaque joueur
+			std::vector<int> tailles;
+			for (const auto& player : players) {
+				tailles.push_back(scores.at(player.getPseudo()).pointsHabitats.at(h));
+			}
 
-		//on v rifie s'il y a d'autres buses adjacentes
-		int nbBusesAdj = 0;
-		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
-		for (unsigned int i = 0; i < 6; i++) {
-			Position posVoisine = vec[i];
+			for (const auto& player : players) {
+				scores[player.getPseudo()].pointsHabitatsBonus[h] = 0;
+			}
 
-			if (carte.count(posVoisine) == 1) {
-				const Tuile& tuileVoisine = carte.at(posVoisine);
-				PositionsVisitees.insert(posVoisine);
-
-				if (tuileVoisine.JetonFaunePresent() && tuileVoisine.getFaunePlace() == Faune::buse) {
-					nbBusesAdj++;
+			if (players.size() == 2) { // 2 joueurs
+				if (tailles[0] > tailles[1]) {
+					scores[players[0].getPseudo()].pointsHabitatsBonus[h] = 2;
+				}
+				else if (tailles[0] < tailles[1]) {
+					scores[players[1].getPseudo()].pointsHabitatsBonus[h] = 2;
+				}
+				else {
+					scores[players[0].getPseudo()].pointsHabitatsBonus[h] = 1;
+					scores[players[1].getPseudo()].pointsHabitatsBonus[h] = 1;
 				}
 			}
-		}
-		PositionsVisitees.insert(position); //position actuelle
+			else { // 3 ou 4 joueurs
+				int valPremier = -1, valDeuxieme = -1;
+				std::vector<int> ensemblePremiers, ensembleDeuxiemes;
 
-		if (nbBusesAdj == 0) {
-			nbBusesIsolees++;
-		}
-	}
-
-	//Calcul du score total
-	switch (nbBusesIsolees) {
-	case 0: return 0;
-	case 2: return 5;
-	case 3: return 8;
-	case 4: return 11;
-	case 5: return 14;
-	case 6: return 18;
-	case 7: return 22;
-	default: return 26; //8+ buses
-	}
-}
-
-
-int EvalScore::CarteRenard::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const
-{
-	int scoreTotal = 0;
-	std::unordered_set<Position> PositionsVisitees;
-	std::vector<int> AdjRenards;
-
-	//parcourt des tuiles de carte
-	for (const auto& [position, tuile] : carte) {
-		std::unordered_set<Faune> FaunesAdjacentes; //afin de stocker les faunes sans duplication, puis avoir la taille
-
-		//on ignore la tuile si deja visit e
-		if (PositionsVisitees.count(position) == 1) continue;
-		//on ignre la tuile si pas de jeton faune ou jeton non renard
-		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::renard) continue;
-
-		//parcourir les tuiles adjacentes   la tuile renard
-		std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
-		for (unsigned int i = 0; i < 6; i++) {
-
-			Position posVoisine = vec[i];
-			if (carte.count(posVoisine) == 1) {
-				const Tuile& tuileVoisine = carte.at(posVoisine);
-
-				if (tuileVoisine.JetonFaunePresent()) {
-					FaunesAdjacentes.insert(tuileVoisine.getFaunePlace());
+				// Trouver les premiers et deuxièmes
+				for (int j = 0; j < (int)players.size(); ++j) {
+					if (tailles[j] > valPremier) {
+						valDeuxieme = valPremier;
+						ensembleDeuxiemes = ensemblePremiers;
+						valPremier = tailles[j];
+						ensemblePremiers = { j };
+					}
+					else if (tailles[j] == valPremier) {
+						ensemblePremiers.push_back(j);
+					}
+					else if (tailles[j] > valDeuxieme && tailles[j] < valPremier) {
+						valDeuxieme = tailles[j];
+						ensembleDeuxiemes = { j };
+					}
+					else if (tailles[j] == valDeuxieme) {
+						ensembleDeuxiemes.push_back(j);
+					}
 				}
+
+				// Attribution des bonus pour les premiers
+				if (ensemblePremiers.size() == 1) {
+					scores[players[ensemblePremiers[0]].getPseudo()].pointsHabitatsBonus[h] = 3;
+				}
+				else if (ensemblePremiers.size() == 2) {
+					for (int idx : ensemblePremiers)
+						scores[players[idx].getPseudo()].pointsHabitatsBonus[h] = 2;
+				}
+				else if (ensemblePremiers.size() == 3 || ensemblePremiers.size() == 4) {
+					for (int idx : ensemblePremiers)
+						scores[players[idx].getPseudo()].pointsHabitatsBonus[h] = 1;
+				}
+
+				// Attribution des bonus pour les deuxièmes
+				if (ensemblePremiers.size() == 1) {
+					if (ensembleDeuxiemes.size() == 1) {
+						scores[players[ensembleDeuxiemes[0]].getPseudo()].pointsHabitatsBonus[h] = 1;
+					}
+					// Si égalité à la 2e place, pas de points
+				}
+				// Si égalité au 1er, pas de points pour les deuxièmes
 			}
 		}
-		//on compte le nombre de types adj pour chaque renard et on l'ajoute   AdjRenards
-		AdjRenards.push_back(static_cast<int>(FaunesAdjacentes.size()));
-		PositionsVisitees.insert(position);
 	}
-	//insert boucle pour parcourir le vecteur ou set, puis le switch
-	for (int renard : AdjRenards) {
-		switch (renard) {
-		case 1: scoreTotal += 1; break;
-		case 2: scoreTotal += 2; break;
-		case 3: scoreTotal += 3; break;
-		case 4: scoreTotal += 4; break;
-		case 5: scoreTotal += 5; break;
-		default: break; //cas 0
-		}
+
+}
+
+void Score::ScoreFeuille::calculScoresPartie(const Partie& p) {
+	scores.clear();
+	const std::vector<EnvJoueur> players = p.getJoueurs();
+	if (p.getVariante() == Variante::standard)
+		setStrategieFaune(std::make_unique<CalculScoreFauneStandard>(marquageToString(p.getMarquage())));
+	else // si variante famille ou intermediaire ou autre
+		setStrategieFaune(std::make_unique<CalculScoreFauneVariante>(varianteToString(p.getVariante())));
+
+	for (const auto& player : players) {
+		ScoreJoueur sj;
+		strategieFaune->calculPointsFaunes(player, sj);
+		calculPointsHabitats(player, sj);
+		
+		calculTotalFaunes(sj);
+		//calculTotalHabitats(sj);
+		sj.nbJetonsNature = player.getNbJetonsNature();
+		scores[player.getPseudo()] = sj;
 	}
-	return scoreTotal;
+
+	calculerBonusHabitats(players);
+	for(const auto& player:players) calculTotalHabitats(scores[player.getPseudo()]);
+	
+	for (const auto& player : players) {
+		calculTotalFinal(scores[player.getPseudo()]);
+	}
 }
 
 
-int EvalScore::CarteSaumon::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const
-{
-	std::unordered_set<Position> PositionsVisitees;
-	std::vector<int> taillesChaines;
-	int scoreTotal = 0;
+std::vector<std::string> Score::ScoreFeuille::getGagnants() const {
+	std::vector<std::string> gagnants;
+	int maxScore = -1;
 
-	for (const auto& [position, tuile] : carte) {
-		int longueur_chaine = 0;
-
-		//on ignore la tuile si deja visit e
-		if (PositionsVisitees.count(position) == 1) continue;
-		//on ignore la tuile si pas de jeton faune ou jeton non saumon
-		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::saumon) continue;
-
-
-		//position actuelle contient saumon
-		int tailleChaine = explorerChaineSaumonA(carte, position, PositionsVisitees, nullptr); //nullptr car premier element n'a pas de pere
-		if (tailleChaine > 0) {
-			taillesChaines.push_back(tailleChaine);
+	// trouver le score total maximum
+	for (const auto& [pseudo, sj] : scores) {
+		if (static_cast<int>(sj.totalFinal) > maxScore) {
+			maxScore = sj.totalFinal;
+			gagnants = { pseudo };
+		}
+		else if (sj.totalFinal == maxScore) {
+			gagnants.push_back(pseudo);
 		}
 	}
 
-	for (int chaine : taillesChaines) {
-		switch (chaine) {
-		case 0: scoreTotal += 0; break;
-		case 1: scoreTotal += 2; break;
-		case 2: scoreTotal += 5; break;
-		case 3: scoreTotal += 9; break;
-		default: scoreTotal += 13; break; // pour 4+ 
+	if (gagnants.size() == 1) return gagnants;
+
+	// 3. Départage avec les jetons nature
+	int maxJetons = -1;
+	std::vector<std::string> gagnantsJetons;
+	for (const auto& pseudo : gagnants) {
+		int jetons = scores.at(pseudo).nbJetonsNature;
+		if (jetons > maxJetons) {
+			maxJetons = jetons;
+			gagnantsJetons = { pseudo };
+		}
+		else if (jetons == maxJetons) {
+			gagnantsJetons.push_back(pseudo);
 		}
 	}
-	return scoreTotal;
+
+	return gagnantsJetons;
 }
 
-int EvalScore::CarteSaumon::explorerChaineSaumonA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, const Position* pos_pere) const
-{
-	PositionsVisitees.insert(position);
-	int nbSaumonsAdj = 0;
-	int taille = 1; //la chaine contient au moins 1 saumon (current)
 
-	std::vector<Position> vec = position.getVecteurPositionsAdjacentes();
+// WARNING: NE MARCHE PAS: probleme au niveau du placement des tuiles
+void testScore() {
+	EnvJoueur j("mario");
+	std::cout << "joueur cree\n";
 
-	//parcourir les positions adjacentes
-	for (const Position& posVoisine : vec) {
-		//verif pr ne pas faire le chemin inverse
-		if (pos_pere && posVoisine == *pos_pere) {
-			continue;
-		}
-		//verif si elle existe bien dans la carte
-		if (carte.count(posVoisine) == 0) continue;
-		const Tuile& tuileVoisine = carte.at(posVoisine);
+	// tuile 1 : regles du jeu page 9 : 23 tuiles
+	// LIGNE 1
+	std::array<Habitat, 6> h1 = { Habitat::prairie, Habitat::fleuve, Habitat::fleuve,
+								   Habitat::fleuve, Habitat::prairie, Habitat::prairie };
+	std::vector<Faune> f1 = { Faune::renard, Faune::ours };
+	Tuile t1(h1, f1);
+	std::cout << "av placement \n";
+	j.placerTuile(Position(0, -4, +4), t1);
+	std::cout << "placer tuile \n";
+	j.confirmerPlacement();
+	std::cout << "placement confirme \n";
 
-		if (!tuileVoisine.JetonFaunePresent() && tuileVoisine.getFaunePlace() != Faune::saumon) continue;
 
-		nbSaumonsAdj++;
-		if (nbSaumonsAdj > 2) return 0; //chaine annul e
-		if (PositionsVisitees.count(posVoisine) == 0) {
-			//appel r cursif sur la position voisine, et la position actuelle est l'argument pere
-			int tailleSuite = explorerChaineSaumonA(carte, posVoisine, PositionsVisitees, &position);
-			if (tailleSuite == 0) return 0; //la chaine est invalide, donc on arrete
-			//else
-			taille += tailleSuite;
-		}
-	}
+	std::cout << "TUILE 1 PLACEE\n";
 
-	return taille;
-}
 
-int EvalScore::CarteWapiti::methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const
-{
-	std::unordered_set<Position> PositionsVisitees;
-	std::vector<int> taillesChaines;
-	int scoreTotal = 0;
+	std::array<Habitat, 6> h2 = { Habitat::prairie, Habitat::prairie, Habitat::prairie,
+							   Habitat::foret, Habitat::foret, Habitat::foret}; 
+	std::vector<Faune> f2 = { Faune::renard, Faune::ours };
+	Tuile t2(h2, f2);
+	Position po2(1, -4, 3);
+	j.placerTuileDefinitive(po2, t2);
+	JetonFaune jf2(Faune::ours);
+	j.placerJetonFaune(po2, jf2);
 
-	for (const auto& [position, tuile] : carte) {
-		int longueur_chaine = 0;
+	//LIGNE 2
+	std::array<Habitat, 6> h3 = { Habitat::fleuve, Habitat::prairie, Habitat::prairie,
+							   Habitat::prairie, Habitat::fleuve, Habitat::fleuve};
+	std::vector<Faune> f3 = { Faune::buse};
+	Tuile t3(h3, f3);
+	Position po3(-1,-3,-4);
+	j.placerTuileDefinitive(po3, t3);
+	JetonFaune jf3(Faune::buse);
+	j.placerJetonFaune(po3, jf3);
 
-		//on ignore la tuile si deja visit e
-		if (PositionsVisitees.count(position) == 1) continue;
-		//on ignore la tuile si pas de jeton faune ou jeton non wapiti
-		if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::wapiti) continue;
+	std::array<Habitat, 6> h4 = { Habitat::fleuve, Habitat::fleuve, Habitat::prairie,
+						   Habitat::prairie, Habitat::prairie, Habitat::fleuve };
+	std::vector<Faune> f4 = { Faune::ours};
+	Tuile t4(h4,f4);
+	Position po4(0,-3,3);
+	j.placerTuileDefinitive(po4,t4);
+	JetonFaune jf4(Faune::ours);
+	j.placerJetonFaune(po4,jf4);
 
-		//position actuelle contient saumon
-		int tailleChaine = explorerChaineWapitiA(carte, position, PositionsVisitees, std::nullopt); //nullopt car on n'a pas encore trouv  la direction de la chaine
-		if (tailleChaine > 0) {
-			taillesChaines.push_back(tailleChaine);
-		}
-	}
 
-	for (int chaine : taillesChaines) {
-		switch (chaine) {
-		case 0: scoreTotal += 0; break;
-		case 1: scoreTotal += 2; break;
-		case 2: scoreTotal += 4; break;
-		case 3: scoreTotal += 7; break;
-		case 4: scoreTotal += 11; break;
-		case 5: scoreTotal += 15; break;
-		case 6: scoreTotal += 20; break;
-		default: scoreTotal += 26; break; // pour 7+ 
-		}
-	}
-	return scoreTotal;
-}
+	std::array<Habitat, 6> h5 = { Habitat::fleuve, Habitat::fleuve, Habitat::fleuve,
+						   Habitat::fleuve, Habitat::fleuve, Habitat::fleuve };
+	Faune faune5 = Faune::saumon;
+	std::vector<Faune> f5 = { faune5 };
+	Tuile t5(h5, f5);
+	Position po5(1, -3, 2);
+	j.placerTuileDefinitive(po5, t5);
+	JetonFaune jf5(faune5);
+	j.placerJetonFaune(po5, jf5);
 
-int EvalScore::CarteWapiti::explorerChaineWapitiA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, std::optional<Direction> direction) const
-{
-	if (PositionsVisitees.count(position)) return 0;
-	if (carte.count(position) == 0) return 0;
 
-	const Tuile& tuile = carte.at(position);
-	if (!tuile.JetonFaunePresent() || tuile.getFaunePlace() != Faune::wapiti) return 0;
+	std::array<Habitat, 6> h6 = { Habitat::montagne, Habitat::montagne, Habitat::montagne,
+						   Habitat::fleuve, Habitat::fleuve, Habitat::fleuve };
+	Faune faune6 = Faune::saumon;
+	std::vector<Faune> f6= { faune6 };
+	Tuile t6(h6, f6);
+	Position po6(2, -3, 1);
+	j.placerTuileDefinitive(po6, t6);
+	JetonFaune jf6(faune6);
+	j.placerJetonFaune(po6, jf6);
 
-	PositionsVisitees.insert(position);
+	std::array<Habitat, 6> h7 = { Habitat::montagne, Habitat::montagne, Habitat::montagne,
+					   Habitat::fleuve, Habitat::fleuve, Habitat::fleuve };
+	Faune faune7 = Faune::wapiti;
+	std::vector<Faune> f7 = { faune7 };
+	Tuile t7(h7, f7);
+	t7.pivoterHoraire();
+	Position po7(3, -3, 0);
+	j.placerTuileDefinitive(po7, t7);
+	JetonFaune jf7(faune7);
+	j.placerJetonFaune(po7, jf7);
 
-	// cas 0: on cherche une direction et on explore dans les 2 sens
-	if (!direction.has_value()) {
-		for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
-			if (carte.count(posVoisine) == 0) continue;
 
-			const Tuile& tVoisine = carte.at(posVoisine);
-			if (!tVoisine.JetonFaunePresent() || tVoisine.getFaunePlace() != Faune::wapiti) continue;
+	std::array<Habitat, 6> h8 = { Habitat::montagne, Habitat::montagne, Habitat::montagne,
+				   Habitat::fleuve, Habitat::fleuve, Habitat::fleuve };
+	Faune faune8 = Faune::buse;
+	std::vector<Faune> f8 = { faune8 };
+	Tuile t8(h8, f8);
+	t8.pivoterHoraire(); 	t8.pivoterHoraire();
+	Position po8(4, -3, -1);
+	j.placerTuileDefinitive(po8, t8);
+	JetonFaune jf8(faune8);
+	j.placerJetonFaune(po8, jf8);
 
-			//trouv  un wapiti voisin
-			Direction dir = coteTangent(position, posVoisine);
-			Direction opp = getDirectionOpposee(dir);
 
-			int taille1 = explorerChaineWapitiA(carte, posVoisine, PositionsVisitees, dir);
-			int taille2 = explorerChaineWapitiA(carte, position.getPositionAdjacente(opp), PositionsVisitees, opp);
+	// LIGNE 3
+	std::array<Habitat, 6> h9 = { Habitat::prairie, Habitat::prairie, Habitat::prairie,
+				   Habitat::marais, Habitat::marais, Habitat::marais};
+	Faune faune9 = Faune::renard;
+	std::vector<Faune> f9 = { faune9 };
+	Tuile t9(h9, f9);
+	Position po9(-2, -2, 4);
+	j.placerTuileDefinitive(po9, t9);
+	JetonFaune jf9(faune9);
+	j.placerJetonFaune(po9, jf9);
 
-			return 1 + taille1 + taille2; //1 : la pos actuelle compte + chaine dans une direction + chaine direction opposee
-		}
-		//pas de voisin wapiti, alors juste la pos actuelle
-		return 1;
-	}
 
-	//else, on a d j  la direction, on continue   la parcourir
-	Position suivante = position.getPositionAdjacente(direction.value());
-	return 1 + explorerChaineWapitiA(carte, suivante, PositionsVisitees, direction);
+	std::array<Habitat, 6> h10 = { Habitat::prairie, Habitat::prairie, Habitat::montagne,
+			   Habitat::montagne, Habitat::montagne, Habitat::prairie };
+	Faune faune10 = Faune::renard;
+	std::vector<Faune> f10= { faune10 };
+	Tuile t10(h10, f10);
+	Position po10(-1, -2, 3);
+	j.placerTuileDefinitive(po10, t10);
+	JetonFaune jf10(faune10);
+	j.placerJetonFaune(po10, jf10);
+
+	std::array<Habitat, 6> h11 = { Habitat::prairie, Habitat::foret, Habitat::foret,
+		   Habitat::foret, Habitat::prairie, Habitat::prairie };
+	Faune faune11 = Faune::saumon;
+	std::vector<Faune> f11 = { faune11 };
+	Tuile t11(h11, f11);
+	Position po11(0, -2, 2);
+	j.placerTuileDefinitive(po11, t11);
+	JetonFaune jf11(faune11);
+	j.placerJetonFaune(po11, jf11);
+
+	std::array<Habitat, 6> h12 = { Habitat::montagne, Habitat::montagne, Habitat::marais,
+	   Habitat::marais, Habitat::marais, Habitat::montagne};
+	Faune faune12 = Faune::buse;
+	std::vector<Faune> f12= { faune12 };
+	Tuile t12(h12, f12);
+	Position po12(1, -2, 1);
+	j.placerTuileDefinitive(po12, t12);
+	JetonFaune jf12(faune12);
+	j.placerJetonFaune(po12, jf12);
+
+	std::array<Habitat, 6> h13 = { Habitat::montagne, Habitat::montagne, Habitat::marais,
+	Habitat::marais, Habitat::marais, Habitat::montagne };
+	Faune faune13 = Faune::wapiti;
+	std::vector<Faune> f13 = { faune13 };
+	Tuile t13(h13, f13);
+	t13.pivoterAntiHoraire();
+	Position po13(2, -2, 0);
+	j.placerTuileDefinitive(po13, t13);
+	JetonFaune jf13(faune13);
+	j.placerJetonFaune(po13, jf13);
+
+	std::array<Habitat, 6> h14 = {Habitat::montagne, Habitat::montagne, Habitat::marais,
+			Habitat::marais, Habitat::marais, Habitat::montagne };
+	Faune faune14= Faune::ours;
+	std::vector<Faune> f14 = { faune14 };
+	Tuile t14(h14, f14);
+	Position po14(3, -2, -1);
+	j.placerTuileDefinitive(po14, t14);
+	JetonFaune jf14(faune14);
+	j.placerJetonFaune(po14, jf14);
+
+	//LIGNE4
+	std::array<Habitat, 6> h15 = {Habitat::prairie, Habitat::prairie, Habitat::prairie,
+			Habitat::prairie, Habitat::prairie, Habitat::prairie };
+	Faune faune15 = Faune::wapiti;
+	std::vector<Faune> f15 = { faune15};
+	Tuile t15(h15, f15);
+	Position po15(2, -1, 3);
+	j.placerTuileDefinitive(po15, t15);
+	JetonFaune jf15(faune15);
+	j.placerJetonFaune(po15, jf15);
+
+
+	std::array<Habitat, 6> h16 = { Habitat::foret, Habitat::foret, Habitat::foret,
+		Habitat::prairie, Habitat::prairie, Habitat::prairie };
+	Faune faune16 = Faune::wapiti;
+	std::vector<Faune> f16= { faune16 };
+	Tuile t16(h16, f16);
+	Position po16(1, -1, 2);
+	j.placerTuileDefinitive(po16, t16);
+	JetonFaune jf16(faune16);
+	j.placerJetonFaune(po16, jf16);
+
+
+	std::array<Habitat, 6> h17 = { Habitat::marais, Habitat::marais, Habitat::marais,
+		Habitat::foret, Habitat::foret, Habitat::foret };
+	Faune faune17 = Faune::saumon;
+	std::vector<Faune> f17 = { faune17 };
+	Tuile t17(h17, f17);
+	Position po17(0, -1, 1);
+	j.placerTuileDefinitive(po17, t17);
+	JetonFaune jf17(faune17);
+	j.placerJetonFaune(po17, jf17);
+
+	std::array<Habitat, 6> h18 = { Habitat::marais, Habitat::marais, Habitat::marais,
+	Habitat::foret, Habitat::foret, Habitat::foret };
+	Faune faune18 = Faune::wapiti;
+	std::vector<Faune> f18 = { faune18 };
+	Tuile t18(h18, f18);
+	t18.pivoterAntiHoraire(); t18.pivoterAntiHoraire();
+	Position po18(1, -1, 0);
+	j.placerTuileDefinitive(po18, t18);
+	JetonFaune jf18(faune18);
+	j.placerJetonFaune(po18, jf18);
+
+	std::array<Habitat, 6>h19= { Habitat::marais, Habitat::marais, Habitat::marais,
+	Habitat::foret, Habitat::foret, Habitat::foret };
+	Faune faune19 = Faune::ours;
+	std::vector<Faune> f19 = { faune19 };
+	Tuile t19(h19, f19);
+	//t18.pivoterAntiHoraire(); t18.pivoterAntiHoraire();
+	Position po19(2, -1, -1);
+	j.placerTuileDefinitive(po19, t19);
+	JetonFaune jf19(faune19);
+	j.placerJetonFaune(po19, jf19);
+
+	std::array<Habitat, 6>h20 = { Habitat::marais, Habitat::marais, Habitat::marais,
+	Habitat::marais, Habitat::marais, Habitat::marais };
+	Faune faune20= Faune::ours;
+	std::vector<Faune> f20= { faune20 };
+	Tuile t20(h20, f20);
+	Position po20(3, -1, -2);
+	j.placerTuileDefinitive(po20, t20);
+	//JetonFaune jf20(faune20);
+	//j.placerJetonFaune(po20, jf20);
+
+	// LIGNE5
+	std::array<Habitat, 6>h21 = { Habitat::foret, Habitat::foret, Habitat::foret,
+				Habitat::prairie, Habitat::prairie, Habitat::prairie};
+	Faune faune21 = Faune::ours;
+	std::vector<Faune> f21 = { faune21 };
+	Tuile t21(h21, f21);
+	Position po21(1, 0, 1);
+	j.placerTuileDefinitive(po21, t21);
+	JetonFaune jf21(faune21);
+	//j.placerJetonFaune(po21, jf21);
+
+
+	std::array<Habitat, 6>h22 = { Habitat::foret, Habitat::foret, Habitat::foret,
+			Habitat::marais, Habitat::marais, Habitat::marais };
+	Faune faune22 = Faune::buse;
+	std::vector<Faune> f22 = { faune22 };
+	Tuile t22(h22, f22);
+	Position po22(0, 0, 0);
+	j.placerTuileDefinitive(po22, t22);
+	JetonFaune jf22(faune22);
+	j.placerJetonFaune(po22, jf22);
+
+
+	std::array<Habitat, 6>h23 = { Habitat::foret, Habitat::foret, Habitat::foret,
+			Habitat::foret, Habitat::foret, Habitat::foret };
+	Faune faune23 = Faune::renard;
+	std::vector<Faune> f23 = { faune23 };
+	Tuile t23(h23, f23);
+	Position po23(1, 0, -1);
+	j.placerTuileDefinitive(po23, t23);
+	JetonFaune jf23(faune23);
+	j.placerJetonFaune(po23, jf23);
+
+
+
+	j.setNbJetonsNature(2);
+
+	Partie p;
+	p.ajouterJoueur(j);
+	p.setMarquage(Marquage::A);
+	p.setVariante(Variante::standard);
+
+	//Score::ScoreFeuille scoreFeuille{};
+	//scoreFeuille.calculScoresPartie(p);
+	//afficheScoreFeuille(scoreFeuille);
+	//afficheGagnants(scoreFeuille);
 
 }

@@ -1,10 +1,12 @@
 #pragma once
 #include <ostream>
+#include <unordered_map>
 #include "jeton_faune.h"
 #include "position.h"
 #include "pioche.h"
 #include "env_joueur.h"
 #include "partie.h"
+#include "score.h"
 
 std::ostream& operator<<(std::ostream& os, const JetonFaune& j);
 
@@ -23,6 +25,10 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env);
 void affichePioche(const Partie& p);
 void afficheJoueurs(const Partie& p);
 void afficheEnvJoueurCourant(const Partie& p);
+void afficheScoreFeuille(const Score::ScoreFeuille& s);
+void afficheGagnants(const Score::ScoreFeuille& s);
+void afficheMenuRotation();
+void affichePlateau(const std::unordered_map<Position, Tuile>& plateau);
 
 void afficherMessageBienvenu();
 void afficherMarquage();

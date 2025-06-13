@@ -12,8 +12,8 @@
 
 class Partie {
 private:
-    static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
-    //static constexpr unsigned int MAX_NB_TOURS = 3; // testing purpose only
+    //static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
+    static constexpr unsigned int MAX_NB_TOURS = 2; // testing purpose only
     static constexpr unsigned int MAX_NB_JOUEURS = 4;
     unsigned int nbJoueurs;
     unsigned int compteurTour;
@@ -23,8 +23,6 @@ private:
     std::unique_ptr<Pioche> pioche;
     Marquage marquage;
     Variante variante;
-    std::optional<std::vector<int>> gagnant; // pour gerer les cas d'égalité
-    std::optional<std::vector<int>> scores;
 
     void initialiserPioche(unsigned int nbJoueur = 1); // privé, car on ne souhaite pas laisser quiconque initialiser la pioche
 
@@ -70,7 +68,6 @@ public:
     std::vector<EnvJoueur>& getJoueursModifiable() { return joueurs; }
 
     void preparer();
-    void lancer();
     void prochainJoueur() { joueurCourant = (joueurCourant + 1) % nbJoueurs; }
     void pauser() { if (!pause) pause = true; }
     void reprendre() { if (pause) pause = false; }
@@ -81,13 +78,6 @@ public:
     //void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
 
-
-    void calculerScores();
-    void afficherScores() const;
-    void calculerGagnant();
-    void afficherGagnant() const;
-
     void revenir(unsigned int indexTuile, unsigned int indexJeton);
-    //void apresPlacementDefinitif(const Position& posTuile, unsigned int indexTuile);
     void apresPlacementDefinitif(EnvJoueur& player);
 };

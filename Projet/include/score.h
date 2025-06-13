@@ -1,102 +1,114 @@
 #pragma once
 #include <ostream>
-#include "enums.h"
-#include "position.h"
-#include "tuile.h"
+#include <exception>
 #include <unordered_map>
-#include <unordered_set>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include "enums.h"
 #include "env_joueur.h"
 #include "partie.h"
-#include <algorithm>
 
+using USI = unsigned int;
 
-namespace EvalScore {
-	// declaration des methodes pour le score habitat
-	class ScoreHabitat {
-		// l'ensemble de tous les joueurs < chaque joueur < taille max de chaque habitat
-		std::vector<std::array<int, 5>> tailleMaxTous;
-		// l'ensemble de tous les joueurs < chaque joueur < son classement pour chaque habitat
-		std::vector<std::array<int, 5>> bonusTous;
-	public:
-		void caclulScoreHabitat(Partie& partie);
-		void updateTailleMaxTous(int indice, std::array<std::vector<std::vector<Position>>, 5> carteIndexee);
-		void updateBonusTous(int nbJoueurs);
-		void updateScore(int indice, EnvJoueur& joueur);
-		void parcourHabitat(Position position, Habitat currentHabitat, const std::unordered_map<Position, Tuile>& carte, 
-			std::vector<Position> positionDirectionVisitees, std::unordered_map<Position, 
-			std::array<bool, 6>> carteAParcourir, std::vector<Position> zone);
+namespace Score {
 
-		// prendre la liste des joueurs et attribut respectivement leur score habitat
-		std::array<std::vector<std::vector<Position>>, 5> repartitionZone(const EnvJoueur& joueur);
-		std::unordered_map<Position, std::array<bool, 6>> parcourirCarte(const std::unordered_map<Position, Tuile>& carte);
-		std::vector<int> indiceMemeHabitat(Habitat habitat, const std::array<Habitat, 6> ensemble, std::array<bool, 6> dejaVisite);
+	// Stockage des resultats : informations de score pour un EnvJoueur (correspond a "une colonne" dans la feuille de score)
+	struct ScoreJoueur {
+		std::unordered_map<Faune, USI> pointsFaunes; // exemple: "ours" correspond a 11 points gagnes
+		std::unordered_map<Habitat, USI> pointsHabitats; // exemple : "marais" correspond a 7 points gagnes
+		std::unordered_map<Habitat, USI> pointsHabitatsBonus; // exemple : "marais" correspond a 2 points de bonus
+		USI nbJetonsNature = 0; 
+		USI totalFaunes = 0, totalHabitats = 0, totalFinal = 0;
 
-		int retournerMax(std::array<std::vector<std::vector<Position>>, 5> carteIndexee, int indice);
-
-		int getFirstFalseIndex(const std::array<bool, 6>& directions);
-
-		void setTailleMaxTous(int taille) {
-			if (taille < 1 || taille > 4) {
-				throw std::out_of_range("La taille doit etre entre 1 et 4.");
+		ScoreJoueur() {
+			for (Faune f : { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti }) {
+				pointsFaunes[f] = 0;
 			}
-			tailleMaxTous.resize(taille);
+
+			for (Habitat h : {Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie}) {
+				pointsHabitats[h] = 0;
+				pointsHabitatsBonus[h] = 0;
+			}
+		}
+	};
+
+	void calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, std::string lettre);
+	void calculFauneVariante(const EnvJoueur& player, ScoreJoueur& sj, std::string variante);
+
+
+	// Design Pattern Strategy pour permettre de choisir le mode de calul des Marquages de Faunes selon les variantes
+	class CalculScoreFaune {
+	public:
+		virtual ~CalculScoreFaune() = default;
+		virtual void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const = 0;
+	};
+
+	// Calcul des points selon les cartes de marquage A, B, C, D...
+	class CalculScoreFauneStandard : public CalculScoreFaune {
+		std::string lettre;
+	public:
+		CalculScoreFauneStandard(std::string l) : lettre(l) {}
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override {
+			calculFauneLettre(player, sj, lettre);
+		}
+	};
+
+	class CalculScoreFauneVariante : public CalculScoreFaune {
+		std::string variante;
+	public:
+		CalculScoreFauneVariante(std::string v) : variante(v) {}
+		void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj) const override {
+			calculFauneVariante(player, sj, variante);
+		}
+	};
+
+
+	// Simule la feuille de score relle : confronte les scores des EnvJoueur entre eux, puis calcul des bonus
+	class ScoreFeuille {
+		std::unordered_map<std::string, ScoreJoueur> scores; // exemple: le joueur "toto" correspond a une structure ScoreJoueur
+		std::unique_ptr<CalculScoreFaune> strategieFaune;
+
+		void calculTotalFaunes(ScoreJoueur& sj) {
+			sj.totalFaunes = 0;
+			for (const auto& [faune, points] : sj.pointsFaunes)
+				sj.totalFaunes += points;
+		}
+		void calculTotalHabitats(ScoreJoueur& sj) {
+			sj.totalHabitats = 0;
+			for (const auto& [habitat, points] : sj.pointsHabitats)
+				sj.totalHabitats += points;
+			for (const auto& [habitat, bonus] : sj.pointsHabitatsBonus)
+				sj.totalHabitats += bonus;
+		}
+		void calculTotalFinal(ScoreJoueur& sj) {
+			sj.totalFinal = sj.totalFaunes + sj.totalHabitats + sj.nbJetonsNature;
+			//for (const auto& [habitat, bonus] : sj.pointsHabitatsBonus)
+			//	sj.totalFinal += bonus;
 		}
 
-		void setBonusTous(int taille) {
-			if (taille < 1 || taille > 4) {
-				throw std::out_of_range("La taille doit etre entre 1 et 4.");
-			}
-			bonusTous.resize(taille, std::array<int, 5>{});
+	public:
+		ScoreFeuille() :scores{}, strategieFaune(nullptr) {} // la feuille sera completee au fur et a mesure
+
+		void setStrategieFaune(std::unique_ptr<CalculScoreFaune> strat) {
+			strategieFaune = std::move(strat);
 		}
 
-		std::vector<std::array<int, 5>> getTailleMaxTous() { return tailleMaxTous; }
-		std::vector<std::array<int, 5>> getBonusTous() { return bonusTous; }
-	};
-
-	void calculScoreFaune(Partie& partie);
+		const ScoreJoueur& getScore(const std::string& nom) const { return scores.at(nom); }
+		const std::unordered_map<std::string, ScoreJoueur>& getScores() const { return scores; }
 
 
+		// utiliser patron Strategy pour calculer les points de Faune selon les variantes
+		//void calculPointsFaunes(const EnvJoueur& player, ScoreJoueur& sj, Marquage m = Marquage::A);
 
-	/// Classe abstraite avec methode virtuelle pure methode calcul
-	class CarteMarquage {
-		Faune faune;
-	public:
-		CarteMarquage(Faune f) : faune(f) {}
-		virtual int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const = 0;
-		Faune getFaune() const { return faune; }
-		virtual ~CarteMarquage() = default; //a redefinir dans classes filles
-	};
+		void calculPointsHabitats(const EnvJoueur& player, ScoreJoueur& sj);
+		void calculerBonusHabitats(const std::vector<EnvJoueur>& players);
 
-	class CarteSaumon : public CarteMarquage {
-	public:
-		CarteSaumon() : CarteMarquage(Faune::saumon) {}
-		int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-		int explorerChaineSaumonA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& positionsVisitees, const Position* pere) const; //fct recursive qui sera appel e dans methodeCalculA, retourn la taille d'une chaine
-	};
 
-	class CarteOurs : public CarteMarquage {
-	public:
-		CarteOurs() : CarteMarquage(Faune::ours) {}
-		int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	};
+		void calculScoresPartie(const Partie&);
 
-	class CarteBuse : public CarteMarquage {
-	public:
-		CarteBuse() : CarteMarquage(Faune::buse) {}
-		int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-
-	};
-
-	class CarteRenard : public CarteMarquage {
-	public:
-		CarteRenard() : CarteMarquage(Faune::renard) {}
-		int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-	};
-
-	class CarteWapiti : public CarteMarquage {
-	public:
-		CarteWapiti() : CarteMarquage(Faune::wapiti) {}
-		int methodeCalculA(const std::unordered_map<Position, Tuile>& carte) const override;
-		int explorerChaineWapitiA(const std::unordered_map<Position, Tuile>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, std::optional<Direction> direction) const;
+		std::vector<std::string> getGagnants() const;
 	};
 }
+
+void testScore();

@@ -27,9 +27,6 @@
     <ClCompile Include="src\jeton_faune.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\partie.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,6 +40,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gestion_pieces.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console\affichage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console\gestion_partie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console\main_console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console\saisie.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\main_qt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\score.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\carte_marquage_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -75,6 +93,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="console\affichage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="console\gestion_partie.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="console\saisie.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\score.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

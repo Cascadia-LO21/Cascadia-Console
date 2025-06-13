@@ -125,10 +125,10 @@ bool EnvJoueur::undoDernierPlacement() {
 	return true; //annulation réussie
 }
 
-//void EnvJoueur::placerTuileDefinitive() {
-//	placerTuile(coord, tuile);
-//	confirmerPlacement(coord);
-//}
+void EnvJoueur::placerTuileDefinitive(const Position& coord, Tuile& tuile) {
+	placerTuile(coord, tuile);
+	confirmerPlacement();
+}
 
 //retourne -1 si le jeton ne peut être placé nulpart, 0 si le jeton ne peut etre placé à cette position, 1 si le jeton est placé avec succès
 int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) {
@@ -153,9 +153,8 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 	}
 
 	//étape 2: est-ce qu'il y a une tuile confirmée libre à cette coordonnée?
-	if (!aTuileConfirmee(coord)) {
-		return 0; //jeton ne peut pas etre placé
-	}
+	//if (!aTuileConfirmee(coord)) { return 0; }  // un jeton peut etre place sur une tuile qui vient d etre ajoute au plateau
+
 	Tuile* tuilePtr = getTuileNonConst(coord);
 	if (!tuilePtr) {
 		throw std::logic_error("Aucune tuile à cette position");
@@ -165,8 +164,9 @@ int EnvJoueur::placerJetonFaune(const Position& coord, const JetonFaune& jeton) 
 	}
 
 	//étape 3: si la tuile à cette coordonnée a parmis son vecteur faunes le type du jeton passé en paramètre
-	if (!std::any_of(tuilePtr->getFaunes().begin(), tuilePtr->getFaunes().end(), 
-			[&](const JetonFaune& j) { return j.getType() == jeton.getType(); })) {
+	bool typePresent = std::any_of(tuilePtr->getFaunes().begin(), tuilePtr->getFaunes().end(),
+		[&](const JetonFaune& j) { return j.getType() == jeton.getType(); });
+	if (!typePresent) {
 		return 0; //jeton ne peut pas etre placé
 	}
 

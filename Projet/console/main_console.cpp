@@ -17,14 +17,24 @@
 #include "saisie.h"
 #include "affichage.h"
 #include "gestion_partie.h"
+//#include "carte_marquage.h" // test only
 
 int main() {
+
+	//testCartes(); // test only, A COMMENTER
+
+	//testScore();
+	//std::cout << "FIN TEST.";
+
+	//unsigned int r = saisirNombre(5);
+
+	// =======================================================================
 
 	// 1. Creation de la partie
 	Partie p;
 	afficherMessageBienvenu();
-	//choisirVariante(p); // a decommenter !
-	//choisirMarquage(p); // a decommenter !
+	choisirVariante(p); // a decommenter !
+	choisirMarquage(p); // a decommenter !
 
 	// 2. Saisie des joueurs
 	saisirJoueurs(p);
@@ -41,10 +51,14 @@ int main() {
 		//affichePioche(p); 
 		jouerTour(p);
 		gestionPause(p);
+		if (abandonner(p)) return 0;
 	}
 
 	// 5. Calcul des scores
-
+	Score::ScoreFeuille scoreFeuille{};
+	scoreFeuille.calculScoresPartie(p);
+	afficheScoreFeuille(scoreFeuille);
+	afficheGagnants(scoreFeuille);
 
 	afficherMessageFin();
 
