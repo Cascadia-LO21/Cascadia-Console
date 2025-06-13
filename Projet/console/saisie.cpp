@@ -9,26 +9,22 @@
 // Verifie si le nombre saisi par le user est correct en terme de bornes et de caractere numerique
 unsigned int saisirNombre(unsigned int max) {
     unsigned int tmp;
-
     while (true) {
         std::cout << "\n>>> Entre un nombre (entre 1 et " << max << ") : ";
         if (std::cin >> tmp) {
-            //tmp--; // car du cote users, les indices commencent a 1
-
-            if (tmp >= 1 || tmp <= max) {
+            if (tmp >= 1 && tmp <= max) {
                 break; // saisie valide
             }
-
+            else {
+                std::cout << ">>>> Erreur : le nombre doit être entre 1 et " << max << ".\n";
+            }
         }
-
-        if (!std::cin >> tmp || tmp<1 || tmp >max) {
-            std::cout << "\n>>>> Erreur : veuillez saisir un nombre entier." << std::endl;
-            std::cin.clear(); // réinitialise l’état de cin
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // vide le buffer
+        else {
+            std::cout << ">>>> Erreur : veuillez saisir un nombre entier.\n";
+            std::cin.clear(); 
         }
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // vide le buffer
     }
-
-    //std::cout << "Le choix choisi est : tmp = " << tmp << "\n";
     return tmp;
 }
 
