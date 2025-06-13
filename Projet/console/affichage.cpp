@@ -300,7 +300,7 @@ void afficheScoreFeuille(const Score::ScoreFeuille& s) {
 	// En-tete
 	std::cout << std::setw(col) << " ";
 	for (const auto& pseudo : pseudos) {
-		std::cout << std::setw(col) << "[" << pseudo << "]";
+		std::cout << std::setw(col) << pseudo;
 	}
 	std::cout << "\n";
 
@@ -314,7 +314,7 @@ void afficheScoreFeuille(const Score::ScoreFeuille& s) {
 	}
 
 	// Total Faunes
-	std::cout << std::setw(col) << "Total Faune:";
+	std::cout << std::setw(col) << "Total Faune";
 	for (const auto& pseudo : pseudos) {
 		std::cout << std::setw(col) << scores.at(pseudo).totalFaunes;
 	}
@@ -332,7 +332,7 @@ void afficheScoreFeuille(const Score::ScoreFeuille& s) {
 	}
 
 	// Total Habitats
-	std::cout << std::setw(col) << "Total Habitats:";
+	std::cout << std::setw(col) << "Total Habitats";
 	for (const auto& pseudo : pseudos) {
 		std::cout << std::setw(col) << scores.at(pseudo).totalHabitats;
 	}

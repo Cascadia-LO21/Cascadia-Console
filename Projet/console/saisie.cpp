@@ -163,10 +163,15 @@ void saisirJoueurs(Partie& p) {
 }
 
 Direction saisirDirection(const std::vector<Direction>& dirValides) {
-    std::cout << "\n>> Les cotés libres autour de la tuile sont :\n>> ";
+    //afficheEnvJoueurCourant(p);
+    std::cout << "\n>> Les cotés libres autour de la tuile sont :\n\n>> ";
     for (auto d : dirValides) {
         std::cout << directionToString(d) << "(" << directionToStringSigle(d) << "), ";
     }
+    std::cout << "\n \n\
+                    NO ╱  ╲ NE \n\
+                    O |    | E \n\
+                    SO ╲  ╱ SE\n";
     std::cout << std::endl;
 
     while (true) {

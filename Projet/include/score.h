@@ -20,6 +20,17 @@ namespace Score {
 		std::unordered_map<Habitat, USI> pointsHabitatsBonus; // exemple : "marais" correspond a 2 points de bonus
 		USI nbJetonsNature = 0; 
 		USI totalFaunes = 0, totalHabitats = 0, totalFinal = 0;
+
+		ScoreJoueur() {
+			for (Faune f : { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti }) {
+				pointsFaunes[f] = 0;
+			}
+
+			for (Habitat h : {Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie}) {
+				pointsHabitats[h] = 0;
+				pointsHabitatsBonus[h] = 0;
+			}
+		}
 	};
 
 	void calculFauneLettre(const EnvJoueur& player, ScoreJoueur& sj, std::string lettre);
@@ -67,11 +78,13 @@ namespace Score {
 			sj.totalHabitats = 0;
 			for (const auto& [habitat, points] : sj.pointsHabitats)
 				sj.totalHabitats += points;
+			for (const auto& [habitat, bonus] : sj.pointsHabitatsBonus)
+				sj.totalHabitats += bonus;
 		}
 		void calculTotalFinal(ScoreJoueur& sj) {
 			sj.totalFinal = sj.totalFaunes + sj.totalHabitats + sj.nbJetonsNature;
-			for (const auto& [habitat, bonus] : sj.pointsHabitatsBonus)
-				sj.totalFinal += bonus;
+			//for (const auto& [habitat, bonus] : sj.pointsHabitatsBonus)
+			//	sj.totalFinal += bonus;
 		}
 
 	public:

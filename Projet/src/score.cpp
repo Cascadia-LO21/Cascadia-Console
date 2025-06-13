@@ -83,7 +83,7 @@ void Score::ScoreFeuille::calculerBonusHabitats(const std::vector<EnvJoueur>& pl
 	std::vector<Habitat> habitats = { Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie };
 	USI nbJoueurs = static_cast<USI>(scores.size());
 
-	if (nbJoueurs) { // si jeu solitaire
+	if (nbJoueurs == 1) { // si jeu solitaire
 		auto& scoreJoueur = scores[players[0].getPseudo()];
 		for (const auto& [hab, taille] : scoreJoueur.pointsHabitats) {
 			if (taille >= 7)
@@ -183,14 +183,14 @@ void Score::ScoreFeuille::calculScoresPartie(const Partie& p) {
 		calculPointsHabitats(player, sj);
 		
 		calculTotalFaunes(sj);
-		calculTotalHabitats(sj);
+		//calculTotalHabitats(sj);
 		sj.nbJetonsNature = player.getNbJetonsNature();
 		scores[player.getPseudo()] = sj;
 	}
 
 	calculerBonusHabitats(players);
+	for(const auto& player:players) calculTotalHabitats(scores[player.getPseudo()]);
 	
-	// NEED TO TEST : this was lacking in the previous version
 	for (const auto& player : players) {
 		calculTotalFinal(scores[player.getPseudo()]);
 	}
