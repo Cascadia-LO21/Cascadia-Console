@@ -191,14 +191,24 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
 
 
 void gestionPause(Partie& p) {
-    std::cout << "> Souhaitez-vous faire une pause ? (o/n)" << std::endl;
+    std::cout << "> Souhaitez-vous faire une pause ? (o/n) : ";
     if (saisirReponse()) p.pauser();
     while (p.getPause() == true) {
         std::cout << ">> Reposez-vous..." << std::endl;
-        std::cout << ">> Souhaitez-vous reprendre la partie ? (o/n)" << std::endl;
+        std::cout << ">> Souhaitez-vous reprendre la partie ? (o/n) : ";
         if (saisirReponse()) p.reprendre();
     }
 
+}
+
+bool abandonner(Partie& p) {
+    std::cout << "> Souhaitez-vous abandonner la partie? (o/n) : ";
+    if (saisirReponse()) {
+        "\n> Abandon de la partie...";
+        afficherMessageFin();
+        return true;
+    }
+    return false;
 }
 
 void choisirVariante(Partie& p) {

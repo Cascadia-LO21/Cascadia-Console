@@ -51,6 +51,7 @@ int main() {
 		//affichePioche(p); 
 		jouerTour(p);
 		gestionPause(p);
+		if (abandonner(p)) return 0;
 	}
 
 	// 5. Calcul des scores

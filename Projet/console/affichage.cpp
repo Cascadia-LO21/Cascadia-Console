@@ -421,7 +421,7 @@ void afficherMenuJetonNature() {
 }
 
 void afficherMessageFin() {
-	std::cout << "[FIN DU JEU CASCADIA]\n" << std::endl;
+	std::cout << "\n[FIN DU JEU CASCADIA]\n" << std::endl;
 }
 
 

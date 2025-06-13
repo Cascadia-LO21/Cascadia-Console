@@ -16,6 +16,7 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player,
 	unsigned int rep, bool jetonNatureUsed);
 
 void gestionPause(Partie& p);
+bool abandonner(Partie& p);
 
 void choisirVariante(Partie& p);
 void choisirMarquage(Partie& p);
