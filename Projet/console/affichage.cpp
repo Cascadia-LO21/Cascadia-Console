@@ -1,6 +1,63 @@
 #include <ostream>
 #include <iomanip>
+#include <unordered_map>
+#include "env_joueur.h"
 #include <affichage.h>
+
+// affichage dans le format ligne par ligne :
+//            (0,-1, 1)
+//    (-1, 0, 1) (0, 0, 0) (1, 0, -1)
+//        (-1, 1, 0) (0, 1, -1)
+//             (-1, 2, -1)
+void affichePlateau(const std::unordered_map<Position, Tuile>& plateau) {
+	if (plateau.empty()) {
+		std::cout << "Plateau vide.\n";
+		return;
+	}
+
+	std::cout << "\n┌──────────────────────────────────────────────────────────────────────────────────────────┐\n\n";
+
+	// determiner les bornes q/r
+	int minQ = 0, maxQ = 0, minR = 0, maxR = 0;
+	bool premier = true;
+	for (const auto& [pos, tuile] : plateau) {
+		int q = pos.getQ();
+		int r = pos.getR();
+		if (premier) {
+			minQ = maxQ = q;
+			minR = maxR = r;
+			premier = false;
+		}
+		else {
+			minQ = std::min(minQ, q);
+			maxQ = std::max(maxQ, q);
+			minR = std::min(minR, r);
+			maxR = std::max(maxR, r);
+		}
+	}
+
+	// affichage ligne par ligne, par r croissant : un r regit une ligne
+	for (int r = minR; r <= maxR; ++r) {
+		int decalage = (r - minR); // decalage pour l'effet hexagonal (pointy top)
+		std::cout << std::string(decalage * 6, ' '); // 6 espaces par decalage
+
+		for (int q = minQ; q <= maxQ; ++q) {
+			int s = -q - r;
+			Position pos(q, r, s);
+			auto it = plateau.find(pos);
+			if (it != plateau.end()) {
+				std::cout << "(" << q << "," << std::setw(2) << r << "," << std::setw(2) << s << ") ";
+			}
+			else {
+				std::cout << "           "; // espace pour une tuile absente
+			}
+		}
+		std::cout << "\n";
+	}
+	
+	std::cout << "\n└──────────────────────────────────────────────────────────────────────────────────────────┘\n";
+	std::cout << "\n";
+}
 
 std::ostream& operator<<(std::ostream& os, const JetonFaune& j) {
 	os << fauneToString(j.getType());
@@ -201,6 +258,8 @@ std::ostream& operator<<(std::ostream& os, const EnvJoueur& env) {
 		std::cout << "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 		return os;
 	}
+	else
+		affichePlateau(tuiles);
 
 	for (const auto& [pos, tuile] : tuiles) os << tuile;
 
@@ -223,6 +282,9 @@ void afficheEnvJoueurCourant(const Partie& p) {
 
 // affichage proche de vrai feuille de score dans le jeu physique
 void afficheScoreFeuille(const Score::ScoreFeuille& s) {
+	std::cout << "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+	std::cout << "> Fin de la partie ! Voici les SCORES : \n";
+
 	std::vector<Faune> faunes = { Faune::buse, Faune::ours, Faune::renard, Faune::saumon, Faune::wapiti };
 	std::vector<Habitat> habitats = { Habitat::fleuve, Habitat::foret, Habitat::marais, Habitat::montagne, Habitat::prairie };
 
@@ -311,6 +373,7 @@ void afficheMenuRotation() {
 	std::cout << "\n\t1. Sens Horaire.";
 	std::cout << "\n\t2. Sens Anti Horaire.";
 }
+
 
 void afficherMessageBienvenu() {
 	std::cout << "[JEU CASCADIA]\n";
