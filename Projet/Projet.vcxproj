@@ -134,6 +134,7 @@
     <ClCompile Include="console\main_console.cpp" />
     <ClCompile Include="console\saisie.cpp" />
     <ClCompile Include="gui\main_qt.cpp" />
+    <ClCompile Include="include\serializers.cpp" />
     <ClCompile Include="src\carte_marquage.cpp" />
     <ClCompile Include="src\carte_marquage_test.cpp" />
     <ClCompile Include="src\enums.cpp" />

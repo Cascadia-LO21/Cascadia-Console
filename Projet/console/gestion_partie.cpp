@@ -201,11 +201,21 @@ void gestionPause(Partie& p) {
 
 }
 
-bool abandonner(Partie& p) {
+bool abandonner(const Partie& p) {
     std::cout << "> Souhaitez-vous abandonner la partie? (o/n) : ";
     if (saisirReponse()) {
         "\n> Abandon de la partie...";
         afficherMessageFin();
+        return true;
+    }
+    return false;
+}
+
+bool sauvegarder(const Partie& p, const std::string& f) {
+    std::cout << "> Souhaitez-vous sauvegarder la partie? (o/n) : ";
+    if (saisirReponse()) {
+        "\n> Sauvegarde de la partie...";
+        sauvegarderPartie(p,f);
         return true;
     }
     return false;
@@ -266,5 +276,66 @@ void choisirMarquage(Partie& p) {
             p.setMarquage(Marquage::A);
             break;
         }
+    }
+}
+
+
+void sauvegarderPartie(const Partie& partie, const std::string& fichier) {
+    nlohmann::json j = partie;
+    std::ofstream ofs(fichier);
+    if (!ofs) throw std::runtime_error("Impossible d'ouvrir le fichier de sauvegarde !");
+    ofs << j.dump(4); // 4 = indentation 
+}
+
+
+bool chargerPartie(Partie& partie, const std::string& fichier) {
+    std::ifstream ifs(fichier);
+    if (!ifs) return false; // pas de sauvegarde existant
+    nlohmann::json j;
+    ifs >> j;
+    partie = j.get<Partie>();
+    return true; 
+}
+
+void supprimerSauvegarde(const std::string& fichier) {
+    std::remove(fichier.c_str());
+}
+
+bool proposerReprisePartie(Partie& p, const std::string& fichier) {
+    std::ifstream test(fichier);
+    if (test.good()) {
+        std::cout << "\n> Une partie sauvegardee existe. Voulez-vous :\n";
+        std::cout << "\n\t1. Reprendre la partie.\n\t2. Faire une nouvelles partie.";
+        unsigned int rep = saisirNombre(2);
+        if (rep == 1) {
+            if (chargerPartie(p, fichier)) {
+                std::cout << "\n> Partie chargee avec succes !\n";
+                return true;
+            }
+            else {
+                std::cout << "\n> Erreur lors du chargement ! Creons une nouvelle partie.\n";
+            }
+        }
+    }
+    return false; // Pas de sauvegarde ou choix nouvelle partie
+}
+
+bool parametrage(Partie& p, const std::string& f) {
+    std::cout << "\n> Avant de passer au prochain tour, voulez-vous : ";
+    std::cout << "\n\t1. Continuer. \n\t2. Pauser. \n\t3. Abandonner. \n\t4. Sauvegarder et quitter.";
+    unsigned int rep = saisirNombre(4);
+    if (rep == 1)
+        return true;
+    else if (rep == 2) {
+        gestionPause(p);
+        return true;
+    }
+    else if (rep == 3) {
+        abandonner(p);
+        return false;
+    }
+    else if (rep == 4) {
+        sauvegarder(p,f);
+        return false;
     }
 }

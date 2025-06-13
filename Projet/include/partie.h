@@ -11,8 +11,7 @@
 #include "gestion_pieces.h"
 #include <fstream>
 #include "json.hpp"
-//using json = nlohmann::json;
-#include "serializers.h"
+//#include "serializers.h"
 
 class Partie {
 private:

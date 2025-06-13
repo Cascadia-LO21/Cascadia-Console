@@ -9,7 +9,8 @@
 #include "position.h"
 #include "enums.h"
 #include "json.hpp"
-#include "serializers.h"
+//#include "serializers.h"
+
 
 class Tuile {
 	std::array<Habitat, 6> habitats;

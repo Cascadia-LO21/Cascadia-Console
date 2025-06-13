@@ -4,40 +4,24 @@
 /// Puis, ajoutez : $(projet/include)include; $(projet/console)console
 
 #include <iostream>
-//#include "enums.h"
-//#include "position.h"
-//#include "tuile.h"
-//#include "jeton_faune.h"
-//#include "pioche.h"
-//#include "env_joueur.h"
-//#include "partie.h"
-//#include "carte_marquage.h"
-//#include "gestion_pieces.h"
-//#include "score.h"
 #include "saisie.h"
 #include "affichage.h"
 #include "gestion_partie.h"
-//#include "carte_marquage.h" // test only
 
 int main() {
 
-	//testCartes(); // test only, A COMMENTER
-
-	//testScore();
-	//std::cout << "FIN TEST.";
-
-	//unsigned int r = saisirNombre(5);
-
-	// =======================================================================
-
 	// 1. Creation de la partie
 	Partie p;
-	afficherMessageBienvenu();
-	choisirVariante(p); // a decommenter !
-	choisirMarquage(p); // a decommenter !
-
-	// 2. Saisie des joueurs
-	saisirJoueurs(p);
+	// 2. Reprise de partie si possible
+	if (!proposerReprisePartie(p)) {
+		// Creation de la partie (si pas de sauvegarde a reprendre)
+		afficherMessageBienvenu(); 
+		choisirVariante(p); 
+		choisirMarquage(p); 
+		saisirJoueurs(p); 
+		p.preparer(); 
+		afficherMessagePret(); 
+	}
 
 	// 3. Preparer le partie avant de demarrer (verifs + distribuer tuiles de depart)
 	p.preparer();
@@ -47,11 +31,11 @@ int main() {
 	while (!p.verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
 		afficherTour(p);
 		gererJetonsIdentiques(p);
-		//afficheEnvJoueurCourant(p);
-		//affichePioche(p); 
 		jouerTour(p);
-		gestionPause(p);
-		if (abandonner(p)) return 0;
+
+		//gestionPause(p);
+		//if (abandonner(p)) return 0;
+		if (!parametrage(p)) return 0; // on termine l'execution si abandon ou sauvegarde
 	}
 
 	// 5. Calcul des scores
