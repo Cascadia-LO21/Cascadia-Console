@@ -53,10 +53,12 @@ public:
 class CarteSaumonD : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
-    int explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+    std::pair<int, int> explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+        const std::unordered_map<Position, Tuile>& tuiles,
         const Position& position,
-        std::unordered_set<Position>& visited,
+        std::unordered_set<Position>& PositionsVisitees,
         const Position* parent) const;
+
 };
 
 // Ours
@@ -211,3 +213,5 @@ public:
         else throw std::invalid_argument("Type de carte inconnu : " + nom);
     }
 };
+
+void testCartes();

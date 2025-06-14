@@ -23,7 +23,7 @@ int main() {
 
 	testCartes(); // test only, A COMMENTER
 
-
+	/*
 	// 1. Creation de la partie
 	Partie p;
 	afficherMessageBienvenu();
@@ -51,6 +51,7 @@ int main() {
 
 
 	afficherMessageFin();
+	*/
 
 	return 0;
 }

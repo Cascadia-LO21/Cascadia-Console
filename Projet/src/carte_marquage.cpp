@@ -106,8 +106,6 @@ int CarteSaumonB::CalculScore(const EnvJoueur& envJ) const
 	return scoreTotal;
 }
 
-
-
 int CarteSaumonB::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, const Position* parent) const
 {
 	if (carte.count(Faune::saumon) == 0) return 0;
@@ -200,7 +198,67 @@ int CarteSaumonC::explorerChaine(const std::unordered_map<Faune, std::unordered_
 
 int CarteSaumonD::CalculScore(const EnvJoueur& envJ) const
 {
-	return 0;
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	const auto& tuiles = envJ.getTuiles();
+
+	if (mapPositionsJetons.count(Faune::saumon) == 0) return 0;
+
+	const auto& positionsSaumon = mapPositionsJetons.at(Faune::saumon);
+	std::unordered_set<Position> PositionsVisitees;
+	int scoreTotal = 0;
+
+	for (const Position& position : positionsSaumon) {
+		if (PositionsVisitees.count(position)) continue;
+
+		// récupérer pour chaque position la taille de sa chaîne + le nombre de faunes adjacentes
+		auto [tailleChaine, faunesAdjacentes] = explorerChaine(mapPositionsJetons, tuiles, position, PositionsVisitees, nullptr);
+		if (tailleChaine > 0) {
+			scoreTotal += tailleChaine + faunesAdjacentes;
+		}
+	}
+
+	return scoreTotal;
+}
+
+std::pair<int, int> CarteSaumonD::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+	const std::unordered_map<Position, Tuile>& tuiles,
+	const Position& position,
+	std::unordered_set<Position>& PositionsVisitees,
+	const Position* parent) const
+{
+	if (carte.count(Faune::saumon) == 0) return { 0, 0 };
+
+	const auto& positionsSaumon = carte.at(Faune::saumon);
+
+	PositionsVisitees.insert(position);
+	int nbSaumonsAdj = 0;
+	int taille = 1;
+	int faunesAdjacentes = 0;
+
+	for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
+		// chercher les faunes adjacentes
+		if (!positionsSaumon.count(posVoisine)) {
+			auto itTuile = tuiles.find(posVoisine);
+			if (itTuile != tuiles.end() && itTuile->second.JetonFaunePresent()) {
+				faunesAdjacentes++;
+			}
+		}
+		// continuer à parcourir la chaîne
+		if (parent && posVoisine == *parent) continue;
+		if (!positionsSaumon.count(posVoisine)) continue;
+
+		nbSaumonsAdj++;
+		if (nbSaumonsAdj > 2) return { 0, 0 }; // chaîne invalide
+
+		if (!PositionsVisitees.count(posVoisine)) {
+			auto [tailleSuite, faunesSuite] = explorerChaine(carte, tuiles, posVoisine, PositionsVisitees, &position);
+			if (tailleSuite == 0) return { 0, 0 }; // chaîne invalide
+			taille += tailleSuite;
+			faunesAdjacentes += faunesSuite;
+		}
+	}
+
+	return { taille, faunesAdjacentes };
 }
 
 // Ours A
@@ -319,7 +377,7 @@ int CarteOursC::CalculScore(const EnvJoueur& envJ) const
 	for (const Position& pos : positionsOurs) {
 		if (dejaVisite.count(pos)) continue;
 
-		// Parcours BFS pour trouver la composante connexe
+		// Parcours en largeur
 		std::queue<Position> file;
 		std::vector<Position> groupe;
 		file.push(pos);
@@ -338,7 +396,7 @@ int CarteOursC::CalculScore(const EnvJoueur& envJ) const
 			}
 		}
 
-		// Taille du groupe trouvé
+		// Taille du groupe
 		size_t taille = groupe.size();
 		if (taille == 1) nbF1++;
 		else if (taille == 2) nbF2++;
@@ -355,7 +413,45 @@ int CarteOursC::CalculScore(const EnvJoueur& envJ) const
 
 int CarteOursD::CalculScore(const EnvJoueur& envJ) const
 {
-	return 0;
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	if (mapPositionsJetons.count(Faune::ours) == 0) return 0;
+
+	const auto& positionsOurs = mapPositionsJetons.at(Faune::ours);
+	std::unordered_set<Position> dejaVisite;
+	int nbF1 = 0, nbF2 = 0, nbF3 = 0;
+
+	for (const Position& pos : positionsOurs) {
+		if (dejaVisite.count(pos)) continue;
+
+		// Parcours en largeur
+		std::queue<Position> file;
+		std::vector<Position> groupe;
+		file.push(pos);
+		dejaVisite.insert(pos);
+
+		while (!file.empty()) {
+			Position current = file.front();
+			file.pop();
+			groupe.push_back(current);
+
+			for (const Position& voisine : current.getVecteurPositionsAdjacentes()) {
+				if (positionsOurs.count(voisine) && !dejaVisite.count(voisine)) {
+					file.push(voisine);
+					dejaVisite.insert(voisine);
+				}
+			}
+		}
+
+		// Taille du groupe
+		size_t taille = groupe.size();
+		if (taille == 2) nbF1++;
+		else if (taille == 3) nbF2++;
+		else if (taille == 4) nbF3++;
+		// Si plus de 4 ou 1 on ignore
+	}
+
+	int scoreTotal = nbF1 * 5 + nbF2 * 8 + nbF3 * 13;
+	return scoreTotal;
 }
 
 // Buse A
