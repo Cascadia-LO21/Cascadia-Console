@@ -220,11 +220,7 @@ int CarteSaumonD::CalculScore(const EnvJoueur& envJ) const
 	return scoreTotal;
 }
 
-std::pair<int, int> CarteSaumonD::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
-	const std::unordered_map<Position, Tuile>& tuiles,
-	const Position& position,
-	std::unordered_set<Position>& PositionsVisitees,
-	const Position* parent) const
+std::pair<int, int> CarteSaumonD::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,const std::unordered_map<Position, Tuile>& tuiles,const Position& position,std::unordered_set<Position>& PositionsVisitees,const Position* parent) const
 {
 	if (carte.count(Faune::saumon) == 0) return { 0, 0 };
 
@@ -882,56 +878,6 @@ int CarteWapitiB::CalculScore(const EnvJoueur& envJ) const
 		}
 	}
 
-		/*
-		else if (wapitisAdj.size() == 2) {
-
-			if (!wapitisAdj[0].estAdjacente(wapitisAdj[1])) continue;
-
-			int q = position.getQ();
-			int r = position.getR();
-			int s = position.getS();
-
-			// on recupere les 2 positions directement au-dessus et en dessous
-			Position posPossible1 = Position(q + 1, r - 2, s + 1);
-			Position posPossible2 = Position(q - 1, r + 2, s - 1);
-
-			// on s'assure qu'elles sont wapiti et que l'adjacence est correcte pour la forme 4 
-			bool possibilite1 = positionsWapiti.count(posPossible1) && wapitisAdj[0].estAdjacente(posPossible1) && wapitisAdj[1].estAdjacente(posPossible1);
-			bool possibilite2 = positionsWapiti.count(posPossible2) && wapitisAdj[0].estAdjacente(posPossible2) && wapitisAdj[1].estAdjacente(posPossible2);
-
-			if (possibilite1) {
-				//wapitisVisites.insert(posPossible1);
-				nbF4++;
-			}
-			else if (possibilite2) {
-				//wapitisVisites.insert(posPossible2);
-				nbF4++;
-			}
-
-			// la forme 4 n'est pas validée, donc il s'agit d'un triangle de wapitis
-			else {
-				nbF3++;
-			}
-			continue;
-		}
-		else if (wapitisAdj.size() == 3) {
-			
-			//on récupère les 3 possibilités d'adjacence d'après les indices des positions dans le vecteur
-			bool possibilite1 = (wapitisAdj[0].estAdjacente(wapitisAdj[1]) && wapitisAdj[1].estAdjacente(wapitisAdj[2]));
-			bool possibilite2 = (wapitisAdj[0].estAdjacente(wapitisAdj[2]) && wapitisAdj[1].estAdjacente(wapitisAdj[2]));
-			bool possibilite3 = (wapitisAdj[0].estAdjacente(wapitisAdj[1]) && wapitisAdj[0].estAdjacente(wapitisAdj[2]));
-			if (possibilite1 || possibilite2 || possibilite3) nbF4++;
-		}
-		
-	}
-	*/
-	/*
-	std::cout << "\n nbf1 :" << nbF1;
-	std::cout << "\n nbf2 :" << nbF2;
-	std::cout << "\n nbf3 :" << nbF3;
-	std::cout << "\n nbf4 :" << nbF4;
-	std::cout <<"\n total :"<< nbF1 * 2 + nbF2 * 5 + nbF3 * 9 + nbF4 * 13<<"\n";
-	*/
 	return (scoreTotal = nbF1 * 2 + nbF2 * 5 + nbF3 * 9 + nbF4 * 13);
 }
 
