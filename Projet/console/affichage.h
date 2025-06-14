@@ -33,7 +33,7 @@ void affichePlateau(const std::unordered_map<Position, Tuile>& plateau);
 void afficherMessageBienvenu();
 void afficherMarquage();
 void afficherVariante();
-void afficherMessagePret();
+void afficherMessagePret(const Partie& p);
 void afficherTour(Partie& p);
 void afficherMenuJetonNature();
 void afficherMessageFin();

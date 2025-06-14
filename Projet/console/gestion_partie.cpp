@@ -258,7 +258,7 @@ void choisirMarquage(Partie& p) {
             break;
         case 6: // marquage aleatoire parmi A, B, C, D
         {
-            int randomValue = 1 + rand() % 4; // génère 1, 2, 3 ou 4
+            int randomValue = 1 + rand() % 3; // génère 1, 2, 3 parce que les cartes D ne sont pas fonctionnels encore
             p.setMarquage(static_cast<Marquage>(randomValue - 1)); // A=0, B=1, etc.
         }
         break;

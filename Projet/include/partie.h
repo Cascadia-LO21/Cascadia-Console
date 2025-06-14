@@ -13,7 +13,7 @@
 class Partie {
 private:
     static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
-    //static constexpr unsigned int MAX_NB_TOURS = 2; // testing purpose only
+    //static constexpr unsigned int MAX_NB_TOURS = 1; // testing purpose only
     static constexpr unsigned int MAX_NB_JOUEURS = 4;
     unsigned int nbJoueurs;
     unsigned int compteurTour;

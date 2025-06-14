@@ -355,9 +355,11 @@ void afficherVariante() {
 
 }
 
-void afficherMessagePret() {
-	std::cout << "\n> Tout est pret : joueurs, pioche, tuiles de depart distribuees.\n";
-	std::cout << "> La partie peut commencer !\n" << std::endl;
+void afficherMessagePret(const Partie& p) {
+	std::cout << "\n╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n";
+	std::cout << "\n> Tout est pret : joueurs, pioche, tuiles de depart distribuees.";
+	std::cout << "\n> Variante : " << varianteToString(p.getVariante()) << " & " << "Marquage : " << marquageToString(p.getMarquage());
+	std::cout << "\n> La partie peut commencer !\n" << std::endl;
 }
 
 void affichePioche(const Partie& p) {

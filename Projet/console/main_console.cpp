@@ -21,7 +21,7 @@ int main() {
 
 	// 3. Preparer le partie avant de demarrer (verifs + distribuer tuiles de depart)
 	p.preparer();
-	afficherMessagePret();
+	afficherMessagePret(p);
 
 	// 4. Boucle principale du jeu
 	while (!p.verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
