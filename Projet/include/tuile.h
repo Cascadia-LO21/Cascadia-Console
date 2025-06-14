@@ -88,6 +88,14 @@ public:
 			position = std::make_unique<Position>(pos.getQ(), pos.getR(), pos.getS());
 	}
 
+	void setHabitat(size_t idx, Habitat h) {
+		if (idx < habitats.size()) habitats[idx] = h;
+	}
+	void setFaunes(const std::vector<Faune>& v) { faunes = v; }
+	void setDonneJetonNature(bool v) { donneJetonNature = v; }
+	void setFaunePlace(const std::optional<Faune>& f) { faunePlace = f; }
+
+
 	void setPositionNull() { position = nullptr; }
 
 	void placerJetonFaune(Faune faune);

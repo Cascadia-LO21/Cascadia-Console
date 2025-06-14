@@ -30,6 +30,7 @@ class EnvJoueur {
 	bool placementEnAttente = false; //est ce qu'il y a un placement en attente de confirmation?
 
 public:
+	EnvJoueur() = default;
 
 	//constructeur principal
 	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0)
@@ -96,10 +97,17 @@ public:
 	void setPseudo(const std::string& pseudo) {
 		this->pseudo = pseudo;
 	};
+
+	void setTuiles(const std::unordered_map<Position, Tuile>& t) { tuiles = t; }
+	void setMapPositionsJetons(const std::unordered_map<Faune, std::unordered_set<Position>>& m) { mapPositionsJetons = m; }
+	void setNbJetonNature(unsigned int n) { nbJetonNature = n; }
+	void setDernierePosition(const std::optional<Position>& pos) { dernierePosition = pos; }
+	void setDerniereTuile(const std::optional<Tuile>& t) { derniereTuile = t; }
+	void setPlacementEnAttente(bool b) { placementEnAttente = b; }
+
 	unsigned int getNbJetonsNature() const { return nbJetonNature; };
 	std::optional<Position> getDernierePosition() const { return dernierePosition; };
-	std::optional<Tuile> getDerniereTuile() const { return derniereTuile; };
-
+	std::optional<Tuile> getDerniereTuile() const { return derniereTuile; }
 	const std::unordered_map<Position, Tuile>& getTuiles() const { return tuiles; }
 	const std::unordered_map<Faune, std::unordered_set<Position>>& getMapPositionsJetons() const { return mapPositionsJetons; }
 	bool getPlacementEnAttente() const { return placementEnAttente; }

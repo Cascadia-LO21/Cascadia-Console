@@ -107,7 +107,9 @@ public:
 		return piocheVisible.at(index).first;
 	}
 
-
+	// Setters pour la restauration
+	std::array<std::pair<Tuile, JetonFaune>, MAX>& getPiocheVisibleForWrite() { return piocheVisible; }
+	std::array<std::pair<bool, bool>, MAX>& getVisibiliteForWrite() { return visibilite; }
 
 	/// AUTRES METHODES ///
 

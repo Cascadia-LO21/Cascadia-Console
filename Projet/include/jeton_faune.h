@@ -10,5 +10,7 @@ public:
 	Faune getType() const { return type; };
 	// constructeur par defaut pour Pioche
 	JetonFaune() : type(Faune::rien) {}
+	void setType(Faune t) { type = t; }
+
 };
 

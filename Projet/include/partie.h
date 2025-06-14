@@ -48,6 +48,12 @@ public:
     void setMarquage(Marquage m = Marquage::A) { marquage = m; }
     void setVariante(Variante v = Variante::standard) { variante = v; }
 
+    void setNbJoueurs(unsigned int n) { nbJoueurs = n; }
+    void setCompteurTour(unsigned int c) { compteurTour = c; }
+    void setJoueurs(const std::vector<EnvJoueur>& v) { joueurs = v; }
+    void setJoueurCourant(unsigned int idx) { joueurCourant = idx; }
+    void setPause(bool p) { pause = p; }
+    void setPioche(std::unique_ptr<Pioche> p) { pioche = std::move(p); }
   
     unsigned int getNbJoueurs() const { return nbJoueurs; }
     unsigned int getCompteurTour() const { return compteurTour; }

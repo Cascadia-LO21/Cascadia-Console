@@ -31,6 +31,9 @@ public:
 	int getQ() const { return q; }
 	int getR() const { return r; }
 	int getS() const { return s; }
+	void setQ(int val) { q = val; }
+	void setR(int val) { r = val; }
+	void setS(int val) { s = val; }
 
 	std::vector<Position> getVecteurPositionsAdjacentes() const;
 
