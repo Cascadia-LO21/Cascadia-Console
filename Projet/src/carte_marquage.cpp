@@ -106,8 +106,6 @@ int CarteSaumonB::CalculScore(const EnvJoueur& envJ) const
 	return scoreTotal;
 }
 
-
-
 int CarteSaumonB::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte, const Position& position, std::unordered_set<Position>& PositionsVisitees, const Position* parent) const
 {
 	if (carte.count(Faune::saumon) == 0) return 0;
@@ -200,7 +198,63 @@ int CarteSaumonC::explorerChaine(const std::unordered_map<Faune, std::unordered_
 
 int CarteSaumonD::CalculScore(const EnvJoueur& envJ) const
 {
-	return 0;
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	const auto& tuiles = envJ.getTuiles();
+
+	if (mapPositionsJetons.count(Faune::saumon) == 0) return 0;
+
+	const auto& positionsSaumon = mapPositionsJetons.at(Faune::saumon);
+	std::unordered_set<Position> PositionsVisitees;
+	int scoreTotal = 0;
+
+	for (const Position& position : positionsSaumon) {
+		if (PositionsVisitees.count(position)) continue;
+
+		// récupérer pour chaque position la taille de sa chaîne + le nombre de faunes adjacentes
+		auto [tailleChaine, faunesAdjacentes] = explorerChaine(mapPositionsJetons, tuiles, position, PositionsVisitees, nullptr);
+		if (tailleChaine > 0) {
+			scoreTotal += tailleChaine + faunesAdjacentes;
+		}
+	}
+
+	return scoreTotal;
+}
+
+std::pair<int, int> CarteSaumonD::explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,const std::unordered_map<Position, Tuile>& tuiles,const Position& position,std::unordered_set<Position>& PositionsVisitees,const Position* parent) const
+{
+	if (carte.count(Faune::saumon) == 0) return { 0, 0 };
+
+	const auto& positionsSaumon = carte.at(Faune::saumon);
+
+	PositionsVisitees.insert(position);
+	int nbSaumonsAdj = 0;
+	int taille = 1;
+	int faunesAdjacentes = 0;
+
+	for (const Position& posVoisine : position.getVecteurPositionsAdjacentes()) {
+		// chercher les faunes adjacentes
+		if (!positionsSaumon.count(posVoisine)) {
+			auto itTuile = tuiles.find(posVoisine);
+			if (itTuile != tuiles.end() && itTuile->second.JetonFaunePresent()) {
+				faunesAdjacentes++;
+			}
+		}
+		// continuer à parcourir la chaîne
+		if (parent && posVoisine == *parent) continue;
+		if (!positionsSaumon.count(posVoisine)) continue;
+
+		nbSaumonsAdj++;
+		if (nbSaumonsAdj > 2) return { 0, 0 }; // chaîne invalide
+
+		if (!PositionsVisitees.count(posVoisine)) {
+			auto [tailleSuite, faunesSuite] = explorerChaine(carte, tuiles, posVoisine, PositionsVisitees, &position);
+			if (tailleSuite == 0) return { 0, 0 }; // chaîne invalide
+			taille += tailleSuite;
+			faunesAdjacentes += faunesSuite;
+		}
+	}
+
+	return { taille, faunesAdjacentes };
 }
 
 // Ours A
@@ -319,7 +373,7 @@ int CarteOursC::CalculScore(const EnvJoueur& envJ) const
 	for (const Position& pos : positionsOurs) {
 		if (dejaVisite.count(pos)) continue;
 
-		// Parcours BFS pour trouver la composante connexe
+		// Parcours en largeur
 		std::queue<Position> file;
 		std::vector<Position> groupe;
 		file.push(pos);
@@ -338,7 +392,7 @@ int CarteOursC::CalculScore(const EnvJoueur& envJ) const
 			}
 		}
 
-		// Taille du groupe trouvé
+		// Taille du groupe
 		size_t taille = groupe.size();
 		if (taille == 1) nbF1++;
 		else if (taille == 2) nbF2++;
@@ -355,7 +409,45 @@ int CarteOursC::CalculScore(const EnvJoueur& envJ) const
 
 int CarteOursD::CalculScore(const EnvJoueur& envJ) const
 {
-	return 0;
+	const auto& mapPositionsJetons = envJ.getMapPositionsJetons();
+	if (mapPositionsJetons.count(Faune::ours) == 0) return 0;
+
+	const auto& positionsOurs = mapPositionsJetons.at(Faune::ours);
+	std::unordered_set<Position> dejaVisite;
+	int nbF1 = 0, nbF2 = 0, nbF3 = 0;
+
+	for (const Position& pos : positionsOurs) {
+		if (dejaVisite.count(pos)) continue;
+
+		// Parcours en largeur
+		std::queue<Position> file;
+		std::vector<Position> groupe;
+		file.push(pos);
+		dejaVisite.insert(pos);
+
+		while (!file.empty()) {
+			Position current = file.front();
+			file.pop();
+			groupe.push_back(current);
+
+			for (const Position& voisine : current.getVecteurPositionsAdjacentes()) {
+				if (positionsOurs.count(voisine) && !dejaVisite.count(voisine)) {
+					file.push(voisine);
+					dejaVisite.insert(voisine);
+				}
+			}
+		}
+
+		// Taille du groupe
+		size_t taille = groupe.size();
+		if (taille == 2) nbF1++;
+		else if (taille == 3) nbF2++;
+		else if (taille == 4) nbF3++;
+		// Si plus de 4 ou 1 on ignore
+	}
+
+	int scoreTotal = nbF1 * 5 + nbF2 * 8 + nbF3 * 13;
+	return scoreTotal;
 }
 
 // Buse A
@@ -786,56 +878,6 @@ int CarteWapitiB::CalculScore(const EnvJoueur& envJ) const
 		}
 	}
 
-		/*
-		else if (wapitisAdj.size() == 2) {
-
-			if (!wapitisAdj[0].estAdjacente(wapitisAdj[1])) continue;
-
-			int q = position.getQ();
-			int r = position.getR();
-			int s = position.getS();
-
-			// on recupere les 2 positions directement au-dessus et en dessous
-			Position posPossible1 = Position(q + 1, r - 2, s + 1);
-			Position posPossible2 = Position(q - 1, r + 2, s - 1);
-
-			// on s'assure qu'elles sont wapiti et que l'adjacence est correcte pour la forme 4 
-			bool possibilite1 = positionsWapiti.count(posPossible1) && wapitisAdj[0].estAdjacente(posPossible1) && wapitisAdj[1].estAdjacente(posPossible1);
-			bool possibilite2 = positionsWapiti.count(posPossible2) && wapitisAdj[0].estAdjacente(posPossible2) && wapitisAdj[1].estAdjacente(posPossible2);
-
-			if (possibilite1) {
-				//wapitisVisites.insert(posPossible1);
-				nbF4++;
-			}
-			else if (possibilite2) {
-				//wapitisVisites.insert(posPossible2);
-				nbF4++;
-			}
-
-			// la forme 4 n'est pas validée, donc il s'agit d'un triangle de wapitis
-			else {
-				nbF3++;
-			}
-			continue;
-		}
-		else if (wapitisAdj.size() == 3) {
-			
-			//on récupère les 3 possibilités d'adjacence d'après les indices des positions dans le vecteur
-			bool possibilite1 = (wapitisAdj[0].estAdjacente(wapitisAdj[1]) && wapitisAdj[1].estAdjacente(wapitisAdj[2]));
-			bool possibilite2 = (wapitisAdj[0].estAdjacente(wapitisAdj[2]) && wapitisAdj[1].estAdjacente(wapitisAdj[2]));
-			bool possibilite3 = (wapitisAdj[0].estAdjacente(wapitisAdj[1]) && wapitisAdj[0].estAdjacente(wapitisAdj[2]));
-			if (possibilite1 || possibilite2 || possibilite3) nbF4++;
-		}
-		
-	}
-	*/
-	/*
-	std::cout << "\n nbf1 :" << nbF1;
-	std::cout << "\n nbf2 :" << nbF2;
-	std::cout << "\n nbf3 :" << nbF3;
-	std::cout << "\n nbf4 :" << nbF4;
-	std::cout <<"\n total :"<< nbF1 * 2 + nbF2 * 5 + nbF3 * 9 + nbF4 * 13<<"\n";
-	*/
 	return (scoreTotal = nbF1 * 2 + nbF2 * 5 + nbF3 * 9 + nbF4 * 13);
 }
 

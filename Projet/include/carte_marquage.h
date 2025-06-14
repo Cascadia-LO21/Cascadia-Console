@@ -20,7 +20,7 @@ public:
 
 // --- Déclaration des classes filles ---
 
-// Saumon A, B, C
+// Saumon
 class CarteSaumonA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -53,13 +53,15 @@ public:
 class CarteSaumonD : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
-    int explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+    std::pair<int, int> explorerChaine(const std::unordered_map<Faune, std::unordered_set<Position>>& carte,
+        const std::unordered_map<Position, Tuile>& tuiles,
         const Position& position,
-        std::unordered_set<Position>& visited,
+        std::unordered_set<Position>& PositionsVisitees,
         const Position* parent) const;
+
 };
 
-// Ours A, B, C
+// Ours
 class CarteOursA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -80,7 +82,7 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-// Buse A, B, C
+// Buse
 class CarteBuseA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -101,7 +103,7 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-// Renard A, B, C
+// Renard
 class CarteRenardA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -122,7 +124,7 @@ public:
     int CalculScore(const EnvJoueur& envJ) const override;
 };
 
-// Wapiti A, B, C, D
+// Wapiti
 class CarteWapitiA : public CarteMarquageStandard {
 public:
     int CalculScore(const EnvJoueur& envJ) const override;
@@ -216,6 +218,5 @@ public:
         throw std::invalid_argument("Type de carte inconnu : " + nom);
     }
 };
-
 
 void testCartes();

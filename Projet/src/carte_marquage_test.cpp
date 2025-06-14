@@ -124,10 +124,10 @@ void testCartes() {
     //Mario.placerTuileDefinitive(Position(2, -2, 0), t20);
     //Mario.placerJetonFaune(Position(2, -2, 0), jetonWapiti);
 
-    Mario.placerTuileDefinitive(Position(3, -1, -2), t21);
+    //Mario.placerTuileDefinitive(Position(3, -1, -2), t21);
     //Mario.placerJetonFaune(Position(3, -1, -2), jetonWapiti);
 
-    Mario.placerTuileDefinitive(Position(3, 0, -3), t20);
+    //Mario.placerTuileDefinitive(Position(3, 0, -3), t20);
     //Mario.placerJetonFaune(Position(3, 0, -3), jetonBuse);
 
     std::cout << "Avant calcul score\n";
@@ -176,15 +176,40 @@ void testCartes() {
     std::cout << "Score wapitis :" << wapitiC.CalculScore(Mario) << "\n";
     std::cout << "Score ours :" << oursC.CalculScore(Mario) << "\n";
 
-    std::cout << "\nVariante famille \n";
-    auto varF = CarteMarquageVarianteFactory::creerCarte("famille");
-    const auto& scoreFam = varF->CalculScore(Mario);
-    for (const auto& [key, value] : scoreFam) {
-        std::cout << key << ": " << value << std::endl;
-    }
+    //std::cout << "\nVariante famille \n";
+    //auto varF = CarteMarquageVarianteFactory::creerCarte("famille");
+    //const auto& scoreFam = varF->CalculScore(Mario);
+    //for (const auto& [key, value] : scoreFam) {
+    //    std::cout << key << ": " << value << std::endl;
+    //}
 
     //std::cout << "\nVariante intermediaire \n";
     //VarianteIntermediaire varI;
+    std::cout << "\nScores des cartes D\n";
+
+    CarteSaumonD saumonD;
+    CarteBuseD buseD;
+    CarteRenardD renardD;
+    CarteWapitiD wapitiD;
+    CarteOursD oursD;
+
+    std::cout << "Score saumons :" << saumonD.CalculScore(Mario) << "\n";
+    std::cout << "Score buses :" << buseD.CalculScore(Mario) << "\n";
+    std::cout << "Score renards :" << renardD.CalculScore(Mario) << "\n";
+    std::cout << "Score wapitis :" << wapitiD.CalculScore(Mario) << "\n";
+    std::cout << "Score ours :" << oursD.CalculScore(Mario) << "\n";
+
+
+    std::cout << "\nVariante familiale \n";
+
+    VarianteFamiliale varF;
+
+    //std::cout << "Score familiale :" << varF.CalculScore(Mario) << "\n";
+
+    std::cout << "\nVariante intermediaire \n";
+
+    VarianteIntermediaire varI;
+
     //std::cout << "Score intermediaire :" << varI.CalculScore(Mario) << "\n";
 
     std::cout << "Fin testCartes()\n";
