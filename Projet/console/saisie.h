@@ -18,6 +18,6 @@ Position saisirCoordonnees(const EnvJoueur& j);
 
 void saisirJoueurs(Partie& p);
 
-Direction saisirDirection(const std::vector<Direction>& dirValides, const Partie& p);
+Direction saisirDirection(const std::vector<Direction>& dirValides, const Partie& p, const Position& pos);
 
 std::string toLowerNoSpace(const std::string& s);

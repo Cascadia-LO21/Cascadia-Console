@@ -94,6 +94,7 @@ bool placerTuileEtJeton(Partie& p, EnvJoueur& player, unsigned int rep, bool jet
 
     // Gestion de la rotation des tuiles
     while (true) {
+        afficheEnvJoueurCourant(p);
         std::cout << "\n>> Veux tu pivoter la tuile ? (o/n) : ";
         if (!saisirReponse()) break;
         afficheMenuRotation(); // 1. sens horaire, 2. sens anti horaire

@@ -62,7 +62,7 @@ const Position saisirPositionTuile(const Partie& p) {
 
     // 3. On lui affiche les directions disponibles autour de la Tuile qu'il a choisit
     std::vector<Direction> dirLibres = player.getDirLibresAutourTuile(tuile);
-    dir = saisirDirection(dirLibres, p);
+    dir = saisirDirection(dirLibres, p, pos);
 
     return tuile.getPosition().getPositionAdjacente(dir);
 }
@@ -156,9 +156,9 @@ void saisirJoueurs(Partie& p) {
     } while (p.getNbJoueurs() < p.getMaxNbJoueurs());
 }
 
-Direction saisirDirection(const std::vector<Direction>& dirValides, const Partie& p) {
+Direction saisirDirection(const std::vector<Direction>& dirValides, const Partie& p, const Position& pos) {
     afficheEnvJoueurCourant(p);
-    std::cout << "\n>> Les cotés libres autour de la tuile sont :\n\n>> ";
+    std::cout << "\n>> Les cotés libres autour de la tuile " << pos << " sont : \n>> ";
     for (auto d : dirValides) {
         std::cout << directionToString(d) << "(" << directionToStringSigle(d) << "), ";
     }

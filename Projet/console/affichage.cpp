@@ -382,7 +382,6 @@ void afficherMenuJetonNature() {
                       \n\t1. Choisir de ne pas utiliser. \
                       \n\t2. Choisir une paire (Tuile,Jeton) libre. \
                       \n\t3. Remplacer les Jetons que tu n'aimes pas.\n";
-	std::cout << ">> Saisis ton choix (1-3) : ";
 }
 
 void afficherMessageFin() {

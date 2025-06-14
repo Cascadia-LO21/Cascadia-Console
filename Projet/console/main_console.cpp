@@ -31,6 +31,7 @@ int main() {
 		gestionPause(p);
 		if (abandonner(p)) return 0;
 	}
+	afficheEnvJoueurCourant(p); // pour mieux comparer les scores a la fin	
 
 	// 5. Calcul des scores
 	Score::ScoreFeuille scoreFeuille{};
