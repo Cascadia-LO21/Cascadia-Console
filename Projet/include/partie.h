@@ -12,8 +12,8 @@
 
 class Partie {
 private:
-    //static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
-    static constexpr unsigned int MAX_NB_TOURS = 2; // testing purpose only
+    static constexpr unsigned int MAX_NB_TOURS = 20; // valeur par défaut officielle
+    //static constexpr unsigned int MAX_NB_TOURS = 2; // testing purpose only
     static constexpr unsigned int MAX_NB_JOUEURS = 4;
     unsigned int nbJoueurs;
     unsigned int compteurTour;
@@ -73,9 +73,6 @@ public:
     void reprendre() { if (pause) pause = false; }
     void reset(); 
 
-
-    //void jouerTourIndividuel();
-    //void jouerTourCollectif(); // un tour fait jouer tous les joueurs
     bool verifierFinPartie() const; // d'apres les regles du jeu, c'est quand la pile des tuiles est vide
 
     void revenir(unsigned int indexTuile, unsigned int indexJeton);

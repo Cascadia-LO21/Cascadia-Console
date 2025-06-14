@@ -49,11 +49,7 @@ const Position saisirPositionTuile(const Partie& p) {
     bool posValide = false;
     Tuile tuile;
     Direction dir;
-    //std::string tmp;
-    //int q, r, s;
     Position pos;
-
-    //std::cout << player; // affiche le plateau du joueur
 
     // 1. On affiche toutes les positions des tuiles qui ont des places libres valides autour
     // 2. On lui demande de choisir la Tuile (la Position plus precisement) a cote de laquelle placer sa nouvelle Tuile
@@ -66,7 +62,7 @@ const Position saisirPositionTuile(const Partie& p) {
 
     // 3. On lui affiche les directions disponibles autour de la Tuile qu'il a choisit
     std::vector<Direction> dirLibres = player.getDirLibresAutourTuile(tuile);
-    dir = saisirDirection(dirLibres);
+    dir = saisirDirection(dirLibres, p);
 
     return tuile.getPosition().getPositionAdjacente(dir);
 }
@@ -75,8 +71,6 @@ const Position saisirPositionTuile(const Partie& p) {
 const std::optional<Position> saisirPositionJeton(const Partie& p, Faune f) {
     const EnvJoueur& player = p.getEnvJoueurCourant();
     bool posValide = false;
-    //Position pos;
-    //int q, r, s;
 
     std::cout << player;
 
@@ -162,7 +156,7 @@ void saisirJoueurs(Partie& p) {
     } while (p.getNbJoueurs() < p.getMaxNbJoueurs());
 }
 
-Direction saisirDirection(const std::vector<Direction>& dirValides) {
+Direction saisirDirection(const std::vector<Direction>& dirValides, const Partie& p) {
     //afficheEnvJoueurCourant(p);
     std::cout << "\n>> Les cotés libres autour de la tuile sont :\n\n>> ";
     for (auto d : dirValides) {

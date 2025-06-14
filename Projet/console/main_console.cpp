@@ -4,37 +4,17 @@
 /// Puis, ajoutez : $(projet/include)include; $(projet/console)console
 
 #include <iostream>
-//#include "enums.h"
-//#include "position.h"
-//#include "tuile.h"
-//#include "jeton_faune.h"
-//#include "pioche.h"
-//#include "env_joueur.h"
-//#include "partie.h"
-//#include "carte_marquage.h"
-//#include "gestion_pieces.h"
-//#include "score.h"
 #include "saisie.h"
 #include "affichage.h"
 #include "gestion_partie.h"
-//#include "carte_marquage.h" // test only
 
 int main() {
-
-	//testCartes(); // test only, A COMMENTER
-
-	//testScore();
-	//std::cout << "FIN TEST.";
-
-	//unsigned int r = saisirNombre(5);
-
-	// =======================================================================
 
 	// 1. Creation de la partie
 	Partie p;
 	afficherMessageBienvenu();
-	choisirVariante(p); // a decommenter !
-	choisirMarquage(p); // a decommenter !
+	choisirVariante(p); 
+	choisirMarquage(p); 
 
 	// 2. Saisie des joueurs
 	saisirJoueurs(p);
@@ -47,8 +27,6 @@ int main() {
 	while (!p.verifierFinPartie()) { // tant qu'il reste des tours à jouer avant d'atteindre NB_MAX_TOURS
 		afficherTour(p);
 		gererJetonsIdentiques(p);
-		//afficheEnvJoueurCourant(p);
-		//affichePioche(p); 
 		jouerTour(p);
 		gestionPause(p);
 		if (abandonner(p)) return 0;

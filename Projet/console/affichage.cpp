@@ -77,43 +77,6 @@ std::ostream& operator<<(std::ostream& flux, const std::vector<Position>& vect) 
 }
 
 
-//std::ostream& operator<<(std::ostream& flux, const Tuile& tuile) {
-//	const auto& habitats = tuile.getHabitats();
-//	const auto& faunes = tuile.getFaunes();
-//
-//	flux << "TUILE : \n";
-//
-//	//PB: LES TUILES DE DEPART N ONT PAS DE pos MAIS placementConfirme...
-//	//std::cout << "AVANT AFFICHER LA TUILE, eske POS TUILE existe :" << tuile.positionDefinie();
-//	//std::cout << tuile.getPosition(); //PLANTE
-//
-//	flux << "\n";
-//	if (tuile.positionDefinie())
-//		flux << "\t- Position : " << tuile.getPosition() << "\n";
-//
-//	flux << "\t- Habitats : ";
-//	for (Habitat h : habitats) {
-//		flux << habitatToString(h) << ", ";
-//	}
-//	flux << "\n";
-//
-//	if (tuile.JetonFaunePresent()) {
-//		flux << "\t- Faune placée : " << fauneToString(tuile.getFaunePlace()) << ".\n";
-//	}
-//	else {
-//		flux << "\t- Faunes possibles : ";
-//		for (Faune f : faunes) {
-//			flux << fauneToString(f) << ", ";
-//		}
-//		flux << "\n";
-//
-//		if (tuile.getDonneJetonNature())
-//			flux << "\t- Donne Jeton Nature.\n";
-//	}
-//
-//	return flux;
-//}
-
 // Si tuile libre dans pioche
 //[REPERE]
 // ┃ Faunes : buse, renard

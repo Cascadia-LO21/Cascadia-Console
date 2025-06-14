@@ -320,13 +320,13 @@ void testHexagonalDisplay() {
 
 	// Test 1: Empty environment
 	std::cout << "Test 1: Environnement vide\n";
-	EnvJoueur joueur1("Alice", 5, 0);
+	EnvJoueur joueur1("Alice", 5);
 	std::cout << joueur1 << "\n";
 	std::cout << std::string(50, '-') << "\n\n";
 
 	// Test 2: Environment with sample tiles
 	std::cout << "Test 2: Environnement avec tuiles d'exemple\n";
-	EnvJoueur joueur2("Bob", 3, 25);
+	EnvJoueur joueur2("Bob", 3);
 
 	// Create sample tiles (you can uncomment and modify these)
 
@@ -397,7 +397,7 @@ void testHexagonalDisplay() {
 void testDivers(){
 	// Test 2: Environment with sample tiles
 	std::cout << "Test 2: Environnement avec tuiles d'exemple\n";
-	EnvJoueur joueur2("Bob", 3, 25);
+	EnvJoueur joueur2("Bob", 3);
 
 	// Example tile 1: Forest/Prairie mix with bear and elk
 	std::array<Habitat, 6> habitats1 = {

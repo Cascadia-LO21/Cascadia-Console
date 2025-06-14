@@ -23,7 +23,6 @@ class EnvJoueur {
 	std::unordered_map<Faune, std::unordered_set<Position>> mapPositionsJetons; //map de clé type faune vers un set de positions où le jeton est placé
 
 	unsigned int nbJetonNature;
-	unsigned int scoreFinal;
 
 	// Undo system
 	std::optional<Position> dernierePosition; //la dernière position jouée
@@ -33,8 +32,8 @@ class EnvJoueur {
 public:
 
 	//constructeur principal
-	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0, unsigned int scoreFinal = 0)
-		: pseudo(pseudo), nbJetonNature(nbJetonNature), scoreFinal(scoreFinal) {
+	EnvJoueur(const std::string& pseudo, unsigned int nbJetonNature = 0)
+		: pseudo(pseudo), nbJetonNature(nbJetonNature) {
 
 	};
 
@@ -97,8 +96,6 @@ public:
 	void setPseudo(const std::string& pseudo) {
 		this->pseudo = pseudo;
 	};
-	unsigned int getScore() const { return scoreFinal; };
-	void setScore(unsigned int score) { scoreFinal = score; };
 	unsigned int getNbJetonsNature() const { return nbJetonNature; };
 	std::optional<Position> getDernierePosition() const { return dernierePosition; };
 	std::optional<Tuile> getDerniereTuile() const { return derniereTuile; };
@@ -113,4 +110,4 @@ public:
 //tests
 void testHexagonalDisplay();
 void testDivers();
-void testEnvJoueur();
+//void testEnvJoueur();
